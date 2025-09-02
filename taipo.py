@@ -88,7 +88,7 @@ class DVP():
         self.LSFT = KC.LSFT
         self.M = KC.M
         self.MINS = KC.QUOTE # minus
-        self.MOD_AC = KC.MOD_AC
+        self.MOD_AC = KC.MOD_AC # ARGH this isn't defined yet
         self.MOD_ACS = KC.MOD_ACS
         self.MOD_AS = KC.MOD_AS
         self.MOD_CS = KC.MOD_CS
@@ -221,6 +221,7 @@ class TaipoKey(Key):
         super().__init__()
     
 class Taipo(Module):
+    # sticky_timeout is now configured in the stickykeys module, this is unused
     def __init__(self, tap_timeout=300, sticky_timeout=1000):
         self.tap_timeout = tap_timeout
         self.sticky_timeout=sticky_timeout
@@ -394,17 +395,17 @@ class Taipo(Module):
             e | i | ot: DV.LEFT,
             e | i | it: DV.PGDN,
             e | i | ot | it: DV.LAYER0,
-            r | a | s | o: DV.MOD_GA,
-            r | a | n | t: DV.MOD_GC,
-            r | a | i | e: DV.MOD_GS,
-            s | o | n | t: DV.MOD_AC,
-            s | o | i | e: DV.MOD_AS,
-            n | t | i | e: DV.MOD_CS,
-            r | a | s | o | n | t: DV.MOD_GAC,
-            r | a | s | o | i | e: DV.MOD_GAS,
-            r | a | n | t | i | e: DV.MOD_GCS,
-            s | o | n | t | i | e: DV.MOD_ACS,
-            r | a | s | o | n | t | i | e: DV.MOD_GACS,
+            r | a | s | o: KC.MOD_GA,
+            r | a | n | t: KC.MOD_GC,
+            r | a | i | e: KC.MOD_GS,
+            s | o | n | t: KC.MOD_AC,
+            s | o | i | e: KC.MOD_AS,
+            n | t | i | e: KC.MOD_CS,
+            r | a | s | o | n | t: KC.MOD_GAC,
+            r | a | s | o | i | e: KC.MOD_GAS,
+            r | a | n | t | i | e: KC.MOD_GCS,
+            s | o | n | t | i | e: KC.MOD_ACS,
+            r | a | s | o | n | t | i | e: KC.MOD_GACS,
         }
 
     def during_bootup(self, keyboard):
@@ -463,7 +464,8 @@ class Taipo(Module):
         key = self.state[side].key
         mods = []
 
-        if key.keycode in [ KC.LGUI, KC.LALT, KC.RALT, KC.LCTL, KC.LSFT ]:
+        # Should these be KC?
+        if key.keycode in [ DV.LGUI, DV.LALT, DV.RALT, DV.LCTL, DV.LSFT ]:
             mods = [key.keycode]
         elif key.keycode == KC.MOD_GA:
             mods = [KC.LGUI, KC.LALT]
@@ -496,7 +498,9 @@ class Taipo(Module):
                     keyboard.add_key(mod)
                     self.state[side].key.hold_handled = True
                 else:
-                    keyboard.tap_key(KC.OS(mod, tap_time=self.sticky_timeout))
+                    keyboard.tap_key(KC.SK(mod, defer_release = True))
+                    # defer_release is needed to hold the ctrl until the taipo key code is emitted
+                    # without that it would release the key as soon as a physical key is emitted, which is wrong
         else:
             if key.hold_handled:
                 keyboard.remove_key(key.keycode)
