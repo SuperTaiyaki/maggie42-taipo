@@ -240,11 +240,11 @@ class Taipo(Module):
             s: DV.S,
             s | ot: KC.LSFT(DV.S),
             s | it: DV.RCBR,
-            s | ot | it: DV.BRIGHTNESS_UP, # ewwww
+            # s | ot | it: DV.BRIGHTNESS_UP, # ewwww
             n: DV.N,
             n | ot: KC.LSFT(DV.N),
             n | it: DV.RBRC,
-            n | ot | it: DV.BRIGHTNESS_DOWN,
+            #n | ot | it: DV.BRIGHTNESS_DOWN,
             i: DV.I,
             i | ot: KC.LSFT(DV.I),
             i | it: DV.RPRN,
@@ -256,11 +256,11 @@ class Taipo(Module):
             o: DV.O,
             o | ot: KC.LSFT(DV.O),
             o | it: DV.LCBR,
-            o | ot | it: DV.AUDIO_VOL_UP, # ewww, and I don't want OT+IT combos
+            # o | ot | it: DV.AUDIO_VOL_UP, # ewww, and I don't want OT+IT combos
             t: DV.T,
             t | ot: KC.LSFT(DV.T),
             t | it: DV.LBRC,
-            t | ot | it: DV.AUDIO_VOL_DOWN, # lol these aren't documented either, just the creator's bonuses?
+            # t | ot | it: DV.AUDIO_VOL_DOWN, # lol these aren't documented either, just the creator's bonuses?
             e: DV.E,
             e | ot: KC.LSFT(DV.E),
             e | it: DV.LPRN,
@@ -317,25 +317,23 @@ class Taipo(Module):
             t | r: DV.X,
             t | r | ot: KC.LSFT(DV.X),
             t | r | it: DV.CIRC,
-            t | r | ot | it: DV.LCTL(DV.X),
+            #t | r | ot | it: DV.LCTL(DV.X),
             i | o: DV.K,
             i | o | ot: KC.LSFT(DV.K),
             i | o | it: DV.PLUS,
-            i | o | ot | it: DV.LCTL(DV.C),
+            #i | o | ot | it: DV.LCTL(DV.C),
             e | s: DV.V,
             e | s | ot: KC.LSFT(DV.V),
             e | s | it: DV.ASTR,
-            e | s | ot | it: DV.LCTL(DV.V),
+            #e | s | ot | it: DV.LCTL(DV.V),
             n | a: DV.J,
             n | a | ot: KC.LSFT(DV.J),
             n | a | it: DV.EQL,
-            n | a | ot | it: DV.LCTL(DV.Z),
-            # e | r: DV.M,
+            #n | a | ot | it: DV.LCTL(DV.Z),
             e | r: DV.W, # changed
             e | r | ot: KC.LSFT(DV.M),
             e | r | it: DV.DLR,
             # e | r | ot | it: DV.NO,
-            # i | a: DV.W,
             i | a: DV.M, # changed
             i | a | ot: KC.LSFT(DV.W),
             i | a | it: DV.AMPR,
@@ -357,7 +355,7 @@ class Taipo(Module):
             e | n | it: DV.TILD,
             # e | n | ot | it: DV.NO,
             o | r: DV.SCLN,
-            t | o | a: DV.SCLN,
+            t | o | a: DV.SCLN, # wait 2 semicolons?
             o | r | ot: DV.COLN,
             t | o | a | ot: DV.COLN,
             # o | r | it: DV.NO,
