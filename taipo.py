@@ -21,6 +21,7 @@ debug = Debug(__name__)
 
 # no enum class in circuitpython! oh well
 # Reverse mapping to get correct taipo keystrokes to come out in dvorak
+
 class DVP():
     def __init__(self):
         self.A = KC.A
@@ -406,7 +407,14 @@ class Taipo(Module):
             r | a | n | t | i | e: KC.MOD_GCS,
             s | o | n | t | i | e: KC.MOD_ACS,
             r | a | s | o | n | t | i | e: KC.MOD_GACS,
+            e | t | a | o: DV.SPC, # Borrowed from Artsey, just to let my space finger float
+            s | r | n | i: DV.BSPC, # Borrowed from Artsey, just to let my space finger float
         }
+
+    # Changes from stock:
+    # * swap m/w
+    # - move DOT to unshifted (probably swap with semicolon)
+    # adding Ardux space/backspace 4-fingers
 
     def during_bootup(self, keyboard):
         pass
@@ -443,6 +451,19 @@ class Taipo(Module):
                 self.state[side].combo |= 1 << (key.meta.taipo_code % 10) # mod 10? ahhhh since the first digit is the side, this pushes to l/r...
                 self.state[side].timer = ticks_ms() + self.tap_timeout
             else:
+                # huh, this is interesting. The key is triggered on the first _release_
+                # Something I would like here: If the modifiers are still held, allow the next combo to reuse them
+                # but... 
+                # this also has the weird property that released keys don't affect the next combo, they have to be re-pressed
+                # that's also kind of useful, makes it feel more responsive
+
+                # One possible way to handle this: IT/OT are read realtime rather than being part of the combo
+                # so on keydown, add it to the combo regardless of other stuff... does this break anything?
+                # AND THEN on keyup, don't trigger the handle_key if it's a modifier
+                # BUT that causes a problem because modifiers with a single tap do other things
+                # if combo is only the modifier then handle_key first?
+                # is handle_key first valid regardless? Need to state diagram this, maybe
+
                 if not self.state[side].key.hold:
                     # Key was not pressed long enough to trigger 'hold'
                     self.state[side].key.keycode = self.determine_key(self.state[side].combo)
