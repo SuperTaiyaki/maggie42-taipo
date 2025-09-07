@@ -1,3 +1,5 @@
+# The license on this repository is GPL2 becasue of taipo.py . This file is BSD.
+
 import board
 
 from kmk.kmk_keyboard import KMKKeyboard
@@ -30,21 +32,15 @@ keyboard.modules.append(StickyKeys())
 keyboard.modules.append(layers)
 keyboard.modules.append(Taipo())
 
+# The RP2040s have a neopixel-ish thing, light it up
 rgb = RGB(pixel_pin = board.NEOPIXEL, num_pixels = 1, hue_default = 176, sat_default = 30, val_default = 128, val_limit = 128,)
 keyboard.extensions.append(rgb)
-
-#keyboard.keymap = [
-#    [KC.Q,KC.W,KC.E,KC.R,KC.T,KC.Y,
-#    KC.A, KC.S, KC.D, KC.F, KC.G, KC.H,
-#     KC.Z, KC.X, KC.C, KC.V, KC.B, KC.N,
-#     KC.NO, KC.NO, KC.NO, KC.N1, KC.N2, KC.N3
-#     ]
-#]
 
 LAYER_NORMAL = 2
 LAYER_BROWSER = 3
 LAYER_RAISED = 4
 
+# dummy keys for combos
 make_key(
     names=('TRIGGERL',),
     on_press=lambda *args: print('TRIGGERL'),
@@ -54,6 +50,7 @@ make_key(
     on_press=lambda *args: print('TRIGGERR'),
 )
 
+# Flip the LED depending on the layout. This only affects the USB-connected half.
 class RGBKey1(Key):
     def __init__(self, mode):
         # TODO: be less lazy and don't use 1/not-1
@@ -124,9 +121,12 @@ keyboard.keymap = [
         ],
     # Raised layer
     [
-        KC.NO, KC.LSFT(KC.N1), KC.LSFT(KC.N2), KC.LSFT(KC.N3), KC.LSFT(KC.N4), KC.LSFT(KC.N5),          KC.LSFT(KC.N6), KC.LSFT(KC.N7), KC.LSFT(KC.N8), KC.LSFT(KC.N9), KC.LSFT(KC.N0), KC.NO, 
+        KC.NO, KC.LSFT(KC.N1), KC.LSFT(KC.N2), KC.LSFT(KC.N3), KC.LSFT(KC.N4), KC.LSFT(KC.N5),  KC.LSFT(KC.N6), KC.LSFT(KC.N7), KC.LSFT(KC.N8), KC.LSFT(KC.N9), KC.LSFT(KC.N0), KC.RBRACKET, 
         KC.TRNS, KC.N1, KC.N2, KC.N3, KC.N4, KC.N5,          KC.N6, KC.N7, KC.N8, KC.N9, KC.N0, KC.BSLASH, 
-        KC.TRNS, KC.NO, KC.NO, KC.LSHIFT(KC.MINUS), KC.MINUS, KC.NO,      KC.NO, KC.EQUAL, KC.LSHIFT(KC.EQUAL), KC.TP_BRR, KC.TP_BRP, KC.TRNS, 
+        # Grave is on the right because that's the HHKB layout
+        # Pipe should probably be somewhere so it's not hiding under the backspace + shift
+        # Splitting backtick and tilde like this is liable to break my brain
+        KC.TRNS, KC.LSHIFT(KC.GRAVE), KC.NO, KC.LSHIFT(KC.MINUS), KC.MINUS, KC.NO,      KC.NO, KC.EQUAL, KC.LSHIFT(KC.EQUAL), KC.TP_BRR, KC.GRAVE, KC.TRNS, 
         KC.NO, KC.NO, KC.NO, KC.TRIGGERL, KC.NO, KC.NO,       KC.NO, KC.NO, KC.TRIGGERR, KC.NO, KC.NO, KC.NO, 
         ],
     # That TRIGGERL should probably be alt or something
@@ -141,7 +141,6 @@ keyboard.modules.append(combos)
 combos.combos = [
         Chord((KC.TRIGGERL, KC.TRIGGERR), NORMAL_ON),
         Chord((KC.BSPACE, KC.TRIGGERR), NORMAL_OFF),
-
     ]
 
 if __name__ == '__main__':
