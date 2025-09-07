@@ -1,8 +1,4 @@
-# memo: This repository is GPL2
-
-# hrmmmm would need a taipo/posh on/off switch... or maybe just alternate python files for layouts?
-# orrrr something to check on boot, I think that's possible in main.py
-
+# This file is from a GPL2 repository, hence the overall license.
 
 try:
     from typing import Optional, Tuple, Union
@@ -21,7 +17,7 @@ debug = Debug(__name__)
 
 # no enum class in circuitpython! oh well
 # Reverse mapping to get correct taipo keystrokes to come out in dvorak
-
+# This should probably have done another way so it's switchable (i.e. reverse just by dropping KC back in)
 class DVP():
     def __init__(self):
         self.A = KC.A
@@ -42,7 +38,7 @@ class DVP():
         self.D = KC.H
         self.DEL = KC.DEL
         self.DLR = KC.DLR
-        self.DOT = KC.DOT # keypad, not relevant
+        self.DOT = KC.E
         self.DOWN = KC.DOWN
         self.DQT = KC.DQT # doublequote - but it's shifted... TODO
         self.E = KC.D
@@ -190,6 +186,12 @@ taipo_keycodes = {
     'MOD_ACS': 33,
     'MOD_GACS': 34, # etc.
 };
+taipo_mods = {
+        taipo_keycodes['TP_LIT'],
+        taipo_keycodes['TP_LOT'],
+        taipo_keycodes['TP_RIT'],
+        taipo_keycodes['TP_ROT'],
+}
 
 r = 1 << 0 # ahhhh, these are the stock single-finger character codes
 s = 1 << 1 # un-mirroring each hand will be a bit tricky like this... (if I want smarter hjkl layout)
@@ -208,8 +210,11 @@ class KeyPress:
     hold_handled = False
     
 class State:
-    combo = 0
+    combo = 0 # the main 8 keys
     timer = 0
+    mods = 0 # use it / ot
+    combo_executed = False # Whether a key has been output using combo (i.e. non-mod key has been pressed)
+    # the clear_state method should be in here, not in TAipo
     key = KeyPress()
 
 class TaipoMeta:
@@ -227,12 +232,13 @@ class Taipo(Module):
         self.tap_timeout = tap_timeout
         self.sticky_timeout=sticky_timeout
         self.state = [State(), State()]
+        # This should probably happen outside the module instead - this is a bit late
         for key, code in taipo_keycodes.items():
             make_key( names=(key,), constructor=TaipoKey, meta=TaipoMeta(code))
 
         self.keymap = {
             t: DV.T,
-            t | e: DV.H, # bad scalability but decent performance? I guess... well, we have 32 (?) bits
+            t | e: DV.H,
             it: DV.BSPC,
             ot: DV.SPC,
             r: DV.R,
@@ -354,10 +360,11 @@ class Taipo(Module):
             # i | t | ot | it: DV.NO,
             e | n: DV.COMM,
             e | n | ot: DV.DOT,
+            e | o | a: DV.DOT,
             e | n | it: DV.TILD,
             # e | n | ot | it: DV.NO,
             o | r: DV.SCLN,
-            t | o | a: DV.SCLN, # wait 2 semicolons?
+            t | o | a: DV.SCLN, # wait 2 semicolons? I guess for some languages this one isn't bad
             o | r | ot: DV.COLN,
             t | o | a | ot: DV.COLN,
             # o | r | it: DV.NO,
@@ -407,13 +414,13 @@ class Taipo(Module):
             r | a | n | t | i | e: KC.MOD_GCS,
             s | o | n | t | i | e: KC.MOD_ACS,
             r | a | s | o | n | t | i | e: KC.MOD_GACS,
-            e | t | a | o: DV.SPC, # Borrowed from Artsey, just to let my space finger float
-            s | r | n | i: DV.BSPC, # Borrowed from Artsey, just to let my space finger float
+            e | t | a | o: DV.SPC, # Borrowed from Ardux, just to let my space finger float
+            s | r | n | i: DV.BSPC, # Borrowed from Ardux, just to let my space finger float
         }
 
     # Changes from stock:
     # * swap m/w
-    # - move DOT to unshifted (probably swap with semicolon)
+    # * move DOT to unshifted (probably swap with semicolon)
     # adding Ardux space/backspace 4-fingers
 
     def during_bootup(self, keyboard):
@@ -424,7 +431,7 @@ class Taipo(Module):
             # SO: if it's timed out (300ms) send the key
             # BUT that's when hold becomes true, and we need to hit the hold point in order to reach the combo logic
             if self.state[side].timer != 0 and ticks_ms() > self.state[side].timer:
-                self.state[side].key.keycode = self.determine_key(self.state[side].combo)
+                self.state[side].key.keycode = self.determine_key(self.state[side].combo | self.state[side].mods)
                 self.state[side].key.hold = True
                 self.handle_key(keyboard, side)
                 self.state[side].timer = 0
@@ -436,38 +443,37 @@ class Taipo(Module):
         if not isinstance(key, TaipoKey):
             return key
 
+        # with the TaipoKey check above this if is maybe unnecessary
         if hasattr(key.meta, 'taipo_code'):
+            print(self.state[0].mods)
             side = 1 if key.meta.taipo_code / 10 >= 1 else 0 # taipo_code & 0x1 would be better, fix that later
             code = key.meta.taipo_code
             if is_pressed:
-                # I don't get it - the first touch sends the add_key, but then the hold triggers and then we get remove_key?
-                # wait this isn't looking at the key variable, it's looking at the existing keyboard state
-                # SO this is actually sent when the keycode pattern changes?
                 if self.state[side].key.keycode != KC.NO:
                     self.handle_key(keyboard, side)
                     self.clear_state(side)
                 
                 # And if the current state is clear (no key determined yet) it gets added to the combo and the timer starts
-                self.state[side].combo |= 1 << (key.meta.taipo_code % 10) # mod 10? ahhhh since the first digit is the side, this pushes to l/r...
-                self.state[side].timer = ticks_ms() + self.tap_timeout
+
+                if key.meta.taipo_code in taipo_mods: # ARGH that's the other it
+                    self.state[side].mods |= 1 << (key.meta.taipo_code % 10)
+                else:
+                    self.state[side].combo |= 1 << (key.meta.taipo_code % 10) # mod 10? ahhhh since the first digit is the side, this pushes to l/r...
+                    self.state[side].timer = ticks_ms() + self.tap_timeout
             else:
-                # huh, this is interesting. The key is triggered on the first _release_
-                # Something I would like here: If the modifiers are still held, allow the next combo to reuse them
-                # but... 
-                # this also has the weird property that released keys don't affect the next combo, they have to be re-pressed
-                # that's also kind of useful, makes it feel more responsive
-
-                # One possible way to handle this: IT/OT are read realtime rather than being part of the combo
-                # so on keydown, add it to the combo regardless of other stuff... does this break anything?
-                # AND THEN on keyup, don't trigger the handle_key if it's a modifier
-                # BUT that causes a problem because modifiers with a single tap do other things
-                # if combo is only the modifier then handle_key first?
-                # is handle_key first valid regardless? Need to state diagram this, maybe
-
                 if not self.state[side].key.hold:
                     # Key was not pressed long enough to trigger 'hold'
-                    self.state[side].key.keycode = self.determine_key(self.state[side].combo)
-                self.handle_key(keyboard, side)
+                    self.state[side].key.keycode = self.determine_key(self.state[side].combo | self.state[side].mods)
+
+                # Combo key that has never triggered a combo does create a keystroke
+                # Combo key that was part of a combo and is released at the end won't trigger a keystroke
+                if self.state[side].combo != 0 or self.state[side].combo_executed == False:
+                    self.handle_key(keyboard, side)
+                    self.state[side].combo_executed = True
+
+                if key.meta.taipo_code in taipo_mods:
+                    self.state[side].mods &= ~(1 << (key.meta.taipo_code % 10))
+
                 self.clear_state(side)
         else:
             return key # AHHHH so anything that's not taipo-mapped gets passed straight through. Handy.
@@ -475,11 +481,15 @@ class Taipo(Module):
     def clear_state(self, side):
         # why does this not work?
         # self.state[side] = State()
+        # Actually we don't want that any more, mods persists beyond the reset
+        # mods is _not reset_
         self.state[side].combo = 0
         self.state[side].timer = 0
         self.state[side].key.keycode = KC.NO
         self.state[side].key.hold = False
         self.state[side].key.hold_handled = False
+        if self.state[side].mods == 0:
+            self.state[side].combo_executed = False 
         
     def handle_key(self, keyboard, side):
         key = self.state[side].key
