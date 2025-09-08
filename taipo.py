@@ -282,8 +282,8 @@ class Taipo(Module):
             t | o | ot: KC.LSFT(DV.U),
             t | o | it: DV.N2,
             t | o | ot | it: DV.F2,
-            t | a: DV.Q,
-            t | a | ot: KC.LSFT(DV.Q),
+            t | a: DV.M,
+            t | a | ot: KC.LSFT(DV.M),
             t | a | it: DV.N3,
             t | a | ot | it: DV.F3,
             o | a: DV.L,
@@ -302,8 +302,8 @@ class Taipo(Module):
             n | s | ot: KC.LSFT(DV.P),
             n | s | it: DV.N7,
             n | s | ot | it: DV.F7,
-            n | r: DV.Z,
-            n | r | ot: KC.LSFT(DV.Z),
+            n | r: DV.W,
+            n | r | ot: KC.LSFT(DV.W),
             n | r | it: DV.N8,
             n | r | ot | it: DV.F8,
             s | r: DV.B,
@@ -338,12 +338,12 @@ class Taipo(Module):
             n | a | ot: KC.LSFT(DV.J),
             n | a | it: DV.EQL,
             #n | a | ot | it: DV.LCTL(DV.Z),
-            e | r: DV.W, # changed
-            e | r | ot: KC.LSFT(DV.M),
+            e | r: DV.Z, # changed
+            e | r | ot: KC.LSFT(DV.Z),
             e | r | it: DV.DLR,
             # e | r | ot | it: DV.NO,
-            i | a: DV.M, # changed
-            i | a | ot: KC.LSFT(DV.W),
+            i | a: DV.Z,
+            i | a | ot: KC.LSFT(DV.Z),
             i | a | it: DV.AMPR,
             # i | a | ot | it: DV.NO,
             t | s: DV.SLSH,
@@ -421,7 +421,9 @@ class Taipo(Module):
     # Changes from stock:
     # * swap m/w
     # * move DOT to unshifted (probably swap with semicolon)
-    # adding Ardux space/backspace 4-fingers
+    # * add Ardux space/backspace 4-fingers
+    # - use the... Z and Q (sn/at) with M and W, since I don't like those big diagonals
+    #   I like the flat chords better so use them for higher frequency stuff
 
     def during_bootup(self, keyboard):
         pass
@@ -445,7 +447,6 @@ class Taipo(Module):
 
         # with the TaipoKey check above this if is maybe unnecessary
         if hasattr(key.meta, 'taipo_code'):
-            print(self.state[0].mods)
             side = 1 if key.meta.taipo_code / 10 >= 1 else 0 # taipo_code & 0x1 would be better, fix that later
             code = key.meta.taipo_code
             if is_pressed:
