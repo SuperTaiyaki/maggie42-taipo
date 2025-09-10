@@ -186,6 +186,8 @@ taipo_keycodes = {
     'MOD_ACS': 33,
     'MOD_GACS': 34, # etc.
 };
+# This is maybe not needed any more?
+# the entire mod/combo distinction...
 taipo_mods = {
         taipo_keycodes['TP_LIT'],
         taipo_keycodes['TP_LOT'],
@@ -237,7 +239,7 @@ class TaipoKey(Key):
     
 class Taipo(Module):
     # sticky_timeout is now configured in the stickykeys module, this is unused
-    def __init__(self, tap_timeout=300, sticky_timeout=1000, ghost_timeout=100):
+    def __init__(self, tap_timeout=300, sticky_timeout=1000, ghost_timeout=50):
         self.tap_timeout = tap_timeout
         self.sticky_timeout=sticky_timeout
         self.state = [State(), State()]
@@ -491,27 +493,24 @@ class Taipo(Module):
                 else:
                     self.state[side].combo |= 1 << (key.meta.taipo_code % 10) # mod 10? ahhhh since the first digit is the side, this pushes to l/r...
                     self.state[side].timer = ticks_ms() + self.tap_timeout
-                    self.state[side].releasing = False
+
+                self.state[side].releasing = False
             else:
-                # Going to need to mess with this logic - keyup _kills the timer_
-                # but it does that!
+
+                anti_ghost = False
+
                 if not self.state[side].key.hold and not self.state[side].releasing:
                     # Key was not pressed long enough to trigger 'hold'
 
-                    # TODO: make this tunable
-                    # TODO: formatting
-                    # TODO: maybe keycode should be changed in a moment...? I don't know what that affects
-                    #combo = self.state[side].last_combo if self.state[side].last_keypress_timestamp > ticks_ms() - 100 else self.state[side].combo
                     combo = self.state[side].combo
-                    if self.state[side].last_keypress_timestamp > ticks_ms() - 100:
-                        last_keypress_timestamp = 0
-                        # OH HEY this needs to stick past the clear_state at the end
-                        # but I thought the rolling fix did that?
-                        # rolling combos not implemented on here yet???
+                    if (self.state[side].last_keypress_timestamp > ticks_ms() - ghost_timeout and
+                        self.state[side].last_combo != 0):
+                        combo = self.state[side].last_combo
+                        print("current: ", self.state[side].last_combo, " last: ", self.state[side].combo)
+                        self.state[side].last_keypress_timestamp = 0
+                        anti_ghost = True
 
                     self.state[side].key.keycode = self.determine_key(combo | self.state[side].mods)
-
-                    # If we trip a fast-keystroke thing releasing has to be reset to _false_
 
                 # Combo key that has never triggered a combo does create a keystroke
                 # Combo key that was part of a combo and is released at the end won't trigger a keystroke
@@ -523,7 +522,11 @@ class Taipo(Module):
                     self.state[side].mods &= ~(1 << (key.meta.taipo_code % 10))
                 else:
                     self.state[side].combo &= ~(1 << (key.meta.taipo_code % 10))
-                self.state[side].releasing = True
+
+                if anti_ghost:
+                    self.state[side].releasing = False
+                else:
+                    self.state[side].releasing = True
 
                 self.clear_state(side)
         else:
@@ -609,4 +612,11 @@ class Taipo(Module):
 
     def on_powersave_disable(self, keyboard):
         pass
+
+# I think the reason I dislike pinkie-high combos is
+# To make the pinkie reach I raise my whole hand, and then crunch everything else back down
+# that movement in particular is bad
+# tenting helps a lot with that
+# ahhhhh the raised wrist thing
+# Need tenting if I'm using a wide grip, normal tight keyboard grip my wrists can roll around
 
