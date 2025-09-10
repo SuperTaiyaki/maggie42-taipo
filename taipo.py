@@ -211,16 +211,25 @@ class KeyPress:
     
 class State:
     combo = 0 # the main 8 keys
-    timer = 0
     mods = 0 # use it / ot
+    timer = 0
     combo_executed = False # Whether a key has been output using combo (i.e. non-mod key has been pressed)
-    # the clear_state method should be in here, not in TAipo
+    # the clear_state method should be in here, not in Taipo
+
+    releasing = False # whether this is the pressing or releasing part of the sequence
+    # the first release after a series of presses triggers the key; the following releases do not
+
+    # Anti-ghost (sort of) stuff. On quick presses the keyup may come after the keydown - wind time back
+    last_combo = 0 # combo as of One step before
+    last_keypress_timestamp = 0
+
     key = KeyPress()
 
 class TaipoMeta:
     def __init__(self, code):
         self.taipo_code = code
 
+# TODO: put taipo_code in here directly, don't need meta
 class TaipoKey(Key):
     def __init__(self, meta):
         self.meta = meta
@@ -228,7 +237,7 @@ class TaipoKey(Key):
     
 class Taipo(Module):
     # sticky_timeout is now configured in the stickykeys module, this is unused
-    def __init__(self, tap_timeout=300, sticky_timeout=1000):
+    def __init__(self, tap_timeout=300, sticky_timeout=1000, ghost_timeout=100):
         self.tap_timeout = tap_timeout
         self.sticky_timeout=sticky_timeout
         self.state = [State(), State()]
@@ -360,11 +369,11 @@ class Taipo(Module):
             # i | t | ot | it: DV.NO,
             e | n: DV.COMM,
             e | n | ot: DV.DOT,
-            e | o | a: DV.DOT,
+            # e | o | a: DV.DOT,
             e | n | it: DV.TILD,
             # e | n | ot | it: DV.NO,
             o | r: DV.SCLN,
-            t | o | a: DV.SCLN, # wait 2 semicolons? I guess for some languages this one isn't bad
+            #t | o | a: DV.SCLN, # wait 2 semicolons? I guess for some languages this one isn't bad
             o | r | ot: DV.COLN,
             t | o | a | ot: DV.COLN,
             # o | r | it: DV.NO,
@@ -372,7 +381,7 @@ class Taipo(Module):
             # o | r | ot | it: DV.NO,
             # t | o | a | ot | it: DV.NO,
             s | a: DV.QUOT,
-            n | s | r: DV.QUOT,
+            #n | s | r: DV.QUOT,
             s | a | ot: DV.DQT,
             n | s | r | ot: DV.DQT,
             s | a | it: DV.GRV,
@@ -392,11 +401,11 @@ class Taipo(Module):
             a | r | it: DV.PGUP,
             a | r | ot | it: DV.LAYER3,
             o | s: DV.LALT,
-            o | s | ot: DV.UP,
+            o | s | ot: DV.DOWN,
             o | s | it: DV.HOME,
             o | s | ot | it: DV.LAYER2,
             t | n: DV.LCTL,
-            t | n | ot: DV.DOWN,
+            t | n | ot: DV.UP,
             t | n | it: DV.END,
             t | n | ot | it: DV.LAYER1,
             e | i: KC.LSFT, # AHHH these aren't kmk oneshots, they're taipo builtins
@@ -416,6 +425,16 @@ class Taipo(Module):
             r | a | s | o | n | t | i | e: KC.MOD_GACS,
             e | t | a | o: DV.SPC, # Borrowed from Ardux, just to let my space finger float
             s | r | n | i: DV.BSPC, # Borrowed from Ardux, just to let my space finger float
+
+            # experimental block
+            r | s | n: DV.J, # up/down not vi style (K is more common, this is more comfortable)
+            a | o | t: DV.K, # plus shift
+
+            r | s | i: DV.X, # V points down
+            a | o | e: DV.V, # middle finger up
+
+            r | n | i: DV.Q, # ring finger gap
+            a | t | e: DV.Z, # Q comes first so it's up on top
         }
 
     # Changes from stock:
@@ -424,6 +443,14 @@ class Taipo(Module):
     # * add Ardux space/backspace 4-fingers
     # - use the... Z and Q (sn/at) with M and W, since I don't like those big diagonals
     #   I like the flat chords better so use them for higher frequency stuff
+
+    # Remove the cross-level keys entirely for letters!
+    # aot, aoe, ate * 2 levels = exactly the amount of missing chars
+    # otherwise I would have to eat the enter, not good
+    # J/K, V/X, Q/Z
+    # just by feeling: KJV are more important
+    # AH CRAP I was using those for quote and semicolon
+    # but I guess some other codes open, so..
 
     def during_bootup(self, keyboard):
         pass
@@ -453,18 +480,38 @@ class Taipo(Module):
                 if self.state[side].key.keycode != KC.NO:
                     self.handle_key(keyboard, side)
                     self.clear_state(side)
-                
+
+                self.state[side].last_combo = self.state[side].combo
+                self.state[side].last_keypress_timestamp = ticks_ms()
+
                 # And if the current state is clear (no key determined yet) it gets added to the combo and the timer starts
 
-                if key.meta.taipo_code in taipo_mods: # ARGH that's the other it
+                if key.meta.taipo_code in taipo_mods:
                     self.state[side].mods |= 1 << (key.meta.taipo_code % 10)
                 else:
                     self.state[side].combo |= 1 << (key.meta.taipo_code % 10) # mod 10? ahhhh since the first digit is the side, this pushes to l/r...
                     self.state[side].timer = ticks_ms() + self.tap_timeout
+                    self.state[side].releasing = False
             else:
-                if not self.state[side].key.hold:
+                # Going to need to mess with this logic - keyup _kills the timer_
+                # but it does that!
+                if not self.state[side].key.hold and not self.state[side].releasing:
                     # Key was not pressed long enough to trigger 'hold'
-                    self.state[side].key.keycode = self.determine_key(self.state[side].combo | self.state[side].mods)
+
+                    # TODO: make this tunable
+                    # TODO: formatting
+                    # TODO: maybe keycode should be changed in a moment...? I don't know what that affects
+                    #combo = self.state[side].last_combo if self.state[side].last_keypress_timestamp > ticks_ms() - 100 else self.state[side].combo
+                    combo = self.state[side].combo
+                    if self.state[side].last_keypress_timestamp > ticks_ms() - 100:
+                        last_keypress_timestamp = 0
+                        # OH HEY this needs to stick past the clear_state at the end
+                        # but I thought the rolling fix did that?
+                        # rolling combos not implemented on here yet???
+
+                    self.state[side].key.keycode = self.determine_key(combo | self.state[side].mods)
+
+                    # If we trip a fast-keystroke thing releasing has to be reset to _false_
 
                 # Combo key that has never triggered a combo does create a keystroke
                 # Combo key that was part of a combo and is released at the end won't trigger a keystroke
@@ -474,6 +521,9 @@ class Taipo(Module):
 
                 if key.meta.taipo_code in taipo_mods:
                     self.state[side].mods &= ~(1 << (key.meta.taipo_code % 10))
+                else:
+                    self.state[side].combo &= ~(1 << (key.meta.taipo_code % 10))
+                self.state[side].releasing = True
 
                 self.clear_state(side)
         else:
@@ -484,7 +534,7 @@ class Taipo(Module):
         # self.state[side] = State()
         # Actually we don't want that any more, mods persists beyond the reset
         # mods is _not reset_
-        self.state[side].combo = 0
+        #self.state[side].combo = 0
         self.state[side].timer = 0
         self.state[side].key.keycode = KC.NO
         self.state[side].key.hold = False
