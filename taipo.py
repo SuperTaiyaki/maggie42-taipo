@@ -186,14 +186,6 @@ taipo_keycodes = {
     'MOD_ACS': 33,
     'MOD_GACS': 34, # etc.
 };
-# This is maybe not needed any more?
-# the entire mod/combo distinction...
-taipo_mods = {
-        taipo_keycodes['TP_LIT'],
-        taipo_keycodes['TP_LOT'],
-        taipo_keycodes['TP_RIT'],
-        taipo_keycodes['TP_ROT'],
-}
 
 r = 1 << 0 # ahhhh, these are the stock single-finger character codes
 s = 1 << 1 # un-mirroring each hand will be a bit tricky like this... (if I want smarter hjkl layout)
@@ -212,11 +204,8 @@ class KeyPress:
     hold_handled = False
     
 class State:
-    combo = 0 # the main 8 keys
-    mods = 0 # use it / ot
+    combo = 0
     timer = 0
-    combo_executed = False # Whether a key has been output using combo (i.e. non-mod key has been pressed)
-    # the clear_state method should be in here, not in Taipo
 
     releasing = False # whether this is the pressing or releasing part of the sequence
     # the first release after a series of presses triggers the key; the following releases do not
@@ -242,6 +231,7 @@ class Taipo(Module):
     def __init__(self, tap_timeout=300, sticky_timeout=1000, ghost_timeout=50):
         self.tap_timeout = tap_timeout
         self.sticky_timeout=sticky_timeout
+        self.ghost_timeout = ghost_timeout
         self.state = [State(), State()]
         # This should probably happen outside the module instead - this is a bit late
         for key, code in taipo_keycodes.items():
@@ -430,13 +420,20 @@ class Taipo(Module):
 
             # experimental block
             r | s | n: DV.J, # up/down not vi style (K is more common, this is more comfortable)
-            a | o | t: DV.K, # plus shift
+            a | o | t: DV.K,
+            r | s | n | ot: DV.LSFT(DV.J),
+            a | o | t | ot: DV.LSFT(DV.K),
+
 
             r | s | i: DV.X, # V points down
             a | o | e: DV.V, # middle finger up
+            r | s | i | ot: DV.LSFT(DV.X),
+            a | o | e | ot: DV.LSFT(DV.V),
 
             r | n | i: DV.Q, # ring finger gap
             a | t | e: DV.Z, # Q comes first so it's up on top
+            r | n | i | ot: DV.LSFT(DV.Q),
+            a | t | e | ot: DV.LSFT(DV.Z),
         }
 
     # Changes from stock:
@@ -462,7 +459,7 @@ class Taipo(Module):
             # SO: if it's timed out (300ms) send the key
             # BUT that's when hold becomes true, and we need to hit the hold point in order to reach the combo logic
             if self.state[side].timer != 0 and ticks_ms() > self.state[side].timer:
-                self.state[side].key.keycode = self.determine_key(self.state[side].combo | self.state[side].mods)
+                self.state[side].key.keycode = self.determine_key(self.state[side].combo)
                 self.state[side].key.hold = True
                 self.handle_key(keyboard, side)
                 self.state[side].timer = 0
@@ -488,11 +485,8 @@ class Taipo(Module):
 
                 # And if the current state is clear (no key determined yet) it gets added to the combo and the timer starts
 
-                if key.meta.taipo_code in taipo_mods:
-                    self.state[side].mods |= 1 << (key.meta.taipo_code % 10)
-                else:
-                    self.state[side].combo |= 1 << (key.meta.taipo_code % 10) # mod 10? ahhhh since the first digit is the side, this pushes to l/r...
-                    self.state[side].timer = ticks_ms() + self.tap_timeout
+                self.state[side].combo |= 1 << (key.meta.taipo_code % 10) # mod 10? ahhhh since the first digit is the side, this pushes to l/r...
+                self.state[side].timer = ticks_ms() + self.tap_timeout
 
                 self.state[side].releasing = False
             else:
@@ -503,25 +497,20 @@ class Taipo(Module):
                     # Key was not pressed long enough to trigger 'hold'
 
                     combo = self.state[side].combo
-                    if (self.state[side].last_keypress_timestamp > ticks_ms() - ghost_timeout and
+                    if (self.state[side].last_keypress_timestamp > ticks_ms() - self.ghost_timeout and
                         self.state[side].last_combo != 0):
                         combo = self.state[side].last_combo
                         print("current: ", self.state[side].last_combo, " last: ", self.state[side].combo)
                         self.state[side].last_keypress_timestamp = 0
                         anti_ghost = True
 
-                    self.state[side].key.keycode = self.determine_key(combo | self.state[side].mods)
+                    self.state[side].key.keycode = self.determine_key(combo)
 
                 # Combo key that has never triggered a combo does create a keystroke
                 # Combo key that was part of a combo and is released at the end won't trigger a keystroke
-                if self.state[side].combo != 0 or self.state[side].combo_executed == False:
-                    self.handle_key(keyboard, side)
-                    self.state[side].combo_executed = True
+                self.handle_key(keyboard, side)
 
-                if key.meta.taipo_code in taipo_mods:
-                    self.state[side].mods &= ~(1 << (key.meta.taipo_code % 10))
-                else:
-                    self.state[side].combo &= ~(1 << (key.meta.taipo_code % 10))
+                self.state[side].combo &= ~(1 << (key.meta.taipo_code % 10))
 
                 if anti_ghost:
                     self.state[side].releasing = False
@@ -535,15 +524,11 @@ class Taipo(Module):
     def clear_state(self, side):
         # why does this not work?
         # self.state[side] = State()
-        # Actually we don't want that any more, mods persists beyond the reset
-        # mods is _not reset_
         #self.state[side].combo = 0
         self.state[side].timer = 0
         self.state[side].key.keycode = KC.NO
         self.state[side].key.hold = False
         self.state[side].key.hold_handled = False
-        if self.state[side].mods == 0:
-            self.state[side].combo_executed = False 
         
     def handle_key(self, keyboard, side):
         key = self.state[side].key
