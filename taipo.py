@@ -430,10 +430,10 @@ class Taipo(Module):
             r | s | i | ot: DV.LSFT(DV.X),
             a | o | e | ot: DV.LSFT(DV.V),
 
-            r | n | i: DV.Q, # ring finger gap
-            a | t | e: DV.Z, # Q comes first so it's up on top
-            r | n | i | ot: DV.LSFT(DV.Q),
-            a | t | e | ot: DV.LSFT(DV.Z),
+            a | t | e: DV.Q, # Chains into U better
+            r | n | i: DV.Z, # ring finger gap
+            r | n | i | ot: DV.LSFT(DV.Z),
+            a | t | e | ot: DV.LSFT(DV.Q),
         }
 
     # Changes from stock:
