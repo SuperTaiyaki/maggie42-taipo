@@ -8,9 +8,8 @@ from kmk.keys import KC, Key, make_key
 from kmk.scanners import DiodeOrientation
 from kmk.modules.layers import Layers
 from kmk.modules.split import Split, SplitSide
-from kmk.modules.combos import Combos, Chord, Sequence
 from kmk.modules.sticky_keys import StickyKeys # requirement for Taipo (formerly oneshot, KC.OS)
-from kmk.modules.macros import Macros
+from kmk.modules.holdtap import HoldTap
 
 from kmk.extensions.rgb import RGB
 
@@ -25,20 +24,24 @@ keyboard.diode_orientation = DiodeOrientation.COL2ROW
 split = Split(data_pin = board.GP0, use_pio = True, split_flip = False)
 keyboard.modules.append(split)
 
-layers = Layers()
 
-keyboard.modules.append(Macros())
 keyboard.modules.append(StickyKeys())
+
+layers = Layers()
 keyboard.modules.append(layers)
-keyboard.modules.append(Taipo())
 
 # The RP2040s have a neopixel-ish thing, light it up
 rgb = RGB(pixel_pin = board.NEOPIXEL, num_pixels = 1, hue_default = 176, sat_default = 30, val_default = 128, val_limit = 128,)
 keyboard.extensions.append(rgb)
 
+keyboard.modules.append(Taipo())
+
 LAYER_NORMAL = 2
 LAYER_BROWSER = 3
 LAYER_RAISED = 4
+LAYER_LOWERED = 5
+
+keyboard.modules.append(HoldTap())
 
 # dummy keys for combos
 make_key(
@@ -75,10 +78,10 @@ NORMAL_OFF = RGBKey1(0)
 
 keyboard.keymap = [
         [
-        KC.NO, KC.NO, KC.NO, KC.NO, KC.NO, KC.NO,          KC.NO, KC.NO, KC.NO, KC.NO, KC.NO, KC.NO, 
+        KC.NO, KC.NO, KC.NO, KC.NO, KC.NO, KC.NO,          KC.NO, KC.NO, KC.NO, KC.NO, KC.TG(5), NORMAL_ON, 
         KC.NO, KC.TP_TLP, KC.TP_TLR, KC.TP_TLM, KC.TP_TLI, KC.NO,     KC.NO, KC.TP_TRI, KC.TP_TRM, KC.TP_TRR, KC.TP_TRP, KC.NO, 
         KC.NO, KC.TP_BLP, KC.TP_BLR, KC.TP_BLM, KC.TP_BLI, KC.NO,      KC.NO, KC.TP_BRI, KC.TP_BRM, KC.TP_BRR, KC.TP_BRP, KC.NO, 
-        KC.NO, KC.NO, KC.NO, KC.TRIGGERL, KC.TP_LIT, KC.TP_LOT,       KC.TP_ROT, KC.TP_RIT, KC.TRIGGERR, KC.NO, KC.NO, KC.NO, 
+        KC.NO, KC.NO, KC.NO, KC.MO(1), KC.TP_LIT, KC.TP_LOT,       KC.TP_ROT, KC.TP_RIT, KC.MO(1), KC.NO, KC.NO, KC.NO, 
         ],
         # Taipo macro layer - useful browser stuff
         # tab left/right
@@ -87,7 +90,7 @@ keyboard.keymap = [
         # flip desktops
         # ctrl+l to focus address bar would be handy (maybe)
         [
-        KC.NO, KC.NO, KC.NO, KC.NO, KC.NO, KC.NO,          KC.NO, KC.NO, KC.NO, KC.NO, KC.NO, KC.NO, 
+        KC.TRNS, KC.LGUI(KC.N1), KC.LGUI(KC.N2), KC.LGUI(KC.N3), KC.LGUI(KC.N4), KC.LGUI(KC.N5),  KC.LGUI(KC.N6), KC.LGUI(KC.N7), KC.LGUI(KC.N8), KC.LGUI(KC.N9), KC.LGUI(KC.N0), KC.NO, 
         KC.NO, KC.TP_TLP, KC.TP_TLR, KC.TP_TLM, KC.TP_TLI, KC.NO,     KC.NO, KC.TP_TRI, KC.TP_TRM, KC.TP_TRR, KC.TP_TRP, KC.NO, 
         KC.NO, KC.TP_BLP, KC.TP_BLR, KC.TP_BLM, KC.TP_BLI, KC.NO,      KC.NO, KC.TP_BRI, KC.TP_BRM, KC.TP_BRR, KC.TP_BRP, KC.NO, 
         KC.NO, KC.NO, KC.NO, KC.TRIGGERL, KC.TP_LIT, KC.TP_LOT,       KC.TP_ROT, KC.TP_RIT, KC.TRIGGERR, KC.NO, KC.NO, KC.NO, 
@@ -110,18 +113,20 @@ keyboard.keymap = [
        [KC.LT(LAYER_BROWSER, KC.TAB),   KC.Q,KC.W,KC.E,KC.R,KC.T,         KC.Y, KC.U, KC.I, KC.O, KC.P, KC.BACKSPACE,
        KC.LCTRL, KC.A, KC.S, KC.D, KC.F, KC.G,     KC.H, KC.J, KC.K, KC.L, KC.SEMICOLON, KC.QUOTE,
        KC.LSHIFT, KC.Z, KC.X, KC.C, KC.V, KC.B,        KC.N, KC.M, KC.COMMA, KC.DOT, KC.SLASH, KC.RSHIFT,
-       KC.NO, KC.NO, KC.NO, KC.ESCAPE, KC.LT(LAYER_RAISED, KC.BSPACE), KC.SPACE,       KC.ENTER, KC.SPACE, KC.TRIGGERR, KC.NO, KC.NO, KC.NO
+       KC.NO, KC.NO, KC.NO, KC.LT(LAYER_BROWSER, KC.ESCAPE), KC.SPACE, KC.LT(LAYER_RAISED, KC.BSPACE),       KC.LT(LAYER_LOWERED, KC.SPACE), KC.ENTER, KC.HT(KC.ESCAPE, KC.LGUI), KC.NO, KC.NO, KC.NO
        ],
+       # That top right backspace is maybe unnecessary
+
     # Browser layer
     [
         KC.TRNS, KC.LGUI(KC.N1), KC.LGUI(KC.N2), KC.LGUI(KC.N3), KC.LGUI(KC.N4), KC.LGUI(KC.N5),  KC.LGUI(KC.N6), KC.LGUI(KC.N7), KC.LGUI(KC.N8), KC.LGUI(KC.N9), KC.LGUI(KC.N0), KC.NO, 
-        KC.NO, KC.TP_TLP, KC.TP_TLR, KC.TP_TLM, KC.TP_TLI, KC.NO,     KC.NO, KC.TP_TRI, KC.TP_TRM, KC.TP_TRR, KC.TP_TRP, KC.NO, 
-        KC.NO, KC.TP_BLP, KC.TP_BLR, KC.TP_BLM, KC.TP_BLI, KC.NO,      KC.NO, KC.TP_BRI, KC.TP_BRM, KC.TP_BRR, KC.TP_BRP, KC.NO, 
+        KC.TRNS, KC.TP_TLP, KC.TP_TLR, KC.TP_TLM, KC.TP_TLI, KC.NO,     KC.NO, KC.TP_TRI, KC.TP_TRM, KC.TP_TRR, KC.TP_TRP, KC.NO, 
+        KC.O, KC.TP_BLP, KC.TP_BLR, KC.TP_BLM, KC.TP_BLI, KC.NO,      KC.NO, KC.TP_BRI, KC.TP_BRM, KC.TP_BRR, KC.TP_BRP, KC.NO, 
         KC.NO, KC.NO, KC.NO, KC.TRIGGERL, KC.TP_LIT, KC.TP_LOT,       KC.TP_ROT, KC.TP_RIT, KC.TRIGGERR, KC.NO, KC.NO, KC.NO, 
         ],
     # Raised layer
     [
-        KC.NO, KC.LSFT(KC.N1), KC.LSFT(KC.N2), KC.LSFT(KC.N3), KC.LSFT(KC.N4), KC.LSFT(KC.N5),  KC.LSFT(KC.N6), KC.LSFT(KC.N7), KC.LSFT(KC.N8), KC.LSFT(KC.N9), KC.LSFT(KC.N0), KC.RBRACKET, 
+        KC.NO, KC.LSFT(KC.N1), KC.LSFT(KC.N2), KC.LSFT(KC.N3), KC.LSFT(KC.N4), KC.LSFT(KC.N5),  KC.LSFT(KC.N6), KC.LSFT(KC.N7), KC.LSFT(KC.N8), KC.LSFT(KC.N9), KC.LSFT(KC.N0), KC.LBRACKET, 
         KC.TRNS, KC.N1, KC.N2, KC.N3, KC.N4, KC.N5,          KC.N6, KC.N7, KC.N8, KC.N9, KC.N0, KC.BSLASH, 
         # Grave is on the right because that's the HHKB layout
         # Pipe should probably be somewhere so it's not hiding under the backspace + shift
@@ -129,20 +134,46 @@ keyboard.keymap = [
         KC.TRNS, KC.LSHIFT(KC.GRAVE), KC.NO, KC.LSHIFT(KC.MINUS), KC.MINUS, KC.NO,      KC.NO, KC.EQUAL, KC.LSHIFT(KC.EQUAL), KC.TP_BRR, KC.GRAVE, KC.TRNS, 
         KC.NO, KC.NO, KC.NO, KC.TRIGGERL, KC.NO, KC.NO,       KC.NO, KC.NO, KC.TRIGGERR, KC.NO, KC.NO, KC.NO, 
         ],
-    # That TRIGGERL should probably be alt or something
+        # outside the brackets, angle brackets
+
+    
+    # Lowered layer
+    # HHKB-based
+    [
+        NORMAL_OFF, KC.LSFT(KC.N1), KC.LSFT(KC.N2), KC.LSFT(KC.N3), KC.LSFT(KC.N4), KC.LSFT(KC.N5),    KC.LSFT(KC.N6), KC.LSFT(KC.N7), KC.LSFT(KC.N8), KC.LSFT(KC.N9), KC.INSERT, KC.DELETE, 
+        KC.TRNS, KC.N1, KC.N2, KC.N3, KC.N4, KC.N5,          KC.HOME, KC.PGUP, KC.N8, KC.UP, KC.N0, KC.BSLASH, 
+        KC.TRNS, KC.NO, KC.NO, KC.NO, KC.END, KC.NO,       KC.END, KC.PGDN, KC.LEFT, KC.DOWN, KC.RIGHT, KC.TRNS, 
+        KC.NO, KC.NO, KC.NO, KC.NO, KC.NO, KC.NO,       KC.NO, KC.NO, KC.NO, KC.NO, KC.NO, KC.NO, 
+        ],
+
 
 # Need to do something about modifiers so they stick between the layer switch
 # ctrl/alt/gui, at minimum
 # also, the backspace hold thing is a bit annoying - can't hold backspace through words!
+
+
+# Weird double-hand taipo
+# Low row is on the left hand, high row is on the right - 4 fingers each that never have to move
+# With the no-diagonal taipo this isn't bad, but very left-heavy
+[
+        KC.NO, KC.NO, KC.NO, KC.NO, KC.NO, KC.NO,          KC.NO, KC.NO, KC.NO, KC.NO, KC.NO, KC.TG(5), 
+        KC.NO, KC.TP_TLP, KC.TP_TLR, KC.TP_TLM, KC.TP_TLI, KC.NO,     KC.NO, KC.TP_TRI, KC.TP_TRM, KC.TP_TRR, KC.TP_TRP, KC.NO, 
+        KC.NO, KC.TP_BLP, KC.TP_BLR, KC.TP_BLM, KC.TP_BLI, KC.NO,      KC.NO, KC.TP_TLI, KC.TP_TLM, KC.TP_TLR, KC.TP_TLP, KC.NO, 
+        KC.NO, KC.NO, KC.NO, KC.TRIGGERL, KC.TP_LIT, KC.TP_LOT,       KC.TP_ROT, KC.TP_RIT, KC.TRIGGERR, KC.NO, KC.NO, KC.NO, 
+        ],
                    ]
 
-combos = Combos()
-keyboard.modules.append(combos)
-combos.combos = [
-        Chord((KC.TRIGGERL, KC.TRIGGERR), NORMAL_ON),
-        Chord((KC.BSPACE, KC.TRIGGERR), NORMAL_OFF),
-    ]
+#combos = Combos()
+#keyboard.modules.append(combos)
+#combos.combos = [
+#        Chord((KC.TRIGGERL, KC.TRIGGERR), NORMAL_ON),
+#        Chord((KC.BSPACE, KC.TRIGGERR), NORMAL_OFF),
+#    ]
 
 if __name__ == '__main__':
     keyboard.go()
+
+# Slightly annoying thing: HT causes a bit of lag. Layer switch doesn't (but that's a bit different....)
+# a HT-ish thing that triggers on release is maybe closer to what I want
+# Oh, there's a lot going on with HT so that's a bit hard
 
