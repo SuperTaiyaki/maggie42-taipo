@@ -14,10 +14,64 @@ from kmk.utils import Debug
 from supervisor import ticks_ms
 
 debug = Debug(__name__)
+# Define keys first so they can be used below in DVP
+class TaipoKey(Key):
+    def __init__(self, code): # Meta has apparently disappeared (kmk docs are old)
+        self.taipo_code = code
+        super().__init__()
+
+# Can this be changed to bits? Should it be?
+# l/r
+# t/b -> finger (OR modifier.... actually that's kind of bad)
+# might gain a tiny bit of performance over the current /10 and %10, but it's not massive (probably)
+# 133mhz core, I don't think we need it
+
+taipo_keycodes = {
+    'TP_TLP': 0, # = top row, left, pinkie
+    'TP_TLR': 1, # ring
+    'TP_TLM': 2, # middle
+    'TP_TLI': 3, # index?
+    'TP_BLP': 4,
+    'TP_BLR': 5,
+    'TP_BLM': 6,
+    'TP_BLI': 7,
+    'TP_LIT': 8, # inner thumb
+    'TP_LOT': 9, # outer thumb (and I have one more thumb, amongst other stuff)
+    'TP_TRP': 10,
+    'TP_TRR': 11,
+    'TP_TRM': 12,
+    'TP_TRI': 13,
+    'TP_BRP': 14,
+    'TP_BRR': 15,
+    'TP_BRM': 16,
+    'TP_BRI': 17,
+    'TP_RIT': 18,
+    'TP_ROT': 19,
+    'LAYER0': 20,
+    'LAYER1': 21,
+    'LAYER2': 22,
+    'LAYER3': 23,
+    'MOD_GA': 24, # GUI+ALT
+    'MOD_GC': 25, # GUI + CTRL
+    'MOD_GS': 26,
+    'MOD_AC': 27,
+    'MOD_AS': 28,
+    'MOD_CS': 29,
+    'MOD_GAC': 30,
+    'MOD_GAS': 31,
+    'MOD_GCS': 32,
+    'MOD_ACS': 33,
+    'MOD_GACS': 34, # etc.
+};
+# This should probably happen outside the module instead - this is a bit late
+for key, code in taipo_keycodes.items():
+    make_key(names=(key,), constructor=TaipoKey, code=code)
+
 
 # no enum class in circuitpython! oh well
 # Reverse mapping to get correct taipo keystrokes to come out in dvorak
 # This should probably have done another way so it's switchable (i.e. reverse just by dropping KC back in)
+# Can replace the DV = below with KC, maybe
 class DVP():
     def __init__(self):
         self.A = KC.A
@@ -144,48 +198,6 @@ class DVP():
         self.Z = KC.SLASH
 DV = DVP()
 
-# Can this be changed to bits? Should it be?
-# l/r
-# t/b -> finger (OR modifier.... actually that's kind of bad)
-# might gain a tiny bit of performance over the current /10 and %10, but it's not massive (probably)
-
-taipo_keycodes = {
-    'TP_TLP': 0, # = top row, left, pinkie
-    'TP_TLR': 1, # ring
-    'TP_TLM': 2, # middle
-    'TP_TLI': 3, # index?
-    'TP_BLP': 4,
-    'TP_BLR': 5,
-    'TP_BLM': 6,
-    'TP_BLI': 7,
-    'TP_LIT': 8, # inner thumb
-    'TP_LOT': 9, # outer thumb (and I have one more thumb, amongst other stuff)
-    'TP_TRP': 10,
-    'TP_TRR': 11,
-    'TP_TRM': 12,
-    'TP_TRI': 13,
-    'TP_BRP': 14,
-    'TP_BRR': 15,
-    'TP_BRM': 16,
-    'TP_BRI': 17,
-    'TP_RIT': 18,
-    'TP_ROT': 19,
-    'LAYER0': 20,
-    'LAYER1': 21,
-    'LAYER2': 22,
-    'LAYER3': 23,
-    'MOD_GA': 24, # GUI+ALT
-    'MOD_GC': 25, # GUI + CTRL
-    'MOD_GS': 26,
-    'MOD_AC': 27,
-    'MOD_AS': 28,
-    'MOD_CS': 29,
-    'MOD_GAC': 30,
-    'MOD_GAS': 31,
-    'MOD_GCS': 32,
-    'MOD_ACS': 33,
-    'MOD_GACS': 34, # etc.
-};
 
 r = 1 << 0 # ahhhh, these are the stock single-finger character codes
 s = 1 << 1 # un-mirroring each hand will be a bit tricky like this... (if I want smarter hjkl layout)
@@ -216,16 +228,7 @@ class State:
 
     key = KeyPress()
 
-class TaipoMeta:
-    def __init__(self, code):
-        self.taipo_code = code
-
-# TODO: put taipo_code in here directly, don't need meta
-class TaipoKey(Key):
-    def __init__(self, meta):
-        self.meta = meta
-        super().__init__()
-    
+   
 class Taipo(Module):
     # sticky_timeout is now configured in the stickykeys module, this is unused
     def __init__(self, tap_timeout=300, sticky_timeout=1000, ghost_timeout=50):
@@ -233,9 +236,6 @@ class Taipo(Module):
         self.sticky_timeout=sticky_timeout
         self.ghost_timeout = ghost_timeout
         self.state = [State(), State()]
-        # This should probably happen outside the module instead - this is a bit late
-        for key, code in taipo_keycodes.items():
-            make_key( names=(key,), constructor=TaipoKey, meta=TaipoMeta(code))
 
         self.keymap = { # KEYMAP_START
             t: DV.T,
@@ -471,55 +471,51 @@ class Taipo(Module):
         if not isinstance(key, TaipoKey):
             return key
 
-        # with the TaipoKey check above this if is maybe unnecessary
-        if hasattr(key.meta, 'taipo_code'):
-            side = 1 if key.meta.taipo_code / 10 >= 1 else 0 # taipo_code & 0x1 would be better, fix that later
-            code = key.meta.taipo_code
-            if is_pressed:
-                if self.state[side].key.keycode != KC.NO:
-                    self.handle_key(keyboard, side)
-                    self.clear_state(side)
+        side = 1 if key.taipo_code / 10 >= 1 else 0 # taipo_code & 0x1 would be better, fix that later
+        code = key.taipo_code # Forgot to use this?
+        if is_pressed:
+            if self.state[side].key.keycode != KC.NO:
+                self.handle_key(keyboard, side)
+                self.clear_state(side)
 
-                self.state[side].last_combo = self.state[side].combo
-                self.state[side].last_keypress_timestamp = ticks_ms()
+            self.state[side].last_combo = self.state[side].combo
+            self.state[side].last_keypress_timestamp = ticks_ms()
 
-                # And if the current state is clear (no key determined yet) it gets added to the combo and the timer starts
+            # And if the current state is clear (no key determined yet) it gets added to the combo and the timer starts
 
-                self.state[side].combo |= 1 << (key.meta.taipo_code % 10) # mod 10? ahhhh since the first digit is the side, this pushes to l/r...
-                self.state[side].timer = ticks_ms() + self.tap_timeout
+            self.state[side].combo |= 1 << (key.taipo_code % 10) # mod 10? ahhhh since the first digit is the side, this pushes to l/r...
+            self.state[side].timer = ticks_ms() + self.tap_timeout
 
+            self.state[side].releasing = False
+        else:
+
+            anti_ghost = False
+
+            if not self.state[side].key.hold and not self.state[side].releasing:
+                # Key was not pressed long enough to trigger 'hold'
+
+                combo = self.state[side].combo
+                if (self.state[side].last_keypress_timestamp > ticks_ms() - self.ghost_timeout and
+                    self.state[side].last_combo != 0):
+                    combo = self.state[side].last_combo
+                    print("current: ", self.state[side].last_combo, " last: ", self.state[side].combo)
+                    self.state[side].last_keypress_timestamp = 0
+                    anti_ghost = True
+
+                self.state[side].key.keycode = self.determine_key(combo)
+
+            # Combo key that has never triggered a combo does create a keystroke
+            # Combo key that was part of a combo and is released at the end won't trigger a keystroke
+            self.handle_key(keyboard, side)
+
+            self.state[side].combo &= ~(1 << (key.taipo_code % 10))
+
+            if anti_ghost:
                 self.state[side].releasing = False
             else:
+                self.state[side].releasing = True
 
-                anti_ghost = False
-
-                if not self.state[side].key.hold and not self.state[side].releasing:
-                    # Key was not pressed long enough to trigger 'hold'
-
-                    combo = self.state[side].combo
-                    if (self.state[side].last_keypress_timestamp > ticks_ms() - self.ghost_timeout and
-                        self.state[side].last_combo != 0):
-                        combo = self.state[side].last_combo
-                        print("current: ", self.state[side].last_combo, " last: ", self.state[side].combo)
-                        self.state[side].last_keypress_timestamp = 0
-                        anti_ghost = True
-
-                    self.state[side].key.keycode = self.determine_key(combo)
-
-                # Combo key that has never triggered a combo does create a keystroke
-                # Combo key that was part of a combo and is released at the end won't trigger a keystroke
-                self.handle_key(keyboard, side)
-
-                self.state[side].combo &= ~(1 << (key.meta.taipo_code % 10))
-
-                if anti_ghost:
-                    self.state[side].releasing = False
-                else:
-                    self.state[side].releasing = True
-
-                self.clear_state(side)
-        else:
-            return key # AHHHH so anything that's not taipo-mapped gets passed straight through. Handy.
+            self.clear_state(side)
 
     def clear_state(self, side):
         # why does this not work?
