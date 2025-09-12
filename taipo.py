@@ -33,7 +33,7 @@ class DVP():
         self.BSPC = KC.BSPC
         self.C = KC.I
         self.CIRC = KC.CIRC # ^
-        self.COLN = KC.COLN # uhhhh does this work? since it's a shifted key
+        self.COLN = KC.Z # uhhhh does this work? since it's a shifted key
         self.COMM = KC.W
         self.D = KC.H
         self.DEL = KC.DEL
@@ -237,7 +237,7 @@ class Taipo(Module):
         for key, code in taipo_keycodes.items():
             make_key( names=(key,), constructor=TaipoKey, meta=TaipoMeta(code))
 
-        self.keymap = {
+        self.keymap = { # KEYMAP_START
             t: DV.T,
             t | e: DV.H,
             it: DV.BSPC,
@@ -434,7 +434,7 @@ class Taipo(Module):
             r | n | i: DV.Z, # ring finger gap
             r | n | i | ot: DV.LSFT(DV.Z),
             a | t | e | ot: DV.LSFT(DV.Q),
-        }
+        } # KEYMAP_END
 
     # Changes from stock:
     # * swap m/w
