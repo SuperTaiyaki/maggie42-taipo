@@ -389,7 +389,7 @@ class Taipo(Module):
             e | t | o | it: DV.RALT,
             # e | t | o | ot | it: DV.NO,
             a | r: DV.LGUI,
-            a | r | ot: DV.RIGHT,
+            a | r | ot: DV.LEFT,
             a | r | it: DV.PGUP,
             a | r | ot | it: DV.LAYER3,
             o | s: DV.LALT,
@@ -401,7 +401,7 @@ class Taipo(Module):
             t | n | it: DV.END,
             t | n | ot | it: DV.LAYER1,
             e | i: KC.LSFT, # AHHH these aren't kmk oneshots, they're taipo builtins
-            e | i | ot: DV.LEFT,
+            e | i | ot: DV.RIGHT,
             e | i | it: DV.PGDN,
             e | i | ot | it: DV.LAYER0,
             r | a | s | o: KC.MOD_GA,
