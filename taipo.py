@@ -37,32 +37,38 @@ taipo_keycodes = {
     'TP_BLI': 7,
     'TP_LIT': 8, # inner thumb
     'TP_LOT': 9, # outer thumb (and I have one more thumb, amongst other stuff)
-    'TP_TRP': 10,
-    'TP_TRR': 11,
-    'TP_TRM': 12,
-    'TP_TRI': 13,
-    'TP_BRP': 14,
-    'TP_BRR': 15,
-    'TP_BRM': 16,
-    'TP_BRI': 17,
-    'TP_RIT': 18,
-    'TP_ROT': 19,
-    'LAYER0': 20,
-    'LAYER1': 21,
-    'LAYER2': 22,
-    'LAYER3': 23,
-    'MOD_GA': 24, # GUI+ALT
-    'MOD_GC': 25, # GUI + CTRL
-    'MOD_GS': 26,
-    'MOD_AC': 27,
-    'MOD_AS': 28,
-    'MOD_CS': 29,
-    'MOD_GAC': 30,
-    'MOD_GAS': 31,
-    'MOD_GCS': 32,
-    'MOD_ACS': 33,
-    'MOD_GACS': 34, # etc.
+    'TP_LUT': 10, # upper thumb
+
+    'TP_TRP': 16,
+    'TP_TRR': 17,
+    'TP_TRM': 18,
+    'TP_TRI': 19,
+    'TP_BRP': 20,
+    'TP_BRR': 21,
+    'TP_BRM': 22,
+    'TP_BRI': 23,
+    'TP_RIT': 24,
+    'TP_ROT': 25,
+    'TP_RUT': 26,
+
+    # If you assign any of these the logic will break
+    'LAYER0': 42, # the actual order doesn't matter
+    'LAYER1': 27,
+    'LAYER2': 28,
+    'LAYER3': 29,
+    'MOD_GA': 30, # GUI+ALT
+    'MOD_GC': 31, # GUI + CTRL
+    'MOD_GS':  33,
+    'MOD_AC':  34,
+    'MOD_AS':  35,
+    'MOD_CS':  36,
+    'MOD_GAC': 37,
+    'MOD_GAS': 38,
+    'MOD_GCS': 39,
+    'MOD_ACS': 40,
+    'MOD_GACS': 41, # etc.
 };
+
 # This should probably happen outside the module instead - this is a bit late
 for key, code in taipo_keycodes.items():
     make_key(names=(key,), constructor=TaipoKey, code=code)
@@ -94,7 +100,7 @@ class DVP():
         self.DLR = KC.DLR
         self.DOT = KC.E
         self.DOWN = KC.DOWN
-        self.DQT = KC.DQT # doublequote - but it's shifted... TODO
+        self.DQT = KC.LSFT(KC.Q)# doublequote - but it's shifted... TODO
         self.E = KC.D
         self.END = KC.END
         self.ENTER = KC.ENTER
@@ -228,10 +234,14 @@ class State:
 
     key = KeyPress()
 
-   
+# Alternate no-lift keymap stuff:
+# ot alone is a modifier (next is shift)
+# Ah crap the various modes don't exist...
+# Let's just implement this and try. If ot is pressed, shift the keymap up 4 (forget it and ot for now)
+
 class Taipo(Module):
     # sticky_timeout is now configured in the stickykeys module, this is unused
-    def __init__(self, tap_timeout=300, sticky_timeout=1000, ghost_timeout=50):
+    def __init__(self, tap_timeout=600, sticky_timeout=1000, ghost_timeout=50):
         self.tap_timeout = tap_timeout
         self.sticky_timeout=sticky_timeout
         self.ghost_timeout = ghost_timeout
@@ -434,6 +444,12 @@ class Taipo(Module):
             r | n | i: DV.Z, # ring finger gap
             r | n | i | ot: DV.LSFT(DV.Z),
             a | t | e | ot: DV.LSFT(DV.Q),
+
+            a | i: DV.DOT,
+            r | e: DV.DQT,
+
+            # Use major diagonals for full stop and... some other important punctuation
+            # quote, semicolon, period
         } # KEYMAP_END
 
     # Changes from stock:
@@ -442,6 +458,7 @@ class Taipo(Module):
     # * add Ardux space/backspace 4-fingers
     # - use the... Z and Q (sn/at) with M and W, since I don't like those big diagonals
     #   I like the flat chords better so use them for higher frequency stuff
+    # - add LUT/RUT keys. They re-trigger the existing combo, which is useful for roll-off chain combos (kind of hard to use though)
 
     # Remove the cross-level keys entirely for letters!
     # aot, aoe, ate * 2 levels = exactly the amount of missing chars
@@ -471,7 +488,7 @@ class Taipo(Module):
         if not isinstance(key, TaipoKey):
             return key
 
-        side = 1 if key.taipo_code / 10 >= 1 else 0 # taipo_code & 0x1 would be better, fix that later
+        side = 1 if key.taipo_code & 0x10 != 0 else 0
         code = key.taipo_code # Forgot to use this?
         if is_pressed:
             if self.state[side].key.keycode != KC.NO:
@@ -483,7 +500,7 @@ class Taipo(Module):
 
             # And if the current state is clear (no key determined yet) it gets added to the combo and the timer starts
 
-            self.state[side].combo |= 1 << (key.taipo_code % 10) # mod 10? ahhhh since the first digit is the side, this pushes to l/r...
+            self.state[side].combo |= 1 << (key.taipo_code & 0xF)
             self.state[side].timer = ticks_ms() + self.tap_timeout
 
             self.state[side].releasing = False
@@ -498,7 +515,6 @@ class Taipo(Module):
                 if (self.state[side].last_keypress_timestamp > ticks_ms() - self.ghost_timeout and
                     self.state[side].last_combo != 0):
                     combo = self.state[side].last_combo
-                    print("current: ", self.state[side].last_combo, " last: ", self.state[side].combo)
                     self.state[side].last_keypress_timestamp = 0
                     anti_ghost = True
 
@@ -508,7 +524,7 @@ class Taipo(Module):
             # Combo key that was part of a combo and is released at the end won't trigger a keystroke
             self.handle_key(keyboard, side)
 
-            self.state[side].combo &= ~(1 << (key.taipo_code % 10))
+            self.state[side].combo &= ~(1 << (key.taipo_code & 0xF))
 
             if anti_ghost:
                 self.state[side].releasing = False
@@ -577,8 +593,10 @@ class Taipo(Module):
                 keyboard.tap_key(key.keycode)
         
     def determine_key(self, val):
-        if val in self.keymap:
-            return self.keymap[val]
+        # LUT/RUT aren't used in combos, they just trigger combos
+        actual_val = val & ~(1 << 10)
+        if actual_val in self.keymap:
+            return self.keymap[actual_val]
         else:
             return KC.NO
        
