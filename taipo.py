@@ -240,16 +240,20 @@ ot = 1 << 9
 # But need to bring in another low-utility character...
 
 # For left hand
-# R [x] [ ] [ ] [x]_[ ]
+# P [x] [ ] [ ] [x]_[ ]
 # M [x] [ ] [x] [ ]_[x]
 # V [ ] [x] [ ] [x]_[x]
 # Z [x] [x] [x] [x]_[ ]
 
 # AH CRAP I meant to reassign P
 # Swap P and Q because it's easier to remember
-# P [x] [ ] [x] [ ]_[ ]
+# R [x] [ ] [x] [ ]_[ ]
 # Q [x] [x] [x] [x]_[x]
 # Looks good! I guess
+
+# 'er' is a high frequency diagram, removing the overlap (swap R/P?) might be better
+# ehhhh there are a lot of those in this keymap anywya... but er/re are high frequency so fixing them might be better
+# Do it sooner than later!
 
 class KeyPress:
     keycode = KC.NO
@@ -321,9 +325,9 @@ class Taipo(Module):
             ot | e | t: DV.D,
             t | o | a: DV.B,
             ot | t: DV.C,
-            t | a: DV.P,
+            t | a: DV.R,
             ot | e | t | o | a: DV.Q,
-            e | a: DV.R,
+            e | a: DV.P,
             ot | t | o: DV.Y,
             ot | t | o | a: DV.X,
             ot | e | o | a: DV.W,
