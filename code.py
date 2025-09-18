@@ -10,6 +10,7 @@ from kmk.modules.layers import Layers
 from kmk.modules.split import Split, SplitSide
 from kmk.modules.sticky_keys import StickyKeys # requirement for Taipo (formerly oneshot, KC.OS)
 from kmk.modules.holdtap import HoldTap
+from kmk.modules.mouse_keys import MouseKeys
 
 from kmk.extensions.rgb import RGB
 
@@ -24,8 +25,8 @@ keyboard.diode_orientation = DiodeOrientation.COL2ROW
 split = Split(data_pin = board.GP0, use_pio = True, split_flip = False)
 keyboard.modules.append(split)
 
-
 keyboard.modules.append(StickyKeys())
+keyboard.modules.append(MouseKeys())
 
 layers = Layers()
 layers.tap_time = 150
@@ -81,10 +82,10 @@ NORMAL_OFF = RGBKey1(0)
 
 keyboard.keymap = [
         [
-        KC.NO, KC.NO, KC.NO, KC.NO, KC.NO, KC.NO,          KC.NO, KC.NO, KC.NO, KC.NO, KC.TG(5), NORMAL_ON, 
-        KC.NO, KC.TP_TLP, KC.TP_TLR, KC.TP_TLM, KC.TP_TLI, KC.NO,     KC.NO, KC.TP_TRI, KC.TP_TRM, KC.TP_TRR, KC.TP_TRP, KC.NO, 
-        KC.NO, KC.TP_BLP, KC.TP_BLR, KC.TP_BLM, KC.TP_BLI, KC.NO,      KC.NO, KC.TP_BRI, KC.TP_BRM, KC.TP_BRR, KC.TP_BRP, KC.NO, 
-        KC.NO, KC.NO, KC.NO, KC.MO(1), KC.TP_LIT, KC.TP_LOT,       KC.TP_ROT, KC.TP_RIT, KC.MO(1), KC.NO, KC.NO, KC.NO, 
+        KC.NO, KC.NO, KC.NO, KC.NO, KC.NO, KC.MW_UP,          KC.NO, KC.NO, KC.NO, KC.NO, KC.TG(5), NORMAL_ON, 
+        KC.NO, KC.TP_TLP, KC.TP_TLR, KC.TP_TLM, KC.TP_TLI, KC.MW_DOWN,     KC.NO, KC.TP_TRI, KC.TP_TRM, KC.TP_TRR, KC.TP_TRP, KC.NO, 
+        KC.NO, KC.TP_BLP, KC.TP_BLR, KC.TP_BLM, KC.TP_BLI, KC.TP_LUT,      KC.TP_RUT, KC.TP_BRI, KC.TP_BRM, KC.TP_BRR, KC.TP_BRP, KC.NO, 
+        KC.NO, KC.NO, KC.NO, KC.MO(LAYER_BROWSER), KC.TP_LIT, KC.TP_LOT,       KC.TP_ROT, KC.TP_RIT, KC.MO(1), KC.NO, KC.NO, KC.NO, 
         ],
         # Taipo macro layer - useful browser stuff
         # tab left/right
@@ -125,9 +126,9 @@ keyboard.keymap = [
     # empty spaces can be used for non-browser convenience stuff
     # mixing this with UI layer might be nice
     [
-        KC.TRNS, KC.LGUI(KC.N1), KC.LGUI(KC.N2), KC.LGUI(KC.N3), KC.LGUI(KC.N4), KC.LGUI(KC.N5),  KC.LGUI(KC.N6), KC.LGUI(KC.N7), KC.LGUI(KC.N8), KC.LGUI(KC.P), KC.LGUI(KC.N0), KC.NO, 
-        KC.TRNS, KC.LCTRL(KC.LSFT(KC.TAB)), KC.LCTRL(KC.K) , KC.LSFT(KC.TAB), KC.NO, KC.NO,     KC.NO, KC.NO, KC.NO, KC.LGUI(KC.P), KC.NO, KC.NO, 
-        KC.NO, KC.NO, KC.LCTRL(KC.COMMA) , KC.LGUI(KC.C), KC.LGUI(KC.V), KC.NO,      KC.NO, KC.LGUI(KC.J), KC.NO, KC.NO, KC.NO, KC.NO, 
+        KC.TRNS, KC.LGUI(KC.N1), KC.LGUI(KC.N2), KC.LGUI(KC.N3), KC.LGUI(KC.N4), KC.LGUI(KC.N5),  KC.LGUI(KC.N6), KC.LGUI(KC.N7), KC.LGUI(KC.N8), KC.LGUI(KC.N9), KC.LGUI(KC.N0), KC.NO, 
+        KC.TRNS, KC.LCTRL(KC.LSFT(KC.TAB)), KC.LCTRL(KC.K) , KC.LCTRL(KC.TAB), KC.NO, KC.NO,     KC.NO, KC.NO, KC.NO, KC.LGUI(KC.P), KC.NO, KC.NO, 
+        KC.NO, KC.LCTRL(KC.P), KC.LCTRL(KC.COMMA) , KC.LGUI(KC.C), KC.LGUI(KC.V), KC.NO,      KC.NO, KC.LGUI(KC.J), KC.NO, KC.NO, KC.NO, KC.NO, 
         KC.NO, KC.NO, KC.NO, KC.TRIGGERL, KC.NO, KC.NO,       KC.NO, KC.NO, KC.TRIGGERR, KC.NO, KC.NO, KC.NO, 
         ],
     
@@ -158,6 +159,7 @@ keyboard.keymap = [
 # ctrl/alt/gui, at minimum
 # also, the backspace hold thing is a bit annoying - can't hold backspace through words!
 
+# why does ctrl++ not trigger alacritty scaling? 
 
 # Weird double-hand taipo
 # Low row is on the left hand, high row is on the right - 4 fingers each that never have to move
