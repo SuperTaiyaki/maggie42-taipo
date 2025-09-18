@@ -69,9 +69,10 @@ taipo_keycodes = {
     'MOD_GCS': 39,
     'MOD_ACS': 40,
     'MOD_GACS': 41, # etc.
+
+    'MOD_N': 43, # Cykey-specific
 };
 
-# This should probably happen outside the module instead - this is a bit late
 for key, code in taipo_keycodes.items():
     make_key(names=(key,), constructor=TaipoKey, code=code)
 
@@ -95,7 +96,7 @@ class DVP():
         self.BSPC = KC.BSPC
         self.C = KC.I
         self.CIRC = KC.CIRC # ^
-        self.COLN = KC.Z # uhhhh does this work? since it's a shifted key
+        self.COLN = KC.LSFT(KC.Z) # uhhhh does this work? since it's a shifted key
         self.COMM = KC.W
         self.D = KC.H
         self.DEL = KC.DEL
@@ -204,8 +205,14 @@ class DVP():
         self.X = KC.B
         self.Y = KC.T
         self.Z = KC.SLASH
-DV = DVP()
 
+        self.MINUS = KC.QUOT,
+        self.EQUAL = KC.LSFT(KC.RBRACKET),
+        #self.DOUBLE_QUOTE = KC.LSFT(KC.Q), # When I send one of these to the Taipo code it explodes. WHY.
+        self.QUESTION = KC.LSFT(KC.LBRACKET),
+
+# DV = KC # To get a straight QWERTY mappign. Maybe!
+DV = DVP()
 
 # These are taipo key names, they don't make much sense for Cykey
 r = 1 << 0 # ahhhh, these are the stock single-finger character codes
@@ -235,7 +242,6 @@ ot = 1 << 9
 # J is useless, use that for M?
 # Z is easy to type too
 
-
 # and then R-M-V
 # But need to bring in another low-utility character...
 
@@ -248,12 +254,28 @@ ot = 1 << 9
 # AH CRAP I meant to reassign P
 # Swap P and Q because it's easier to remember
 # R [x] [ ] [x] [ ]_[ ]
-# Q [x] [x] [x] [x]_[x]
+# #Q [x] [x] [x] [x]_[x] # Removed
 # Looks good! I guess
 
 # 'er' is a high frequency diagram, removing the overlap (swap R/P?) might be better
 # ehhhh there are a lot of those in this keymap anywya... but er/re are high frequency so fixing them might be better
 # Do it sooner than later!
+# -> r is a-t so that it can roll to and from e
+
+# Swap U and A since that's how taipo does it. A has much higher frequency than U;
+# mostly for comfort. Will affect some digrams...
+# Purely for familiarity, A on pinkie and U on pair feels closer to taipo
+# Is there much benefit?
+# A is on a strong pair...
+# -> +1 keystroke of efficiency, may as well do it
+
+# I don't like Q (full press), it's just awkward. Is there another open chord?
+# Punctuation... swap with exclamation mark? That seems appropriate
+# Actually that chord is quite nice, does something else need to be upgraded? maybe F? Not a huge difference, meh.
+# But that was [Y]
+# Q [X] [X] [ ] [X]_[ ]
+# ! [x] [x] [x] [x]_[x]
+# This Q can't roll to U, though that's not a huge deaal
 
 class KeyPress:
     keycode = KC.NO
@@ -273,17 +295,6 @@ class State:
 
     key = KeyPress()
 
-# Alternate no-lift keymap stuff:
-# ot alone is a modifier (next is shift)
-# Ah crap the various modes don't exist...
-# Let's just implement this and try. If ot is pressed, shift the keymap up 4 (forget it and ot for now)
-
-# Early confusion: Wow this is nice
-# Now, how to make the shift and various other modes work?
-# space tap for space, space tap for caps... wait wut
-# ahhhh it's command not space
-# so that's it (uh oh), 
-
 
 class Taipo(Module):
     # sticky_timeout is now configured in the stickykeys module, this is unused
@@ -293,7 +304,7 @@ class Taipo(Module):
         self.ghost_timeout = ghost_timeout
         self.state = [State(), State()]
 
-# One thing I want to work on: enter is not safe! It's too close to backspace, liable to do it accidentally
+# One thing I want to work on: enter ([C] for carriage return) is not safe! It's too close to backspace, liable to do it accidentally
 # Will be better once I remember K...
 
 # Will want left/right for text editing
@@ -302,10 +313,17 @@ class Taipo(Module):
 # oh hey [H] and [L] are in the right places (and only one key apart)
 # [P] and [H] are also mode switches, a bit hard to reach
 
+
         self.keymap = { # KEYMAP_START
             it: DV.LSFT, # Next char is capital
             ot: DV.SPC,
-            
+            # These two are also in the punctuation mode...?
+            # (and space)
+            e | o | a: DV.COMM,
+            e | t | o: DV.DOT,
+            # Wasn't there one or two more...?
+
+            it | t | o: KC.MOD_N,
             ot | e: DV.I,
             ot | e | a: DV.L,
             a | o: DV.G,
@@ -315,8 +333,8 @@ class Taipo(Module):
             e: DV.E,
             t: DV.O,
             o: DV.S,
-            a: DV.U,
-            e | t: DV.A,
+            a: DV.A,
+            e | t: DV.U,
             t | o: DV.N,
             ot | e | o: DV.V,
             ot | o: DV.K,
@@ -326,19 +344,22 @@ class Taipo(Module):
             t | o | a: DV.B,
             ot | t: DV.C,
             t | a: DV.R,
-            ot | e | t | o | a: DV.Q,
+           #ot | e | t | o | a: DV.Q,
             e | a: DV.P,
             ot | t | o: DV.Y,
             ot | t | o | a: DV.X,
             ot | e | o | a: DV.W,
             ot | t | a: DV.M,
 
-            # These two are also in the punctuation mode...?
-            # (and space)
-            e | o | a: DV.COMM,
-            e | t | o: DV.DOT,
+            # Non-permanent punctuation
+                       #e | t | a: KC.QUOT, # DV.MINUS, DV.MINUS doesn't work!
+            e | t | a: DV.Q,
+            ot | e | t | a: DV.QUOT,
+            ot | e | t | o | a: KC.EXCLAIM,
+
 
             # Not in the original layout, but since I have more keys...
+            # This is mostly useful because they can be shifted for symbols
             i: DV.N1,
             i | ot: DV.N2,
             i | ot | n: DV.N3,
@@ -346,26 +367,58 @@ class Taipo(Module):
             i | ot | n | s | r: DV.N5,
             r: DV.N6,
             r | s: DV.N7,
-            r | s | t: DV.N8,
-            r | s | t | i: DV.N9,
+            r | s | n: DV.N8,
+            r | s | n | i: DV.N9,
             n: DV.N0,
             # And then add their shifted symbols on top with... uhh.... the same shift logic! so hold IT or replace OT with IT
+            # Just use a physical shift for the number layer (less logic to write)
+
+            i | r | s: DV.COMM,
+            i | n | s: DV.DOT,
+
+            ot | r | s | i: DV.COLN,
+            ot | s | i: DV.SCLN,
+            ot | s | r: DV.EQUAL,
+            r | n: KC.LEFT_PAREN,
+            n | ot: KC.RIGHT_PAREN,
+            ot | r: DV.QUOT, # Don't know why this doesn't work via DV.
+
+            # LSFTing stuff doesn't work in here - need to use the constructor directly.
+            n | s: KC.LSFT(KC.Q), # DOUBLE_QUOTE
+            i | n | r: KC.LSFT(KC.LBRACKET), # QUESTION,
+            ot | n | s: KC.EXCLAIM, # Wasn't this in the top layer...?
+            ot | s: DV.BSLS, # re-slanted because left hand
+            r | i: DV.SLSH,
 
             # Shifted commands
             it | o: DV.BSPC, # [K] bacK
             it | t: DV.ENTER, # [C] Carriage return
+            # Want an escape here just in case I happen to be vim-ing for some reason...
+            it | e: DV.ESC, # [E] for escape
 
-            # These are not from the official layout
-            it | a: DV.LEFT, # H
-            it | a | e: DV.RIGHT, # L
+            # Taipo arrow keys since they don't clash
+            ot | t | n : DV.UP,
+            ot | o | s : DV.DOWN,
+            ot | a | r : DV.LEFT,
+            ot | e | i : DV.RIGHT, # why is this not DV? oh well
 
+            # Taipo modifier block since it works well
+            t | n : DV.LCTL,
+            o | s : DV.LALT,
+            a | r : DV.LGUI,
+            e | i : KC.LSFT, # why is this not DV? oh well
+
+            # TODO: 
 
         } # KEYMAP_END
 
+        # The shifted map (numbers)
+        # Punctuation is in the number layer!
         self.keymap_symbol = {
             ot | e | o | a: KC.LSFT(DV.SCLN),
             ot | e | o: DV.SCLN,
-            #ot | t | a: DV.PERCENT, # TODO
+            # Only include the main-block (non-number) symbols in here
+
             # uh oh, maybe I should put weird symbols onto numbers?
             # And there are a few symbols missing, maybe expand the layout for those
             # upper row for numbers...?
