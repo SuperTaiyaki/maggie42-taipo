@@ -14,7 +14,7 @@ from kmk.modules.mouse_keys import MouseKeys
 
 from kmk.extensions.rgb import RGB
 
-from taipo import Taipo
+from cykey import Cykey
 
 keyboard = KMKKeyboard()
 
@@ -36,7 +36,7 @@ keyboard.modules.append(layers)
 rgb = RGB(pixel_pin = board.NEOPIXEL, num_pixels = 1, hue_default = 176, sat_default = 30, val_default = 128, val_limit = 128,)
 keyboard.extensions.append(rgb)
 
-keyboard.modules.append(Taipo())
+keyboard.modules.append(Cykey())
 
 LAYER_NORMAL = 2
 LAYER_BROWSER = 3

@@ -1,7 +1,5 @@
 # This file is from a GPL2 repository, hence the overall license.
 
-# Actually this file is no longer Taipo, it's a (modified) CyKey layout
-
 try:
     from typing import Optional, Tuple, Union
 except ImportError:
@@ -298,7 +296,7 @@ class State:
     key = KeyPress()
 
 
-class Taipo(Module):
+class Cykey(Module):
     # sticky_timeout is now configured in the stickykeys module, this is unused
     def __init__(self, tap_timeout=600, sticky_timeout=1000, ghost_timeout=50):
         self.tap_timeout = tap_timeout
@@ -587,30 +585,4 @@ class Taipo(Module):
 
     def on_powersave_disable(self, keyboard):
         pass
-
-# I think the reason I dislike pinkie-high combos is
-# To make the pinkie reach I raise my whole hand, and then crunch everything else back down
-# that movement in particular is bad
-# tenting helps a lot with that
-# ahhhhh the raised wrist thing
-# Need tenting if I'm using a wide grip, normal tight keyboard grip my wrists can roll around
-
-# Where'd my comments go, about designing a fresh layout...
-# So, no diagonals!
-# it feels like j/k should have higher priority than m/w
-# K is actually really low! 
-# K/W are about even, actually
-# At the tail end we have:
-# worst: Z/Q
-# Then: V/X
-# Then: J/K
-# Then the normal stuff
-# They're all so low that it doesn't matter, but the sequences matter...
-# Bigram chart! See Norvig (https://norvig.com/mayzner.html)
-# THE is important, not being able to roll that is annoying
-#   Some special behaviour for this (slow roll?) might help
-# Ideally I'd like E to be in the dvorak location, since muscle memory
-# t/h/e/r being on the same row would maybe help efficiency? But then other stuff goes weird
-# So it feels like the level switch is slowing me down (compared to dvorak...) but is that the biggest problem?
-# I want full homing dots on one row...
 
