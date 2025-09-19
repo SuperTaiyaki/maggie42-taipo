@@ -293,6 +293,8 @@ class State:
     last_combo = 0 # combo as of One step before
     last_keypress_timestamp = 0
 
+    shifted = 0 # MOD_n and friends (only mod_n for now)
+
     key = KeyPress()
 
 
@@ -381,7 +383,7 @@ class Taipo(Module):
             ot | s | r: DV.EQUAL,
             r | n: KC.LEFT_PAREN,
             n | ot: KC.RIGHT_PAREN,
-            ot | r: DV.QUOT, # Don't know why this doesn't work via DV.
+            ot | r: KC.QUOT, # DV.MINUS, # Don't know why this doesn't work via DV.
 
             # LSFTing stuff doesn't work in here - need to use the constructor directly.
             n | s: KC.LSFT(KC.Q), # DOUBLE_QUOTE
@@ -407,8 +409,10 @@ class Taipo(Module):
             o | s : DV.LALT,
             a | r : DV.LGUI,
             e | i : KC.LSFT, # why is this not DV? oh well
+            # TODO: Need all the combinations too
 
-            # TODO: 
+            # TODO: need an escape key somewhere (or just a hardware escape...
+            a | it: KC.ESC, # [H] for escape (or [A], either way)
 
         } # KEYMAP_END
 
@@ -422,6 +426,7 @@ class Taipo(Module):
             # uh oh, maybe I should put weird symbols onto numbers?
             # And there are a few symbols missing, maybe expand the layout for those
             # upper row for numbers...?
+            # Use the [N] mode switch to just swap the top and bottom rows?
 
             }
 
@@ -475,7 +480,7 @@ class Taipo(Module):
                     self.state[side].last_keypress_timestamp = 0
                     anti_ghost = True
 
-                self.state[side].key.keycode = self.determine_key(combo)
+                self.state[side].key.keycode = self.determine_key(combo, self.state[side].shifted)
 
             # Combo key that has never triggered a combo does create a keystroke
             # Combo key that was part of a combo and is released at the end won't trigger a keystroke
@@ -501,6 +506,11 @@ class Taipo(Module):
         
     def handle_key(self, keyboard, side):
         key = self.state[side].key
+
+        if key.keycode == KC.MOD_N:
+
+            return
+
         mods = []
 
         # Should these be KC?
@@ -549,9 +559,18 @@ class Taipo(Module):
             else:
                 keyboard.tap_key(key.keycode)
         
-    def determine_key(self, val):
-        # LUT/RUT aren't used in combos, they just trigger combos
-        actual_val = val & ~(1 << 10)
+    def determine_key(self, val, shifted = False):
+
+        actual_val = val
+        if shifted:
+            high = val & 0xF0
+            low = val & 0x0F
+
+            # WAIT A FUCKING SEC THIS DOESN'T WORK
+            # Need to make sure this is aplied to only the next key, like tap_key...
+            actual_val = high >> 4 | low << 4
+
+
         if actual_val in self.keymap:
             return self.keymap[actual_val]
         else:
