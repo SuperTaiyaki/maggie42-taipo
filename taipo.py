@@ -67,10 +67,9 @@ taipo_keycodes = {
     'MOD_GCS': 39,
     'MOD_ACS': 40,
     'MOD_GACS': 41, # etc.
-
-    'MOD_N': 43, # Cykey-specific
 };
 
+# This should probably happen outside the module instead - this is a bit late
 for key, code in taipo_keycodes.items():
     make_key(names=(key,), constructor=TaipoKey, code=code)
 
@@ -94,7 +93,7 @@ class DVP():
         self.BSPC = KC.BSPC
         self.C = KC.I
         self.CIRC = KC.CIRC # ^
-        self.COLN = KC.LSFT(KC.Z) # uhhhh does this work? since it's a shifted key
+        self.COLN = KC.Z # uhhhh does this work? since it's a shifted key
         self.COMM = KC.W
         self.D = KC.H
         self.DEL = KC.DEL
@@ -203,16 +202,9 @@ class DVP():
         self.X = KC.B
         self.Y = KC.T
         self.Z = KC.SLASH
-
-        self.MINUS = KC.QUOT,
-        self.EQUAL = KC.LSFT(KC.RBRACKET),
-        #self.DOUBLE_QUOTE = KC.LSFT(KC.Q), # When I send one of these to the Taipo code it explodes. WHY.
-        self.QUESTION = KC.LSFT(KC.LBRACKET),
-
-# DV = KC # To get a straight QWERTY mappign. Maybe!
 DV = DVP()
 
-# These are taipo key names, they don't make much sense for Cykey
+
 r = 1 << 0 # ahhhh, these are the stock single-finger character codes
 s = 1 << 1 # un-mirroring each hand will be a bit tricky like this... (if I want smarter hjkl layout)
 n = 1 << 2
@@ -223,57 +215,6 @@ t = 1 << 6
 e = 1 << 7
 it = 1 << 8
 ot = 1 << 9
-
-# Changes to make to the layout:
-# P is a pain, swap it with something less useful (maybe P/Z)
-# Apart from that.... nothing, really?
-# M and R are also not great (4 fingers for M, 3 for R). What's open?
-# There are only 31 combinations available, there's not much open...
-# Oh what the hell punctuation get 3 characters!
-# Punctuation beats VKXJQZ
-# Q is taking up a damn valuable slot!
-# So, drop m? into the Q slot? or R?
-# Don't forget that Q leads into U
-# V is also damn low, put R in there
-# and then put M into Q
-# Don't want to touch K because it's an important command
-# J is useless, use that for M?
-# Z is easy to type too
-
-# and then R-M-V
-# But need to bring in another low-utility character...
-
-# For left hand
-# P [x] [ ] [ ] [x]_[ ]
-# M [x] [ ] [x] [ ]_[x]
-# V [ ] [x] [ ] [x]_[x]
-# Z [x] [x] [x] [x]_[ ]
-
-# AH CRAP I meant to reassign P
-# Swap P and Q because it's easier to remember
-# R [x] [ ] [x] [ ]_[ ]
-# #Q [x] [x] [x] [x]_[x] # Removed
-# Looks good! I guess
-
-# 'er' is a high frequency diagram, removing the overlap (swap R/P?) might be better
-# ehhhh there are a lot of those in this keymap anywya... but er/re are high frequency so fixing them might be better
-# Do it sooner than later!
-# -> r is a-t so that it can roll to and from e
-
-# Swap U and A since that's how taipo does it. A has much higher frequency than U;
-# mostly for comfort. Will affect some digrams...
-# Purely for familiarity, A on pinkie and U on pair feels closer to taipo
-# Is there much benefit?
-# A is on a strong pair...
-# -> +1 keystroke of efficiency, may as well do it
-
-# I don't like Q (full press), it's just awkward. Is there another open chord?
-# Punctuation... swap with exclamation mark? That seems appropriate
-# Actually that chord is quite nice, does something else need to be upgraded? maybe F? Not a huge difference, meh.
-# But that was [Y]
-# Q [X] [X] [ ] [X]_[ ]
-# ! [x] [x] [x] [x]_[x]
-# This Q can't roll to U, though that's not a huge deaal
 
 class KeyPress:
     keycode = KC.NO
@@ -291,12 +232,14 @@ class State:
     last_combo = 0 # combo as of One step before
     last_keypress_timestamp = 0
 
-    shifted = 0 # MOD_n and friends (only mod_n for now)
-
     key = KeyPress()
 
+# Alternate no-lift keymap stuff:
+# ot alone is a modifier (next is shift)
+# Ah crap the various modes don't exist...
+# Let's just implement this and try. If ot is pressed, shift the keymap up 4 (forget it and ot for now)
 
-class Cykey(Module):
+class Taipo(Module):
     # sticky_timeout is now configured in the stickykeys module, this is unused
     def __init__(self, tap_timeout=600, sticky_timeout=1000, ghost_timeout=50):
         self.tap_timeout = tap_timeout
@@ -304,109 +247,173 @@ class Cykey(Module):
         self.ghost_timeout = ghost_timeout
         self.state = [State(), State()]
 
-# One thing I want to work on: enter ([C] for carriage return) is not safe! It's too close to backspace, liable to do it accidentally
-# Will be better once I remember K...
-
-# Will want left/right for text editing
-# could sneak them into the top layer but it has something...
-# [F] and [K], but they're not write for modern systems
-# oh hey [H] and [L] are in the right places (and only one key apart)
-# [P] and [H] are also mode switches, a bit hard to reach
-
-
         self.keymap = { # KEYMAP_START
-            it: DV.LSFT, # Next char is capital
+            t: DV.T,
+            t | e: DV.H,
+            it: DV.BSPC,
             ot: DV.SPC,
-            # These two are also in the punctuation mode...?
-            # (and space)
-            e | o | a: DV.COMM,
-            e | t | o: DV.DOT,
-            # Wasn't there one or two more...?
-
-            it | t | o: KC.MOD_N,
-            ot | e: DV.I,
-            ot | e | a: DV.L,
-            a | o: DV.G,
-            ot | o | a: DV.J,
-            e | o: DV.T,
-            a | ot: DV.H,
-            e: DV.E,
-            t: DV.O,
-            o: DV.S,
+            r: DV.R,
+            r | ot: KC.LSFT(DV.R),
+            r | it: DV.RABK,
+            r | ot | it: DV.PRINT_SCREEN, # ewwwww
+            s: DV.S,
+            s | ot: KC.LSFT(DV.S),
+            s | it: DV.RCBR,
+            # s | ot | it: DV.BRIGHTNESS_UP, # ewwww
+            n: DV.N,
+            n | ot: KC.LSFT(DV.N),
+            n | it: DV.RBRC,
+            #n | ot | it: DV.BRIGHTNESS_DOWN,
+            i: DV.I,
+            i | ot: KC.LSFT(DV.I),
+            i | it: DV.RPRN,
+            #i | ot | it: DV.MEDIA_PLAY_PAUSE,
             a: DV.A,
-            e | t: DV.U,
-            t | o: DV.N,
-            ot | e | o: DV.V,
-            ot | o: DV.K,
-            ot | e | t | o: DV.F,
-            e | t | o | a: DV.Z,
-            ot | e | t: DV.D,
-            t | o | a: DV.B,
-            ot | t: DV.C,
-            t | a: DV.R,
-           #ot | e | t | o | a: DV.Q,
-            e | a: DV.P,
-            ot | t | o: DV.Y,
-            ot | t | o | a: DV.X,
-            ot | e | o | a: DV.W,
-            ot | t | a: DV.M,
-
-            # Non-permanent punctuation
-                       #e | t | a: KC.QUOT, # DV.MINUS, DV.MINUS doesn't work!
-            e | t | a: DV.Q,
-            ot | e | t | a: DV.QUOT,
-            ot | e | t | o | a: KC.EXCLAIM,
-
-
-            # Not in the original layout, but since I have more keys...
-            # This is mostly useful because they can be shifted for symbols
-            i: DV.N1,
-            i | ot: DV.N2,
-            i | ot | n: DV.N3,
-            i | ot | n | s: DV.N4,
-            i | ot | n | s | r: DV.N5,
-            r: DV.N6,
-            r | s: DV.N7,
-            r | s | n: DV.N8,
-            r | s | n | i: DV.N9,
-            n: DV.N0,
-            # And then add their shifted symbols on top with... uhh.... the same shift logic! so hold IT or replace OT with IT
-            # Just use a physical shift for the number layer (less logic to write)
-
-            i | r | s: DV.COMM,
-            i | n | s: DV.DOT,
-
-            ot | r | s | i: DV.COLN,
-            ot | s | i: DV.SCLN,
-            ot | s | r: DV.EQUAL,
-            r | n: KC.LEFT_PAREN,
-            n | ot: KC.RIGHT_PAREN,
-            ot | r: KC.QUOT, # DV.MINUS, # Don't know why this doesn't work via DV.
-
-            # LSFTing stuff doesn't work in here - need to use the constructor directly.
-            n | s: KC.LSFT(KC.Q), # DOUBLE_QUOTE
-            i | n | r: KC.LSFT(KC.LBRACKET), # QUESTION,
-            ot | n | s: KC.EXCLAIM, # Wasn't this in the top layer...?
-            ot | s: DV.BSLS, # re-slanted because left hand
-            r | i: DV.SLSH,
-
-            # Shifted commands
-            it | o: DV.BSPC, # [K] bacK
-            it | t: DV.ENTER, # [C] Carriage return
-            # Want an escape here just in case I happen to be vim-ing for some reason...
-            it | e: DV.ESC, # [E] for escape
-
-            # Taipo arrow keys since they don't clash
-            ot | t | n : DV.UP,
-            ot | o | s : DV.DOWN,
-            ot | a | r : DV.LEFT,
-            ot | e | i : DV.RIGHT, # why is this not DV? oh well
-
-            # Taipo modifier block since it works well
-            t | n : DV.LCTL,
-            o | s : DV.LALT,
-            a | r : DV.LGUI,
-            e | i : KC.LSFT, # why is this not DV? oh well
+            a | ot: KC.LSFT(DV.A),
+            a | it: DV.LABK,
+            #a | ot | it: DV.MEDIA_NEXT_TRACK,
+            o: DV.O,
+            o | ot: KC.LSFT(DV.O),
+            o | it: DV.LCBR,
+            # o | ot | it: DV.AUDIO_VOL_UP, # ewww, and I don't want OT+IT combos
+            t: DV.T,
+            t | ot: KC.LSFT(DV.T),
+            t | it: DV.LBRC,
+            # t | ot | it: DV.AUDIO_VOL_DOWN, # lol these aren't documented either, just the creator's bonuses?
+            e: DV.E,
+            e | ot: KC.LSFT(DV.E),
+            e | it: DV.LPRN,
+            #e | ot | it: DV.MEDIA_PREV_TRACK, # More importantly, can these be re-coded or re-expressed to be less annoying? Maybe not... though being able to express shift without this would be nice
+            # Yeah, change to dynamically generating this
+            e | o: DV.C,
+            e | o | ot: KC.LSFT(DV.C),
+            e | o | it: DV.N1,
+            e | o | ot | it: DV.F1, # on the other hand, this is kind of useful.... actually, I have 3 modifiers so I can go further
+            t | o: DV.U,
+            t | o | ot: KC.LSFT(DV.U),
+            t | o | it: DV.N2,
+            t | o | ot | it: DV.F2,
+            t | a: DV.M,
+            t | a | ot: KC.LSFT(DV.M),
+            t | a | it: DV.N3,
+            t | a | ot | it: DV.F3,
+            o | a: DV.L,
+            o | a | ot: KC.LSFT(DV.L),
+            o | a | it: DV.N4,
+            o | a | ot | it: DV.F4,
+            i | n: DV.Y,
+            i | n | ot: KC.LSFT(DV.Y),
+            i | n | it: DV.N5,
+            i | n | ot | it: DV.F5,
+            i | s: DV.F,
+            i | s | ot: KC.LSFT(DV.F),
+            i | s | it: DV.N6,
+            i | s | ot | it: DV.F6,
+            n | s: DV.P,
+            n | s | ot: KC.LSFT(DV.P),
+            n | s | it: DV.N7,
+            n | s | ot | it: DV.F7,
+            n | r: DV.W,
+            n | r | ot: KC.LSFT(DV.W),
+            n | r | it: DV.N8,
+            n | r | ot | it: DV.F8,
+            s | r: DV.B,
+            s | r | ot: KC.LSFT(DV.B),
+            s | r | it: DV.N9,
+            s | r | ot | it: DV.F9,
+            e | t: DV.H,
+            e | t | ot: KC.LSFT(DV.H),
+            e | t | it: DV.N0,
+            e | t | ot | it: DV.F10,
+            e | a: DV.D,
+            e | a | ot: KC.LSFT(DV.D),
+            e | a | it: DV.AT,
+            e | a | ot | it: DV.F11,
+            i | r: DV.G,
+            i | r | ot: KC.LSFT(DV.G),
+            i | r | it: DV.HASH,
+            i | r | ot | it: DV.F12,
+            t | r: DV.X,
+            t | r | ot: KC.LSFT(DV.X),
+            t | r | it: DV.CIRC,
+            #t | r | ot | it: DV.LCTL(DV.X),
+            i | o: DV.K,
+            i | o | ot: KC.LSFT(DV.K),
+            i | o | it: DV.PLUS,
+            #i | o | ot | it: DV.LCTL(DV.C),
+            e | s: DV.V,
+            e | s | ot: KC.LSFT(DV.V),
+            e | s | it: DV.ASTR,
+            #e | s | ot | it: DV.LCTL(DV.V),
+            n | a: DV.J,
+            n | a | ot: KC.LSFT(DV.J),
+            n | a | it: DV.EQL,
+            #n | a | ot | it: DV.LCTL(DV.Z),
+            e | r: DV.Z, # changed
+            e | r | ot: KC.LSFT(DV.Z),
+            e | r | it: DV.DLR,
+            # e | r | ot | it: DV.NO,
+            i | a: DV.Z,
+            i | a | ot: KC.LSFT(DV.Z),
+            i | a | it: DV.AMPR,
+            # i | a | ot | it: DV.NO,
+            t | s: DV.SLSH,
+            t | s | ot: DV.BSLS,
+            t | s | it: DV.PIPE,
+            # t | s | ot | it: DV.NO,
+            n | o: DV.MINS,
+            n | o | ot: DV.UNDS,
+            n | o | it: DV.PERC,
+            # n | o | ot | it: DV.NO,
+            i | t: DV.QUES,
+            i | t | ot: DV.EXLM,
+            # i | t | it: DV.NO,
+            # i | t | ot | it: DV.NO,
+            e | n: DV.COMM,
+            e | n | ot: DV.DOT,
+            # e | o | a: DV.DOT,
+            e | n | it: DV.TILD,
+            # e | n | ot | it: DV.NO,
+            o | r: DV.SCLN,
+            #t | o | a: DV.SCLN, # wait 2 semicolons? I guess for some languages this one isn't bad
+            o | r | ot: DV.COLN,
+            t | o | a | ot: DV.COLN,
+            # o | r | it: DV.NO,
+            # t | o | a | it: DV.NO,
+            # o | r | ot | it: DV.NO,
+            # t | o | a | ot | it: DV.NO,
+            s | a: DV.QUOT,
+            #n | s | r: DV.QUOT,
+            s | a | ot: DV.DQT,
+            n | s | r | ot: DV.DQT,
+            s | a | it: DV.GRV,
+            n | s | r | it: DV.GRV,
+            # s | a | ot | it: DV.NO,
+            # n | s | r | ot | it: DV.NO,
+            i | n | s: DV.TAB,
+            i | n | s | ot: DV.DEL,
+            i | n | s | it: DV.INS,
+            # i | n | s | ot | it: DV.NO,
+            e | t | o: DV.ENTER,
+            e | t | o | ot: DV.ESC,
+            e | t | o | it: DV.RALT,
+            # e | t | o | ot | it: DV.NO,
+            a | r: DV.LGUI,
+            a | r | ot: DV.LEFT,
+            a | r | it: DV.PGUP,
+            a | r | ot | it: DV.LAYER3,
+            o | s: DV.LALT,
+            o | s | ot: DV.DOWN,
+            o | s | it: DV.HOME,
+            o | s | ot | it: DV.LAYER2,
+            t | n: DV.LCTL,
+            t | n | ot: DV.UP,
+            t | n | it: DV.END,
+            t | n | ot | it: DV.LAYER1,
+            e | i: KC.LSFT, # AHHH these aren't kmk oneshots, they're taipo builtins
+            e | i | ot: DV.RIGHT,
+            e | i | it: DV.PGDN,
+            e | i | ot | it: DV.LAYER0,
             r | a | s | o: KC.MOD_GA,
             r | a | n | t: KC.MOD_GC,
             r | a | i | e: KC.MOD_GS,
@@ -417,25 +424,49 @@ class Cykey(Module):
             r | a | s | o | i | e: KC.MOD_GAS,
             r | a | n | t | i | e: KC.MOD_GCS,
             s | o | n | t | i | e: KC.MOD_ACS,
+            r | a | s | o | n | t | i | e: KC.MOD_GACS,
+            e | t | a | o: DV.SPC, # Borrowed from Ardux, just to let my space finger float
+            s | r | n | i: DV.BSPC, # Borrowed from Ardux, just to let my space finger float
 
-            # TODO: need an escape key somewhere (or just a hardware escape...
-            a | it: KC.ESC, # [H] for escape (or [A], either way)
+            # experimental block
+            r | s | n: DV.J, # up/down not vi style (K is more common, this is more comfortable)
+            a | o | t: DV.K,
+            r | s | n | ot: DV.LSFT(DV.J),
+            a | o | t | ot: DV.LSFT(DV.K),
 
+
+            r | s | i: DV.X, # V points down
+            a | o | e: DV.V, # middle finger up
+            r | s | i | ot: DV.LSFT(DV.X),
+            a | o | e | ot: DV.LSFT(DV.V),
+
+            a | t | e: DV.Q, # Chains into U better
+            r | n | i: DV.Z, # ring finger gap
+            r | n | i | ot: DV.LSFT(DV.Z),
+            a | t | e | ot: DV.LSFT(DV.Q),
+
+            a | i: DV.DOT,
+            r | e: DV.DQT,
+
+            # Use major diagonals for full stop and... some other important punctuation
+            # quote, semicolon, period
         } # KEYMAP_END
 
-        # The shifted map (numbers)
-        # Punctuation is in the number layer!
-        self.keymap_symbol = {
-            ot | e | o | a: KC.LSFT(DV.SCLN),
-            ot | e | o: DV.SCLN,
-            # Only include the main-block (non-number) symbols in here
+    # Changes from stock:
+    # * swap m/w
+    # * move DOT to unshifted (probably swap with semicolon)
+    # * add Ardux space/backspace 4-fingers
+    # - use the... Z and Q (sn/at) with M and W, since I don't like those big diagonals
+    #   I like the flat chords better so use them for higher frequency stuff
+    # - add LUT/RUT keys. They re-trigger the existing combo, which is useful for roll-off chain combos (kind of hard to use though)
 
-            # uh oh, maybe I should put weird symbols onto numbers?
-            # And there are a few symbols missing, maybe expand the layout for those
-            # upper row for numbers...?
-            # Use the [N] mode switch to just swap the top and bottom rows?
-
-            }
+    # Remove the cross-level keys entirely for letters!
+    # aot, aoe, ate * 2 levels = exactly the amount of missing chars
+    # otherwise I would have to eat the enter, not good
+    # J/K, V/X, Q/Z
+    # just by feeling: KJV are more important
+    # AH CRAP I was using those for quote and semicolon
+    # but I guess some other codes open, so..
 
     def during_bootup(self, keyboard):
         pass
@@ -487,7 +518,7 @@ class Cykey(Module):
                     self.state[side].last_keypress_timestamp = 0
                     anti_ghost = True
 
-                self.state[side].key.keycode = self.determine_key(combo, self.state[side].shifted)
+                self.state[side].key.keycode = self.determine_key(combo)
 
             # Combo key that has never triggered a combo does create a keystroke
             # Combo key that was part of a combo and is released at the end won't trigger a keystroke
@@ -513,11 +544,6 @@ class Cykey(Module):
         
     def handle_key(self, keyboard, side):
         key = self.state[side].key
-
-        if key.keycode == KC.MOD_N:
-
-            return
-
         mods = []
 
         # Should these be KC?
@@ -566,18 +592,9 @@ class Cykey(Module):
             else:
                 keyboard.tap_key(key.keycode)
         
-    def determine_key(self, val, shifted = False):
-
-        actual_val = val
-        if shifted:
-            high = val & 0xF0
-            low = val & 0x0F
-
-            # WAIT A FUCKING SEC THIS DOESN'T WORK
-            # Need to make sure this is aplied to only the next key, like tap_key...
-            actual_val = high >> 4 | low << 4
-
-
+    def determine_key(self, val):
+        # LUT/RUT aren't used in combos, they just trigger combos
+        actual_val = val & ~(1 << 10)
         if actual_val in self.keymap:
             return self.keymap[actual_val]
         else:
@@ -594,4 +611,30 @@ class Cykey(Module):
 
     def on_powersave_disable(self, keyboard):
         pass
+
+# I think the reason I dislike pinkie-high combos is
+# To make the pinkie reach I raise my whole hand, and then crunch everything else back down
+# that movement in particular is bad
+# tenting helps a lot with that
+# ahhhhh the raised wrist thing
+# Need tenting if I'm using a wide grip, normal tight keyboard grip my wrists can roll around
+
+# Where'd my comments go, about designing a fresh layout...
+# So, no diagonals!
+# it feels like j/k should have higher priority than m/w
+# K is actually really low! 
+# K/W are about even, actually
+# At the tail end we have:
+# worst: Z/Q
+# Then: V/X
+# Then: J/K
+# Then the normal stuff
+# They're all so low that it doesn't matter, but the sequences matter...
+# Bigram chart! See Norvig (https://norvig.com/mayzner.html)
+# THE is important, not being able to roll that is annoying
+#   Some special behaviour for this (slow roll?) might help
+# Ideally I'd like E to be in the dvorak location, since muscle memory
+# t/h/e/r being on the same row would maybe help efficiency? But then other stuff goes weird
+# So it feels like the level switch is slowing me down (compared to dvorak...) but is that the biggest problem?
+# I want full homing dots on one row...
 
