@@ -275,6 +275,12 @@ ot = 1 << 9
 # ! [x] [x] [x] [x]_[x]
 # This Q can't roll to U, though that's not a huge deaal
 
+# C and R changed, to move R to the stronger side. Improves some transitions slightly.
+# R is about twice is frequent
+# C [X] [ ] [X] [ ] [ ]_[ ]
+# R [ ] [ ] [X] [ ] [X]_[ ]
+
+
 class KeyPress:
     keycode = KC.NO
     hold = False
@@ -342,9 +348,8 @@ class Cykey(Module):
             e | t | o | a: DV.Z,
             ot | e | t: DV.D,
             t | o | a: DV.B,
-            ot | t: DV.C,
-            t | a: DV.R,
-           #ot | e | t | o | a: DV.Q,
+            ot | t: DV.R, # swap 
+            t | a: DV.C, # swap
             e | a: DV.P,
             ot | t | o: DV.Y,
             ot | t | o | a: DV.X,
@@ -385,8 +390,8 @@ class Cykey(Module):
 
             # LSFTing stuff doesn't work in here - need to use the constructor directly.
             n | s: KC.LSFT(KC.Q), # DOUBLE_QUOTE
-            i | n | r: KC.LSFT(KC.LBRACKET), # QUESTION,
-            ot | n | s: KC.EXCLAIM, # Wasn't this in the top layer...?
+            i | n | r: KC.EXCLAIM, # Wasn't this in the top layer...?
+            ot | n | s:  KC.LSFT(KC.LBRACKET), # QUESTION,
             ot | s: DV.BSLS, # re-slanted because left hand
             r | i: DV.SLSH,
 
