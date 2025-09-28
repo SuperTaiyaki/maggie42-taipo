@@ -10,7 +10,10 @@ from kmk.modules.layers import Layers
 from kmk.modules.split import Split, SplitSide
 from kmk.modules.sticky_keys import StickyKeys # requirement for Taipo (formerly oneshot, KC.OS)
 from kmk.modules.holdtap import HoldTap
+# Mouse stuff
 from kmk.modules.mouse_keys import MouseKeys
+from kmk.modules.rapidfire import RapidFire
+
 
 from kmk.extensions.rgb import RGB
 
@@ -25,8 +28,9 @@ keyboard.diode_orientation = DiodeOrientation.COL2ROW
 split = Split(data_pin = board.GP0, use_pio = True, split_flip = False)
 keyboard.modules.append(split)
 
-keyboard.modules.append(StickyKeys())
+keyboard.modules.append(StickyKeys(release_after = 3000))
 keyboard.modules.append(MouseKeys())
+keyboard.modules.append(RapidFire())
 
 layers = Layers()
 layers.tap_time = 150
@@ -36,7 +40,7 @@ keyboard.modules.append(layers)
 rgb = RGB(pixel_pin = board.NEOPIXEL, num_pixels = 1, hue_default = 176, sat_default = 30, val_default = 128, val_limit = 128,)
 keyboard.extensions.append(rgb)
 
-keyboard.modules.append(Cykey())
+keyboard.modules.append(Cykey(rgb))
 
 LAYER_NORMAL = 2
 LAYER_BROWSER = 3
@@ -48,6 +52,7 @@ holdtap.tap_time = 150
 keyboard.modules.append(holdtap)
 
 # dummy keys for combos
+# TODO delete these
 make_key(
     names=('TRIGGERL',),
     on_press=lambda *args: print('TRIGGERL'),
@@ -80,11 +85,14 @@ NORMAL_ON = RGBKey1(1)
 NORMAL_OFF = RGBKey1(0)
 # oh right I was going to do separate left/right layouts instead of this
 
+MWUP = KC.RF(KC.MW_UP, interval = 800, timeout = 20)
+MWDOWN = KC.RF(KC.MW_DOWN, interval = 800, timeout = 20)
+
 keyboard.keymap = [
         [
-        KC.NO, KC.NO, KC.NO, KC.NO, KC.NO, KC.MW_UP,          KC.NO, KC.NO, KC.NO, KC.NO, KC.TG(5), NORMAL_ON, 
-        KC.NO, KC.TP_TLP, KC.TP_TLR, KC.TP_TLM, KC.TP_TLI, KC.MW_DOWN,     KC.NO, KC.TP_TRI, KC.TP_TRM, KC.TP_TRR, KC.TP_TRP, KC.NO, 
-        KC.NO, KC.TP_BLP, KC.TP_BLR, KC.TP_BLM, KC.TP_BLI, KC.TP_LUT,      KC.TP_RUT, KC.TP_BRI, KC.TP_BRM, KC.TP_BRR, KC.TP_BRP, KC.NO, 
+        KC.NO, KC.TP_TLP, KC.TP_TLR, KC.TP_TLM, KC.TP_TLI,  MWUP,          KC.NO, KC.TP_TRI, KC.TP_TRM, KC.TP_TRR, KC.TG(5), NORMAL_ON, 
+        KC.NO, KC.TP_TLP, KC.TP_BLR, KC.TP_BLM, KC.TP_BLI, MWDOWN,     KC.NO, KC.TP_BRI, KC.TP_BRM, KC.TP_BRR, KC.TP_TRP, KC.NO, 
+        KC.NO, KC.TP_BLP, KC.TP_BLR, KC.LAYER2, KC.LAYER1, KC.TP_LUT,      KC.TP_RUT, KC.TP_BRI, KC.TP_BRM, KC.TP_BRR, KC.TP_BRP, KC.NO, 
         KC.NO, KC.NO, KC.NO, KC.MO(LAYER_BROWSER), KC.TP_LIT, KC.TP_LOT,       KC.TP_ROT, KC.TP_RIT, KC.MO(1), KC.NO, KC.NO, KC.NO, 
         ],
         # Taipo macro layer - useful browser stuff
@@ -170,6 +178,8 @@ keyboard.keymap = [
         KC.NO, KC.TP_BLP, KC.TP_BLR, KC.TP_BLM, KC.TP_BLI, KC.NO,      KC.NO, KC.TP_TLI, KC.TP_TLM, KC.TP_TLR, KC.TP_TLP, KC.NO, 
         KC.NO, KC.NO, KC.NO, KC.TRIGGERL, KC.TP_LIT, KC.TP_LOT,       KC.TP_ROT, KC.TP_RIT, KC.TRIGGERR, KC.NO, KC.NO, KC.NO, 
         ],
+# Extra layer: Gaming layout
+# arrow keys, z, x, and the like hanging out nearby
                    ]
 
 #combos = Combos()

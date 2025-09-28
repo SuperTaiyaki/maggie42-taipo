@@ -39,6 +39,10 @@ taipo_keycodes = {
     'TP_LOT': 9, # outer thumb (and I have one more thumb, amongst other stuff)
     'TP_LUT': 10, # upper thumb
 
+    'LAYER1': 11, # actually having these not bound no either side isn't great...
+    'LAYER2': 12, # this keyboard isn't for 2-handed use anyway (maybe)
+    'LAYER3': 13,
+
     'TP_TRP': 16,
     'TP_TRR': 17,
     'TP_TRM': 18,
@@ -53,9 +57,6 @@ taipo_keycodes = {
 
     # If you assign any of these the logic will break
     'LAYER0': 42, # the actual order doesn't matter
-    'LAYER1': 27,
-    'LAYER2': 28,
-    'LAYER3': 29,
     'MOD_GA': 30, # GUI+ALT
     'MOD_GC': 31, # GUI + CTRL
     'MOD_GS':  33,
@@ -69,6 +70,12 @@ taipo_keycodes = {
     'MOD_GACS': 41, # etc.
 
     'MOD_N': 43, # Cykey-specific
+    'MOD_N_LOCK': 45, # Cykey-specific
+    'MOD_S': 47,
+    'MOD_S_LOCK': 48,
+    'MOD_SHIFT': 46,
+    'MOD_CLEAR': 44,
+
 };
 
 for key, code in taipo_keycodes.items():
@@ -223,6 +230,10 @@ t = 1 << 6
 e = 1 << 7
 it = 1 << 8
 ot = 1 << 9
+ut = 1 << 10
+s1 = 1 << 11
+s2 = 1 << 12
+s3 = 1 << 13
 
 # Changes to make to the layout:
 # P is a pain, swap it with something less useful (maybe P/Z)
@@ -255,7 +266,7 @@ ot = 1 << 9
 # #Q [x] [x] [x] [x]_[x] # Removed
 # Looks good! I guess
 
-# 'er' is a high frequency diagram, removing the overlap (swap R/P?) might be better
+# 'er' is a high frequency digram, removing the overlap (swap R/P?) might be better
 # ehhhh there are a lot of those in this keymap anywya... but er/re are high frequency so fixing them might be better
 # Do it sooner than later!
 # -> r is a-t so that it can roll to and from e
@@ -271,7 +282,7 @@ ot = 1 << 9
 # Punctuation... swap with exclamation mark? That seems appropriate
 # Actually that chord is quite nice, does something else need to be upgraded? maybe F? Not a huge difference, meh.
 # But that was [Y]
-# Q [X] [X] [ ] [X]_[ ]
+# Q [X] [_] [X] [X]_[ ]
 # ! [x] [x] [x] [x]_[x]
 # This Q can't roll to U, though that's not a huge deaal
 
@@ -280,12 +291,31 @@ ot = 1 << 9
 # C [X] [ ] [X] [ ] [ ]_[ ]
 # R [ ] [ ] [X] [ ] [X]_[ ]
 
+# Move enter ([C] to upper layer, cmd + middle-upper (I guess it doesn't have a name, but would be [O])
+
+# Something else to try: swap B and D around
+# with the C/R switch, it feels like the left side of the hand is a bit... light
+# Come to think of it, G is prime real estate (the worst of the pairs). Upgrade ... F? and throw it there?
+# G is higher according to wikipedia!
+# OK, so just b/d
+# No effects of note (I guess keep it...?)
+# D is much more common!
+
+
+# Can I do a dollar sign...?
+# no, the shift switch drops the mode....
+# also need a hard tab
 
 class KeyPress:
     keycode = KC.NO
     hold = False
     hold_handled = False
-    
+
+LAYER_NORMAL = const(0)
+LAYER_N = const(1) # numeric
+LAYER_S = const(2) # symbol
+LAYER_LOCK = const(1 << 20)
+ 
 class State:
     combo = 0
     timer = 0
@@ -297,14 +327,17 @@ class State:
     last_combo = 0 # combo as of One step before
     last_keypress_timestamp = 0
 
-    shifted = 0 # MOD_n and friends (only mod_n for now)
+    shifted = LAYER_NORMAL
+    shift = 0
 
     key = KeyPress()
 
 
 class Cykey(Module):
     # sticky_timeout is now configured in the stickykeys module, this is unused
-    def __init__(self, tap_timeout=600, sticky_timeout=1000, ghost_timeout=50):
+    # TODO: take an RGB and use it to display the current shift mode
+    def __init__(self, rgb = None, tap_timeout=600, sticky_timeout=1000, ghost_timeout=50):
+        self.rgb = rgb
         self.tap_timeout = tap_timeout
         self.sticky_timeout=sticky_timeout
         self.ghost_timeout = ghost_timeout
@@ -320,16 +353,21 @@ class Cykey(Module):
 # [P] and [H] are also mode switches, a bit hard to reach
 
 
-        self.keymap = { # KEYMAP_START
-            it: DV.LSFT, # Next char is capital
-            ot: DV.SPC,
+        keymap_main = { # KEYMAP_START
+            it: KC.MOD_SHIFT, # Next char is capital
+            ot: DV.SPC, # is this a permanent...?
+            it | e | o: DV.TAB, # [T]
             # These two are also in the punctuation mode...?
             # (and space)
             e | o | a: DV.COMM,
             e | t | o: DV.DOT,
             # Wasn't there one or two more...?
+            it | t | o: KC.MOD_N,  # [Y]/[N]
+           #it | n | s: KC.MOD_N_LOCK, # This is here because shift logic swaps the rows around - can't double tap [N] otherwise
+            it | t | a: KC.MOD_S, # [C]/[M] mod_s layer: left/right brackets, easily accessible arrow keys...
 
-            it | t | o: KC.MOD_N,
+            a | it: KC.ESC, # [H] for escape (or [A], either way)
+
             ot | e: DV.I,
             ot | e | a: DV.L,
             a | o: DV.G,
@@ -346,10 +384,10 @@ class Cykey(Module):
             ot | o: DV.K,
             ot | e | t | o: DV.F,
             e | t | o | a: DV.Z,
-            ot | e | t: DV.D,
-            t | o | a: DV.B,
-            ot | t: DV.R, # swap 
-            t | a: DV.C, # swap
+            ot | e | t: DV.B,
+            t | o | a: DV.D,
+            ot | t: DV.R,
+            t | a: DV.C,
             e | a: DV.P,
             ot | t | o: DV.Y,
             ot | t | o | a: DV.X,
@@ -357,49 +395,60 @@ class Cykey(Module):
             ot | t | a: DV.M,
 
             # Non-permanent punctuation
-                       #e | t | a: KC.QUOT, # DV.MINUS, DV.MINUS doesn't work!
+            #e | t | a: KC.QUOT, # DV.MINUS, DV.MINUS doesn't work!
             e | t | a: DV.Q,
             ot | e | t | a: DV.QUOT,
             ot | e | t | o | a: KC.EXCLAIM,
+        }
 
+        keymap_numbers = {
+            it | t | o: KC.MOD_N_LOCK,  # [Y]/[N]
 
             # Not in the original layout, but since I have more keys...
             # This is mostly useful because they can be shifted for symbols
-            i: DV.N1,
-            i | ot: DV.N2,
-            i | ot | n: DV.N3,
-            i | ot | n | s: DV.N4,
-            i | ot | n | s | r: DV.N5,
-            r: DV.N6,
-            r | s: DV.N7,
-            r | s | n: DV.N8,
-            r | s | n | i: DV.N9,
-            n: DV.N0,
-            # And then add their shifted symbols on top with... uhh.... the same shift logic! so hold IT or replace OT with IT
-            # Just use a physical shift for the number layer (less logic to write)
+            e: DV.N1,
+            e | ot: DV.N2,
+            e | ot | t: DV.N3,
+            e | ot | t | o: DV.N4,
+            e | ot | t | o | a: DV.N5,
+            a: DV.N6,
+            a | o: DV.N7,
+            a | o | t: DV.N8,
+            a | o | t | e: DV.N9,
+            t: DV.N0,
 
-            i | r | s: DV.COMM,
-            i | n | s: DV.DOT,
-
-            ot | r | s | i: DV.COLN,
-            ot | s | i: DV.SCLN,
-            ot | s | r: DV.EQUAL,
-            r | n: KC.LEFT_PAREN,
-            n | ot: KC.RIGHT_PAREN,
-            ot | r: KC.QUOT, # DV.MINUS, # Don't know why this doesn't work via DV.
+            ot | a | o | e: DV.COLN,
+            ot | o | e: DV.SCLN,
+            ot | o | a: DV.EQUAL, # "J"ust the same
+            a | t: KC.LEFT_PAREN,
+            t | ot: KC.RIGHT_PAREN,
+            ot | a: KC.QUOT, # DV.MINUS, # Don't know why this doesn't work via DV.
 
             # LSFTing stuff doesn't work in here - need to use the constructor directly.
-            n | s: KC.LSFT(KC.Q), # DOUBLE_QUOTE
-            i | n | r: KC.EXCLAIM, # Wasn't this in the top layer...?
-            ot | n | s:  KC.LSFT(KC.LBRACKET), # QUESTION,
-            ot | s: DV.BSLS, # re-slanted because left hand
-            r | i: DV.SLSH,
+            t | o: KC.LSFT(KC.Q), # DOUBLE_QUOTE
+            e | t | a: KC.EXCLAIM, # Wasn't this in the top layer...? (all five)
+            ot | t | o:  KC.LSFT(KC.LBRACKET), # QUESTION,
+            ot | o: DV.BSLS, # re-slanted because left hand
+            a | e: DV.SLSH,
+            # TODO: need an escape key somewhere (or just a hardware escape...
+        } # KEYMAP_END
 
+        keymap_permanent = {
             # Shifted commands
-            it | o: DV.BSPC, # [K] bacK
-            it | t: DV.ENTER, # [C] Carriage return
+            # These seem to be permanents in Microwriter
+            it | o: DV.BSPC,
+            #it | t: DV.ENTER, # [C] Carriage return
+            it | n: DV.ENTER, # [C] Carriage return
             # Want an escape here just in case I happen to be vim-ing for some reason...
-            it | e: DV.ESC, # [E] for escape
+            it | i: DV.ESC, # [E] for escape (level shifted up)
+
+            it | ot: KC.MOD_CLEAR,
+            s1: KC.MOD_CLEAR, # Since mashing thumbs together on this board is an annoying reach
+                       # actually since I have the three lowered keys, I can use them for mode changes!
+            s2: KC.MOD_N,
+            s3: KC.MOD_S,
+            s1 | s2 | s3: DV.ENTER,
+            s1 | s2 | o: DV.ENTER, # since the mapping changed ugh
 
             # Taipo arrow keys since they don't clash
             ot | t | n : DV.UP,
@@ -422,25 +471,50 @@ class Cykey(Module):
             r | a | s | o | i | e: KC.MOD_GAS,
             r | a | n | t | i | e: KC.MOD_GCS,
             s | o | n | t | i | e: KC.MOD_ACS,
+        }
 
-            # TODO: need an escape key somewhere (or just a hardware escape...
-            a | it: KC.ESC, # [H] for escape (or [A], either way)
+        keymap_extra = {
+            it | t | a: KC.MOD_S_LOCK, # [C]/[M] mod_s layer: left/right brackets, easily accessible arrow keys...
+            # delete, insert, home, end, pgup, pgdn... where's my tilde?
+            # F keys?
 
-        } # KEYMAP_END
+            a | t: KC.MINUS, # [
+            t | ot: KC.EQUAL, # ]
+            a | o: KC.LSFT(KC.MINUS), # {
+            e | ot: KC.LSFT(KC.EQUAL), # }
+            # And then fill this layer with other things that might be useful without having to shift-number or whatever
+        }
 
-        # The shifted map (numbers)
-        # Punctuation is in the number layer!
-        self.keymap_symbol = {
-            ot | e | o | a: KC.LSFT(DV.SCLN),
-            ot | e | o: DV.SCLN,
-            # Only include the main-block (non-number) symbols in here
+        def bitswap(val):
+            high = val & 0xF0
+            low = val & 0x0F
+            mods = val & 0xFF00 # Actually there are only 2 bits
+            return mods | high >> 4 | low << 4
 
-            # uh oh, maybe I should put weird symbols onto numbers?
-            # And there are a few symbols missing, maybe expand the layout for those
-            # upper row for numbers...?
-            # Use the [N] mode switch to just swap the top and bottom rows?
+        # Might be better to define this as main set, number set, then merge them as number set bitswapped
+        # So I can keep merged layers for other stuff
+        self.keymap = keymap_permanent | keymap_main | {bitswap(combo): result for combo, result in keymap_numbers.items()}
+        self.keymap_layer1 = keymap_permanent | keymap_numbers | {bitswap(combo): result for combo, result in keymap_main.items()}
+        self.keymap_layer2 = keymap_permanent | keymap_extra | {bitswap(combo): result for combo, result in keymap_main.items()}
 
-            }
+        # Standard modes are U (upper), N (numeric), P (extended printable)
+        # TODO: maybe auto generate this by flipping the main keymap and have real layers
+        # Since layer 3 is going to be something else entirely
+        # ALSO: Pull in layer 3 chars from quirkey, they look reasonable
+        # In theory I have <, > since they're on , and . but hard to remember...
+        # Have B/D, R/C, maybe s/e to use as directionals
+
+
+    def rgb_neutral(self):
+        if self.rgb:
+            self.rgb.set_hsv_fill(176, 140, 90)
+            self.rgb.show()
+        pass
+    def rgb_moden(self):
+        if self.rgb:
+            self.rgb.set_hsv_fill(30, 200, 180)
+            self.rgb.show()
+        pass
 
     def during_bootup(self, keyboard):
         pass
@@ -493,10 +567,26 @@ class Cykey(Module):
                     anti_ghost = True
 
                 self.state[side].key.keycode = self.determine_key(combo, self.state[side].shifted)
+                # If it's not a mod, keep it...?
+                # Can shift-4 using the lock but this breaks it. Being able to go in either order would be nice...
+                # so hold the shift lock here instead, can add a KC_LSHIFT inside the determine_key (maybe)
+                # Shift kind of isn't a real modifier layer - it doesn't replace the others (so just another flag?)
+                # Otherwise I need to fight with KC.SK
+                # The original MW4 didn't really have a concept of shift, it's just another character map (I guess)
+                # i.e. shifting a number is meaningless... maybe
+                # I want to see the Quinkey manual...
+                # Quirkey seems to do it that way
+                #if self.state[side].key.keycode != KC.NO and self.state[side].shifted & LAYER_LOCK == 0:
+                #    self.state[side].shifted = LAYER_NORMAL
+                #    self.rgb_neutral()
 
             # Combo key that has never triggered a combo does create a keystroke
             # Combo key that was part of a combo and is released at the end won't trigger a keystroke
             self.handle_key(keyboard, side)
+
+            # At some point I need logic to one-shot the mode shifts
+            # But for now I have multiple rows to use so it doesn't actually matter
+
 
             self.state[side].combo &= ~(1 << (key.taipo_code & 0xF))
 
@@ -518,10 +608,35 @@ class Cykey(Module):
         
     def handle_key(self, keyboard, side):
         key = self.state[side].key
-
-        if key.keycode == KC.MOD_N:
-
+        if key.keycode == KC.NO:
             return
+        elif key.keycode == KC.MOD_N:
+            self.state[side].shifted = LAYER_N
+            self.rgb_moden()
+            return
+        # unfortunately the shifted state has been lost by here - this code does nothing
+        elif key.keycode == KC.MOD_N_LOCK:
+            self.state[side].shifted = LAYER_N | LAYER_LOCK
+            return
+        elif key.keycode == KC.MOD_S:
+            self.state[side].shifted = LAYER_S
+            self.rgb_moden() # TODO
+            return
+        elif key.keycode == KC.MOD_S_LOCK:
+            self.state[side].shifted = LAYER_S | LAYER_LOCK
+            return
+        elif key.keycode == KC.MOD_CLEAR:
+            self.state[side].shifted = LAYER_NORMAL
+            self.state[side].shift = 0
+            self.rgb_neutral()
+            return
+        elif key.keycode == KC.MOD_SHIFT:
+            if self.state[side].shift == LAYER_S:
+                self.state[side].shift = LAYER_S | LAYER_LOCK
+            else:
+                self.state[side].shift = LAYER_S
+            return
+            # guess we don't need to clear the shift state here
 
         mods = []
 
@@ -563,28 +678,35 @@ class Cykey(Module):
                     # defer_release is needed to hold the ctrl until the taipo key code is emitted
                     # without that it would release the key as soon as a physical key is emitted, which is wrong
         else:
+            # Oh hey this is maybe not good, the remove_key may not match
+            code = key.keycode if self.state[side].shift == 0 else KC.RSFT(key.keycode)
+            if self.state[side].shift & LAYER_LOCK == 0:
+                self.state[side].shift = 0
+
+            if self.state[side].shifted & LAYER_LOCK == 0:
+                if self.state[side].shifted > 0:
+                    print("Cancelled layer")
+                    # AH FUCK on the release it passes through here...
+                self.state[side].shifted = LAYER_NORMAL
+                self.rgb_neutral()
+
             if key.hold_handled:
-                keyboard.remove_key(key.keycode)
+                keyboard.remove_key(code)
             elif key.hold:
-                keyboard.add_key(key.keycode)
+                keyboard.add_key(code)
                 self.state[side].key.hold_handled = True
             else:
-                keyboard.tap_key(key.keycode)
-        
+                keyboard.tap_key(code)
+
     def determine_key(self, val, shifted = False):
+        keymap = self.keymap
+        if shifted & LAYER_N != 0:
+            keymap = self.keymap_layer1
+        elif shifted & LAYER_S != 0:
+            keymap = self.keymap_layer2
 
-        actual_val = val
-        if shifted:
-            high = val & 0xF0
-            low = val & 0x0F
-
-            # WAIT A FUCKING SEC THIS DOESN'T WORK
-            # Need to make sure this is aplied to only the next key, like tap_key...
-            actual_val = high >> 4 | low << 4
-
-
-        if actual_val in self.keymap:
-            return self.keymap[actual_val]
+        if val in keymap:
+            return keymap[val]
         else:
             return KC.NO
        
@@ -600,3 +722,7 @@ class Cykey(Module):
     def on_powersave_disable(self, keyboard):
         pass
 
+# Some stuff to do:
+# Separate the keymaps into different files
+# Try building a web app (touchscreen) to practice on this?
+# Heck, even a web emulated MicroWriter!
