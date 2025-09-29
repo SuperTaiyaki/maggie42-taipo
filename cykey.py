@@ -20,6 +20,11 @@ class TaipoKey(Key):
         self.taipo_code = code
         super().__init__()
 
+class TaipoMacro(TaipoKey):
+    def __init__(self, output): # Meta has apparently disappeared (kmk docs are old)
+        self.output = output
+        super().__init__('TP_MACRO')
+
 # Can this be changed to bits? Should it be?
 # l/r
 # t/b -> finger (OR modifier.... actually that's kind of bad)
@@ -343,6 +348,8 @@ class Cykey(Module):
         self.ghost_timeout = ghost_timeout
         self.state = [State(), State()]
 
+        self.send_next = []
+
 # One thing I want to work on: enter ([C] for carriage return) is not safe! It's too close to backspace, liable to do it accidentally
 # Will be better once I remember K...
 
@@ -399,6 +406,12 @@ class Cykey(Module):
             e | t | a: DV.Q,
             ot | e | t | a: DV.QUOT,
             ot | e | t | o | a: KC.EXCLAIM,
+
+            # Experimental bigram macros
+            it | a | o | e: TaipoMacro([DV.T, DV.H]), # actually these probably shouldn't be descended from TaipoKey
+            it | a | e: TaipoMacro([DV.H, DV.E]),
+            it | o | t | e: TaipoMacro([DV.I, DV.N]),
+            it | t | e: TaipoMacro([DV.E, DV.R]),
         }
 
         keymap_numbers = {
@@ -444,7 +457,6 @@ class Cykey(Module):
 
             it | ot: KC.MOD_CLEAR,
             s1: KC.MOD_CLEAR, # Since mashing thumbs together on this board is an annoying reach
-                       # actually since I have the three lowered keys, I can use them for mode changes!
             s2: KC.MOD_N,
             s3: KC.MOD_S,
             s1 | s2 | s3: DV.ENTER,
@@ -482,8 +494,27 @@ class Cykey(Module):
             t | ot: KC.EQUAL, # ]
             a | o: KC.LSFT(KC.MINUS), # {
             e | ot: KC.LSFT(KC.EQUAL), # }
+            # <
+            # >
+            # T -> ~ ?
+
             # And then fill this layer with other things that might be useful without having to shift-number or whatever
+
+            # Maybe put F keys in the top row - they're not frequently used to a stretch is fine
         }
+
+        # inspired by reddit: common word macros
+        # macro shift - w looks like 'the', d looks like 'and'
+        # that, with, at least four letters
+        # non-macro layer, command buttons would be better... otherwise efficiency sucks. is [D] used for anything?
+        # [X]/[D] for and
+        # [W]/[,] for the
+        # Even better, can start typing and as long as I don't press the thumb first can switch to macro partway through
+        # OR: TH/HE as commands instead. Not a huge improvement... but common enough to be useful?
+        # IN/ER would be next
+        # I think they're all available...
+        # I guess .... just record them straight into the table?
+        # Logic needs to be smart enough to shift only the first character
 
         def bitswap(val):
             high = val & 0xF0
@@ -608,6 +639,14 @@ class Cykey(Module):
         
     def handle_key(self, keyboard, side):
         key = self.state[side].key
+
+        if isinstance(key.keycode, TaipoMacro):
+            keyboard.tap_key(key.keycode.output[0])
+            remain = key.keycode.output[1:]
+            remain.reverse()
+            self.send_next = remain
+            return
+
         if key.keycode == KC.NO:
             return
         elif key.keycode == KC.MOD_N:
@@ -711,7 +750,8 @@ class Cykey(Module):
             return KC.NO
        
     def before_hid_send(self, keyboard):
-        pass
+        if len(self.send_next) > 0:
+            keyboard.tap_key(self.send_next.pop())
 
     def after_hid_send(self, keyboard):
         pass
