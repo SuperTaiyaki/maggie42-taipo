@@ -1,5 +1,7 @@
 # The license on this repository is GPL2 becasue of taipo.py . This file is BSD.
 
+# This is the not-keyboard board to run the LCD. Based on KMK because that gives me keyboard-to-keyboard communication without any mess
+
 import board
 
 from kmk.kmk_keyboard import KMKKeyboard
@@ -19,6 +21,8 @@ from kmk.extensions.rgb import RGB
 
 from cykey import Cykey
 
+import writer
+
 keyboard = KMKKeyboard()
 
 keyboard.col_pins = (board.GP10,board.GP9,board.GP8,board.GP7,board.GP6,board.GP5,)
@@ -37,7 +41,7 @@ layers.tap_time = 150
 keyboard.modules.append(layers)
 
 # The RP2040s have a neopixel-ish thing, light it up
-rgb = RGB(pixel_pin = board.NEOPIXEL, num_pixels = 1, hue_default = 176, sat_default = 30, val_default = 128, val_limit = 128,)
+rgb = RGB(pixel_pin = board.NEOPIXEL, num_pixels = 1, hue_default = 176, sat_default = 30, val_default = 8, val_limit = 8,)
 keyboard.extensions.append(rgb)
 
 keyboard.modules.append(Cykey(rgb))
@@ -91,8 +95,8 @@ MWDOWN = KC.RF(KC.MW_DOWN, interval = 800, timeout = 20)
 keyboard.keymap = [
         [
         KC.NO, KC.TP_TLP, KC.TP_TLR, KC.TP_TLM, KC.TP_TLI,  MWUP,          KC.TP_LIT, KC.TP_TRI, KC.TP_TRM, KC.TP_TRR, KC.TG(5), NORMAL_ON, 
-        KC.NO, KC.TP_TLP, KC.TP_BLR, KC.TP_BLM, KC.TP_BLI, MWDOWN,     KC.TP_LOT, KC.TP_BRI, KC.TP_BRM, KC.TP_BRR, KC.TP_TRP, KC.NO, 
-        KC.NO, KC.TP_BLP, KC.TP_BLR, KC.LAYER2, KC.LAYER1, KC.TP_LUT,      KC.TP_RUT, KC.TP_BRI, KC.TP_BRM, KC.TP_BRR, KC.TP_BRP, KC.NO, 
+        KC.NO, KC.TP_TLP, KC.TP_BLR, KC.TP_BLM, KC.TP_BLI, MWDOWN,     KC.TP_LOT, KC.TP_BRI, KC.TP_BRM, KC.TP_BRR, KC.TP_TRP, KC.TP_LIT, 
+        KC.NO, KC.TP_BLP, KC.TP_BLR, KC.LAYER2, KC.LAYER1, KC.TP_LUT,      KC.TP_RUT, KC.TP_BRI, KC.TP_BRM, KC.TP_BRR, KC.TP_BRP, KC.TP_LOT, 
         KC.NO, KC.NO, KC.NO, KC.SK(KC.MO(LAYER_BROWSER)), KC.TP_LOT, KC.TP_LIT,       KC.TP_ROT, KC.TP_RIT, KC.MO(1), KC.NO, KC.NO, KC.NO, 
         ],
         # bottom-left should probably change to a oneshot since it's a pain to reach
@@ -189,6 +193,8 @@ keyboard.keymap = [
 #        Chord((KC.TRIGGERL, KC.TRIGGERR), NORMAL_ON),
 #        Chord((KC.BSPACE, KC.TRIGGERR), NORMAL_OFF),
 #    ]
+
+keyboard.extensions.append(writer.Writer())
 
 if __name__ == '__main__':
     keyboard.go()

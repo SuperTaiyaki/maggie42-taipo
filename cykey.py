@@ -86,7 +86,6 @@ taipo_keycodes = {
 for key, code in taipo_keycodes.items():
     make_key(names=(key,), constructor=TaipoKey, code=code)
 
-
 # no enum class in circuitpython! oh well
 # Reverse mapping to get correct taipo keystrokes to come out in dvorak
 # This should probably have done another way so it's switchable (i.e. reverse just by dropping KC back in)
@@ -400,18 +399,22 @@ class Cykey(Module):
             ot | t | o | a: DV.X,
             ot | e | o | a: DV.W,
             ot | t | a: DV.M,
+            e | t | a: DV.Q,
 
             # Non-permanent punctuation
             #e | t | a: KC.QUOT, # DV.MINUS, DV.MINUS doesn't work!
-            e | t | a: DV.Q,
             ot | e | t | a: DV.QUOT,
             ot | e | t | o | a: KC.EXCLAIM,
 
             # Experimental bigram macros
-            it | a | o | e: TaipoMacro([DV.T, DV.H]), # actually these probably shouldn't be descended from TaipoKey
+            # TODO: simplify these
+            # [T] -> TH, [H] -> HE (escape needs to go somewhere else), [I] for IN...?
+            # [R] for ER is possible but hard to catch. Maybe leave that as-is
+            it | o | e: TaipoMacro([DV.T, DV.H]), # actually these probably shouldn't be descended from TaipoKey
             it | a | e: TaipoMacro([DV.H, DV.E]),
             it | o | t | e: TaipoMacro([DV.I, DV.N]),
             it | t | e: TaipoMacro([DV.E, DV.R]),
+
         }
 
         keymap_numbers = {
@@ -617,9 +620,7 @@ class Cykey(Module):
 
             # At some point I need logic to one-shot the mode shifts
             # But for now I have multiple rows to use so it doesn't actually matter
-
-
-            self.state[side].combo &= ~(1 << (key.taipo_code & 0xF))
+            self.state[side].combo &= ~(1 << (key.taipo_code & 0xF)) # Remove the released key from the combo block
 
             if anti_ghost:
                 self.state[side].releasing = False
