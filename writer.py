@@ -29,7 +29,7 @@ class Display:
             print("ERROR: Failed to initialize I2C LCD")
             pass
 
-    def _set_4bit():
+    def _set_4bit(self):
         with self.lcd:
             byte = 0x30
             for _ in range(3):
@@ -69,8 +69,9 @@ class Display:
     def write_chars(self, string):
         buffer = []
         for char in string:
-            high = (ord(char) & 0xf0) | BACKLIGHT_ON | RAM_ON
-            low = ((ord(char) << 4) & 0xf0) | BACKLIGHT_ON | RAM_ON
+            c = ord(char) if isinstance(char, str) else char
+            high = (c & 0xf0) | BACKLIGHT_ON | RAM_ON
+            low = ((c << 4) & 0xf0) | BACKLIGHT_ON | RAM_ON
             buffer += ([high] * 2 +
                        [high | CS_ON] * 2 +
                        [high] * 1 +
@@ -94,7 +95,7 @@ class Display:
 
         target = base + column
 
-        self._write_cmd([0x80 | target])
+        self.write_cmd([0x80 | target])
 
     def clear(self):
         self.write_cmd([0x1, 0x2])
@@ -103,9 +104,137 @@ class Display:
         self.setpos(row, 0)
         self.write_chars(text[:20])
 
+class DisplayMode:
+    def receive(self, char):
+        pass
+
+# Probably need an intermediate class that flattens out the display memory
+class Editor(DisplayMode):
+    def __init__(self):
+        self.buffer = bytearray([ord(' ')] * 2_048) # who knows
+        self.pointer_head = 0
+        self.pointer_lines = [0, 0, 0, 0]
+        self.pointer_cursor_buffer = 0
+        
+        self.cursor_row = 0 # logical
+        self.cursor_column = 0
+
+        self.lines = bytearray([ord(' ')] * 80) # on-screen text data, in logical order (not screen order)
+        self.current_word = bytearray(20)
+        self.current_word_length = 0
+
+    def reformat(self):
+        pointer = self.pointer_head
+
+        next_word = bytearray(20)
+        for line in range(0, 3):
+            line_pointer = 0
+
+            word_chars = 0
+            while buffer[pointer] != ' ':
+                next_word[word_chars] = buffer[pointer]
+                pointer += 1
+                word_chars += 1
+
+            if word_chars + line_pointer + 1 < 20:
+                self.lines[line][line_pointer] = ' '
+                line_pointer += 1
+                for i in range(word_chars):
+                    self.lines[line][line_pointer] = next_word[i]
+            # ARGH the else case flows into the next line
+
+
+    def receive(self, char):
+        self.buffer[self.pointer_cursor_buffer] = ord(char)
+        self.pointer_cursor_buffer += 1
+
+        self.lines[self.cursor_row * 20 + self.cursor_column] = ord(char)
+        display.write_chars([char])
+
+        self.cursor_column += 1
+        if self.cursor_column > 19:
+            self.cursor_column = 0
+            self.cursor_row += 1
+
+            # Updating lines is purely for the redraw
+            if self.cursor_row > 3:
+                self._shift_up()
+
+            display.setpos(self.cursor_row, self.cursor_column)
+
+    def _next_line(self, partial_word = None):
+        self.cursor_column = 0
+        self.cursor_row += 1
+        if self.cursor_row == 4:
+            self._shift_up()
+            self.cursor_row = 3
+
+        display.jump(self.cursor_row, 0)
+        if partial_word:
+            # Write it out to the screen and the line buffer (but not the text buffer)
+            pass
+
+
+        
+    def _shift_up(self):
+        # move the 3 on-screen lines up
+        for i in range(60):
+            self.lines[i] = self.lines[i + 20]
+        for i in range(60, 80):
+            self.lines[i] = ord(' ')
+        # Would be nice to have a better way to express this... oh well
+        display.write_row(0, self.lines[0:20])
+        display.write_row(1, self.lines[20:40])
+        display.write_row(2, self.lines[40:60])
+        display.write_row(3, self.lines[60:80])
+
+        self.cursor_row = 3
+        self.cursor_column = 0
+
+# This entire class exists only to delay the initialization until after the initial USB
+# setup is done. Might be able to use the HID hook too, instead of hooking kmk_keyboard
+# directly
+class Writer(Extension):
+    def on_runtime_enabled(self, _):
+        return
+    
+    def on_runtime_disable(self, keyboard):
+        return
+
+    def during_bootup(self, keyboard):
+        # Do this a little later just in case it's messing with USB init (probably not)
+
+        display.setup()
+        display.write_chars(sample)
+        display.write_cmd([0x80 | 84]) # There's some sort of offset...?
+        display.write_chars("MW 4/10")
+        display.write_cmd([0x80 | 0]) # Could just jump home, but anyway
+
+
+    def before_matrix_scan(self, keyboard):
+        return
+
+    def after_matrix_scan(self, keyboard):
+        return
+
+    def before_hid_send(self, keyboard):
+        return
+
+    def after_hid_send(self, keyboard):
+        return
+
+    def on_powersave_enable(self, keyboard):
+        return
+
+    def on_powersave_disable(self, keyboard):
+        return
+
+
+
 # Keyboard scan codes: 0x1 = a, 0x81 is A
 
 display = Display()
+mode = Editor()
 
 sequence = [random.choice(wordlist) for x in range(8)]
 sample = " ".join(sequence[0:4])
@@ -116,7 +245,8 @@ position = 0
 # in kmk_keyboard.c, hook this into the USB report generator
 def handle_report(usb_report):
     global position
-    print("Received key report: ", usb_report)
+    # print("Received key report: ", usb_report)
+    # NEXT: Change to a Writer instance
 
     # Need to process modifiers first
     shifted = False
@@ -146,117 +276,31 @@ def handle_report(usb_report):
             position -= 1
         if c.code in dvorak.scancodes:
             char = dvorak.scancodes[c.code]
+            mode.receive(char)
 
-            if shifted and  char == '1':
-                display.write_cmd([0x1, 0x2])
-                position = 0
-            else:
-                if shifted:
-                    char = char.upper()
 
-                display.write_chars([char])
-                if True or sample[position] == char:
-                    #write_cmd([0x4 | 0x2, 0x14]) # Push the cursor one right
-                    position += 1
+#           if shifted and  char == '1':
+#               display.write_cmd([0x1, 0x2])
+#               position = 0
+#           else:
+#               if shifted:
+#                   char = char.upper()
 
-                    if (position == 20):
-                        display.write_cmd([0x80 | 44])
-                    if (position == 40):
-                        display.write_cmd([0x80 | 20])
-                    if (position == 60):
-                        display.write_cmd([0x80 | 84])
-                    if (position == 80):
-                        position = 0
+#               display.write_chars([char])
+#               if True or sample[position] == char:
+#                   #write_cmd([0x4 | 0x2, 0x14]) # Push the cursor one right
+#                   position += 1
+
+#                   if (position == 20):
+#                       display.write_cmd([0x80 | 44])
+#                   if (position == 40):
+#                       display.write_cmd([0x80 | 20])
+#                   if (position == 60):
+#                       display.write_cmd([0x80 | 84])
+#                   if (position == 80):
+#                       position = 0
                     #write_cmd([0x80 | 44])
                 # Argh need to handle actual position and whatever logic somewhere
-
-class DisplayMode:
-    def receive(self, char):
-        pass
-
-class Editor(DisplayMode):
-    def __init__(self):
-        self.buffer = bytearray(2_048) # who knows
-        self.pointer_head = 0
-        self.pointer_lines = [0, 0, 0, 0]
-        self.pointer_cursor_buffer = 0
-        
-        self.cursor_row= 0 # logical
-        self.cursor_column = 0
-
-        # Need screen cursors too, wow.
-        self.lines = bytearray(80) # on-screen text data, in logical order (not screen order)
-
-    def receive(self, char):
-        self.buffer[self.pointer_cursor] = char
-        self.pointer_cursor_buffer += 1
-        
-        self.cursor_column += 1
-        if self.cursor_column > 19:
-            self.cursor_column = 0
-            self.cursor_row += 1
-
-        # Updating lines is purely for the redraw
-        if self.cursor_row > 3:
-            self._shift_up()
-        self.lines[self.cursor_row * 20 + self.cursor_row] = char
-        
-    def _shift_up(self):
-        # move the 3 on-screen lines up
-        for i in range(60):
-            self.lines[i] = self.lines[i + 20]
-        for i in range(60, 80):
-            self.lines[i] = " "
-        self.cursor_row = 0
-        self.cursor_column = 2
-        # Would be nice to have a better way to express this... oh well
-        self.lcd.write_row(0, self.lines[0:20])
-        self.lcd.write_row(1, self.lines[20:40])
-        self.lcd.write_row(2, self.lines[40:60])
-        self.lcd.write_row(3, self.lines[60:80])
-
-    # So when scrolling back, pull 20 chars back and... uhh... what's most usable?
-    # Existing rows not shifting around too much is best
-
-# This entire class exists only to delay the initialization until after the initial USB
-# setup is done. Might be able to use the HID hook too, instead of hooking kmk_keyboard
-# directly
-class Writer(Extension):
-    def on_runtime_enabled(self, _):
-        return
-    
-    def on_runtime_disable(self, keyboard):
-        return
-
-    def during_bootup(self, keyboard):
-        # Do this a little later just in case it's messing with USB init (probably not)
-        set_4bit()
-        init()
-
-        write_chars(sample)
-        write_cmd([0x80 | 84]) # There's some sort of offset...?
-        write_chars("MW 4/10")
-        write_cmd([0x80 | 0]) # Could just jump home, but anyway
-
-
-    def before_matrix_scan(self, keyboard):
-        return
-
-    def after_matrix_scan(self, keyboard):
-        return
-
-    def before_hid_send(self, keyboard):
-        return
-
-    def after_hid_send(self, keyboard):
-        return
-
-    def on_powersave_enable(self, keyboard):
-        return
-
-    def on_powersave_disable(self, keyboard):
-        return
-
 
 # TODO: line break logic
 # Line scroll logic!
