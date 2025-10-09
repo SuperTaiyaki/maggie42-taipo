@@ -104,8 +104,16 @@ class Display:
         self.setpos(row, 0)
         self.write_chars(text[:20])
 
+    def backspace(self):
+        display.write_cmd([0x4, 0x10]) # Reverse direction, step 1
+        display.write_chars([" "])
+        display.write_cmd([0x4 | 0x2, 0x14]) # Normal direction then one to the right
+
 class DisplayMode:
     def receive(self, char):
+        pass
+
+    def backspace(self):
         pass
 
 # Probably need an intermediate class that flattens out the display memory
@@ -162,6 +170,22 @@ class Editor(DisplayMode):
 
             display.setpos(self.cursor_row, self.cursor_column)
 
+    def backspace(self):
+        print("Column: ", self.cursor_column)
+        if self.cursor_column > 0:
+            display.backspace()
+            self.cursor_column -= 1
+        else:
+            if self.cursor_row == 0:
+                # The user can't see what they're deleting, block it (the logic is too hard here)
+                return
+            # jump -> write jump seems cleanest
+            self.cursor_column = 19
+            self.cursor_row -= 1
+            display.setpos(self.cursor_row, self.cursor_column)
+            display.write_chars([" "])
+            display.setpos(self.cursor_row, self.cursor_column)
+
     def _next_line(self, partial_word = None):
         self.cursor_column = 0
         self.cursor_row += 1
@@ -173,8 +197,6 @@ class Editor(DisplayMode):
         if partial_word:
             # Write it out to the screen and the line buffer (but not the text buffer)
             pass
-
-
         
     def _shift_up(self):
         # move the 3 on-screen lines up
@@ -191,6 +213,87 @@ class Editor(DisplayMode):
         self.cursor_row = 3
         self.cursor_column = 0
 
+class Trainer(DisplayMode):
+    def __init__(self):
+        self.pointer_head = 0
+        self.pointer_lines = [0, 0, 0, 0]
+        self.pointer_cursor_buffer = 0
+        
+        self.cursor_row = 0 # logical
+        self.cursor_column = 0
+
+        self.lines = bytearray([ord(' ')] * 80) # on-screen text data, in logical order (not screen order)
+        self.current_word = bytearray(20)
+        self.current_word_length = 0
+
+        self.line_lengths = [0] * 4
+
+    def setup(self):
+        self.buffer = bytearray([ord(x) for x in " ".join(random.choice(wordlist) for x in range(100))])
+        self._fill_lines(0)
+
+    def receive(self, char):
+        if self.buffer[self.pointer_head] == ord(char):
+            self.pointer_head += 1
+            # Kick one right
+            print("Current: ", self.cursor_column, " EOL: ", self.line_lengths[self.cursor_row])
+            self.cursor_column += 1
+
+            if self.cursor_column == self.line_lengths[self.cursor_row]:
+                self.cursor_row += 1
+                self.cursor_column = 0
+                display.setpos(self.cursor_row, self.cursor_column)
+
+                if self.cursor_row == 4:
+                    self._fill_lines(self.pointer_head)
+                    self.cursor_row = 0
+                    self.cursor_column = 0
+
+            else:
+                display.write_cmd([0x4 | 0x2, 0x14]) # Normal direction then one to the right
+
+        else:
+            print("WRONG")
+
+    def _fill_lines(self, offset):
+        word = [' '] * 20
+        word_index = 0
+
+        line = 0
+        line_index = 0
+
+        while line < 4:
+            if offset > 2047:
+                break
+            if self.buffer[offset] == ord(' '):
+                for i in range(word_index):
+                    self.lines[line * 20 + line_index] = word[i]
+                    line_index += 1
+                word_index = 0
+                offset += 1
+
+                # TODO: overflow? If this is at 20, don't need it
+                self.lines[line * 20 + line_index] = ord(' ')
+                line_index += 1
+            else:
+                word[word_index] = self.buffer[offset]
+                offset += 1
+                word_index += 1
+                if word_index > 20:
+                    print(word)
+                if word_index + line_index > 18:
+                    self.lines[line * 20 + line_index] = ord(' ')
+                    self.line_lengths[line] = line_index
+                    line += 1
+                    line_index = 0
+
+        display.write_row(0, self.lines[0:20])
+        display.write_row(1, self.lines[20:40])
+        display.write_row(2, self.lines[40:60])
+        display.write_row(3, self.lines[60:80])
+
+
+
 # This entire class exists only to delay the initialization until after the initial USB
 # setup is done. Might be able to use the HID hook too, instead of hooking kmk_keyboard
 # directly
@@ -205,10 +308,11 @@ class Writer(Extension):
         # Do this a little later just in case it's messing with USB init (probably not)
 
         display.setup()
-        display.write_chars(sample)
         display.write_cmd([0x80 | 84]) # There's some sort of offset...?
         display.write_chars("MW 4/10")
         display.write_cmd([0x80 | 0]) # Could just jump home, but anyway
+
+        mode.setup()
 
 
     def before_matrix_scan(self, keyboard):
@@ -234,7 +338,8 @@ class Writer(Extension):
 # Keyboard scan codes: 0x1 = a, 0x81 is A
 
 display = Display()
-mode = Editor()
+#mode = Editor()
+mode = Trainer()
 
 sequence = [random.choice(wordlist) for x in range(8)]
 sample = " ".join(sequence[0:4])
@@ -257,53 +362,14 @@ def handle_report(usb_report):
     for c in usb_report:
         if isinstance(c, ModifierKey):
             continue
-        # End of line 1 is 0x27 (39)
-        # Start of line 2 is 0x40 (64)
-        # When reversing, which do we want...?
         if c.code == dvorak.BACKSPACE:
-            print(position)
-            display.write_cmd([0x4, 0x10]) # Reverse direction, step 1
-            if position == 20:
-                display.write_cmd([0x80 | 19]) # this is ok, don't fucking touch
-            elif position == 40:
-                display.write_cmd([0x80 | 0x40 + 19])
-            elif position == 60:
-                display.write_cmd([0x80 | 0x27])
-            elif position == 1:
-                display.write_cmd([0x80 | 0x67])
-            display.write_chars([" "])
-            display.write_cmd([0x4 | 0x2, 0x14]) # Normal direction then one to the right
-            position -= 1
+            mode.backspace()
         if c.code in dvorak.scancodes:
             char = dvorak.scancodes[c.code]
+            if shifted:
+                char = char.upper()
+
             mode.receive(char)
-
-
-#           if shifted and  char == '1':
-#               display.write_cmd([0x1, 0x2])
-#               position = 0
-#           else:
-#               if shifted:
-#                   char = char.upper()
-
-#               display.write_chars([char])
-#               if True or sample[position] == char:
-#                   #write_cmd([0x4 | 0x2, 0x14]) # Push the cursor one right
-#                   position += 1
-
-#                   if (position == 20):
-#                       display.write_cmd([0x80 | 44])
-#                   if (position == 40):
-#                       display.write_cmd([0x80 | 20])
-#                   if (position == 60):
-#                       display.write_cmd([0x80 | 84])
-#                   if (position == 80):
-#                       position = 0
-                    #write_cmd([0x80 | 44])
-                # Argh need to handle actual position and whatever logic somewhere
-
-# TODO: line break logic
-# Line scroll logic!
 
 # Argh need to design a text editor-ish interface for this. Pretty annoying....
 # Single block of text with a window (pointers) is the start
