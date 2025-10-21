@@ -305,10 +305,16 @@ s3 = 1 << 13
 # No effects of note (I guess keep it...?)
 # D is much more common!
 
-
 # Can I do a dollar sign...?
 # no, the shift switch drops the mode....
 # also need a hard tab
+
+# W is kind of awkward, with the lifted finger. Swap with Z?
+# Even all five is maybe better... allow that for W?
+# Actually the X (a o t ot) might be more comfortable than the all-4, maybe change...?
+# W [X] [X] [X] [ ] [X]_[ ]
+# X [X] [X] [X] [X] [ ]_[ ]
+
 
 class KeyPress:
     keycode = KC.NO
@@ -369,8 +375,12 @@ class Cykey(Module):
             e | t | o: DV.DOT,
             # Wasn't there one or two more...?
             it | t | o: KC.MOD_N,  # [Y]/[N]
-           #it | n | s: KC.MOD_N_LOCK, # This is here because shift logic swaps the rows around - can't double tap [N] otherwise
             it | t | a: KC.MOD_S, # [C]/[M] mod_s layer: left/right brackets, easily accessible arrow keys...
+                       # was originally mod-p, all-five. Not bad, maybe.
+            
+            # Maybe add all-five (P) as a cancel
+            # so that if I know i've fudged a chord I can go to all-five and cancel it
+            # EXCLAIM doesn't require a top-level spot...
 
             a | it: KC.ESC, # [H] for escape (or [A], either way)
 
@@ -389,15 +399,15 @@ class Cykey(Module):
             ot | e | o: DV.V,
             ot | o: DV.K,
             ot | e | t | o: DV.F,
-            e | t | o | a: DV.Z,
             ot | e | t: DV.B,
             t | o | a: DV.D,
             ot | t: DV.R,
             t | a: DV.C,
             e | a: DV.P,
             ot | t | o: DV.Y,
-            ot | t | o | a: DV.X,
-            ot | e | o | a: DV.W,
+            ot | t | o | a: DV.W,
+            ot | e | o | a: DV.Z,
+            e | t | o | a: DV.X,
             ot | t | a: DV.M,
             e | t | a: DV.Q,
 
@@ -410,14 +420,16 @@ class Cykey(Module):
             # TODO: simplify these
             # [T] -> TH, [H] -> HE (escape needs to go somewhere else), [I] for IN...?
             # [R] for ER is possible but hard to catch. Maybe leave that as-is
-            it | o | e: TaipoMacro([DV.T, DV.H]), # actually these probably shouldn't be descended from TaipoKey
-            it | a | e: TaipoMacro([DV.H, DV.E]),
-            it | o | t | e: TaipoMacro([DV.I, DV.N]),
-            it | t | e: TaipoMacro([DV.E, DV.R]),
+            it | o | e: TaipoMacro([DV.T, DV.H]), # [T] -> T,H     actually these probably shouldn't be descended from TaipoKey
+            it | a | e: TaipoMacro([DV.H, DV.E]), # [HE]
+            #it | o | t | e: TaipoMacro([DV.I, DV.N]), # [IN]
+            it | t | e: TaipoMacro([DV.E, DV.R]), # [ER]
+            it | e | t | a: TaipoMacro([DV.Q, DV.U]), # [Q] -> Q,U
 
         }
 
         keymap_numbers = {
+            it: KC.MOD_SHIFT, # Should this be a permanent?
             it | t | o: KC.MOD_N_LOCK,  # [Y]/[N]
 
             # Not in the original layout, but since I have more keys...
@@ -453,10 +465,15 @@ class Cykey(Module):
             # Shifted commands
             # These seem to be permanents in Microwriter
             it | o: DV.BSPC,
-            #it | t: DV.ENTER, # [C] Carriage return
-            it | n: DV.ENTER, # [C] Carriage return
+            it | t: DV.TAB, # [C] Tab
+            #it | n: DV.ENTER, # [C] Carriage return
+            it | o | t | e: DV.ENTER,
+            # Want something main-row but safer...
+            # [M] or [.]?
+
             # Want an escape here just in case I happen to be vim-ing for some reason...
             it | i: DV.ESC, # [E] for escape (level shifted up)
+            # Should move this so I can have the combo for HE bigram instead
 
             it | ot: KC.MOD_CLEAR,
             s1: KC.MOD_CLEAR, # Since mashing thumbs together on this board is an annoying reach
@@ -492,6 +509,11 @@ class Cykey(Module):
             it | t | a: KC.MOD_S_LOCK, # [C]/[M] mod_s layer: left/right brackets, easily accessible arrow keys...
             # delete, insert, home, end, pgup, pgdn... where's my tilde?
             # F keys?
+
+            a: DV.LEFT,
+            o: DV.DOWN,
+            t: DV.UP,
+            e: DV.RIGHT,
 
             a | t: KC.MINUS, # [
             t | ot: KC.EQUAL, # ]
@@ -532,7 +554,6 @@ class Cykey(Module):
         self.keymap_layer2 = keymap_permanent | keymap_extra | {bitswap(combo): result for combo, result in keymap_main.items()}
 
         # Standard modes are U (upper), N (numeric), P (extended printable)
-        # TODO: maybe auto generate this by flipping the main keymap and have real layers
         # Since layer 3 is going to be something else entirely
         # ALSO: Pull in layer 3 chars from quirkey, they look reasonable
         # In theory I have <, > since they're on , and . but hard to remember...
@@ -544,9 +565,22 @@ class Cykey(Module):
             self.rgb.set_hsv_fill(176, 140, 90)
             self.rgb.show()
         pass
-    def rgb_moden(self):
+
+    def rgb_modes(self):
         if self.rgb:
             self.rgb.set_hsv_fill(30, 200, 180)
+            self.rgb.show()
+        pass
+
+    def rgb_moden(self):
+        if self.rgb:
+            self.rgb.set_hsv_fill(240, 200, 180)
+            self.rgb.show()
+        pass
+
+    def rgb_modem(self):
+        if self.rgb:
+            self.rgb.set_hsv_fill(120, 200, 180)
             self.rgb.show()
         pass
 
@@ -558,7 +592,7 @@ class Cykey(Module):
             # SO: if it's timed out (300ms) send the key
             # BUT that's when hold becomes true, and we need to hit the hold point in order to reach the combo logic
             if self.state[side].timer != 0 and ticks_ms() > self.state[side].timer:
-                self.state[side].key.keycode = self.determine_key(self.state[side].combo)
+                self.state[side].key.keycode = self.determine_key(self.state[side].combo, self.state[side].shifted)
                 self.state[side].key.hold = True
                 self.handle_key(keyboard, side)
                 self.state[side].timer = 0
@@ -642,10 +676,19 @@ class Cykey(Module):
         key = self.state[side].key
 
         if isinstance(key.keycode, TaipoMacro):
-            keyboard.tap_key(key.keycode.output[0])
+            # Oddly enough this doesn't work - first comes out after the next char!
+            # actually that's kind of cool but too hard to use normally
+            # Basically the RSFT does something simliar to tap_key but it's not quite right
+            first = KC.RSFT(key.keycode.output[0]) if self.state[side].shift else key.keycode.output[0]
+            keyboard.tap_key(first)
             remain = key.keycode.output[1:]
             remain.reverse()
             self.send_next = remain
+            # TODO: store the combo length so they can be backspaced in one shot
+
+            if self.state[side].shift & LAYER_LOCK == 0:
+                self.state[side].shift = 0
+
             return
 
         if key.keycode == KC.NO:
@@ -660,7 +703,7 @@ class Cykey(Module):
             return
         elif key.keycode == KC.MOD_S:
             self.state[side].shifted = LAYER_S
-            self.rgb_moden() # TODO
+            self.rgb_modek()
             return
         elif key.keycode == KC.MOD_S_LOCK:
             self.state[side].shifted = LAYER_S | LAYER_LOCK
@@ -675,6 +718,7 @@ class Cykey(Module):
                 self.state[side].shift = LAYER_S | LAYER_LOCK
             else:
                 self.state[side].shift = LAYER_S
+                self.rgb_modes()
             return
             # guess we don't need to clear the shift state here
 
@@ -723,10 +767,8 @@ class Cykey(Module):
             if self.state[side].shift & LAYER_LOCK == 0:
                 self.state[side].shift = 0
 
+            # This is the layer shift, the above is the shift (uppercase) key
             if self.state[side].shifted & LAYER_LOCK == 0:
-                if self.state[side].shifted > 0:
-                    print("Cancelled layer")
-                    # AH FUCK on the release it passes through here...
                 self.state[side].shifted = LAYER_NORMAL
                 self.rgb_neutral()
 
@@ -767,3 +809,6 @@ class Cykey(Module):
 # Separate the keymaps into different files
 # Try building a web app (touchscreen) to practice on this?
 # Heck, even a web emulated MicroWriter!
+
+# More silliness to try: a repeat key?
+# double taps aren't exactly problematic for me, but for big chords it allows space to move elsewhere on the layout... but then, where should it be?

@@ -46,6 +46,7 @@ LAYER_NORMAL = 2
 LAYER_BROWSER = 3
 LAYER_RAISED = 4
 LAYER_LOWERED = 5
+LAYER_GAME = 6
 
 holdtap = HoldTap()
 holdtap.tap_time = 150
@@ -90,10 +91,10 @@ MWDOWN = KC.RF(KC.MW_DOWN, interval = 800, timeout = 20)
 
 keyboard.keymap = [
         [
-        KC.NO, KC.TP_TLP, KC.TP_TLR, KC.TP_TLM, KC.TP_TLI,  MWUP,          KC.TP_LIT, KC.TP_TRI, KC.TP_TRM, KC.TP_TRR, KC.TG(5), NORMAL_ON, 
-        KC.NO, KC.TP_TLP, KC.TP_BLR, KC.TP_BLM, KC.TP_BLI, MWDOWN,     KC.TP_LOT, KC.TP_BRI, KC.TP_BRM, KC.TP_BRR, KC.TP_TRP, KC.NO, 
-        KC.NO, KC.TP_BLP, KC.TP_BLR, KC.LAYER2, KC.LAYER1, KC.TP_LUT,      KC.TP_RUT, KC.TP_BRI, KC.TP_BRM, KC.TP_BRR, KC.TP_BRP, KC.NO, 
-        KC.NO, KC.NO, KC.NO, KC.SK(KC.MO(LAYER_BROWSER)), KC.TP_LOT, KC.TP_LIT,       KC.TP_ROT, KC.TP_RIT, KC.MO(1), KC.NO, KC.NO, KC.NO, 
+        KC.NO, KC.TP_TLP, KC.TP_TLR, KC.TP_TLM, KC.TP_TLI,  MWUP,          KC.TG(LAYER_GAME), KC.TP_TRI, KC.TP_TRM, KC.TP_TRR, KC.TP_BRP, KC.NO, 
+        KC.NO, KC.TP_TLP, KC.TP_BLR, KC.TP_BLM, KC.TP_BLI, MWDOWN,         KC.NO, KC.TP_BRI, KC.TP_BRI, KC.TP_BRM, KC.TP_BRR, KC.NO, 
+        KC.NO, KC.TP_BLP, KC.TP_BLR, KC.LAYER2, KC.LAYER1, KC.TP_LUT,      KC.NO, KC.TP_BRI, KC.TP_BRI, KC.TP_BRM, KC.TP_BRR, KC.TP_BRP, 
+        KC.NO, KC.NO, KC.NO, KC.SK(KC.MO(LAYER_BROWSER)), KC.TP_LOT, KC.TP_LIT,       KC.TP_RIT, KC.TP_ROT, KC.MO(1), KC.NO, KC.NO, KC.NO, 
         ],
         # bottom-left should probably change to a oneshot since it's a pain to reach
         # Taipo macro layer - useful browser stuff
@@ -135,9 +136,9 @@ keyboard.keymap = [
     # empty spaces can be used for non-browser convenience stuff
     # mixing this with UI layer might be nice
     [
-        KC.TRNS, KC.LGUI(KC.N1), KC.LGUI(KC.N2), KC.LGUI(KC.N3), KC.LGUI(KC.N4), KC.LGUI(KC.N5),  KC.LGUI(KC.N6), KC.LGUI(KC.N7), KC.LGUI(KC.N8), KC.LGUI(KC.N9), KC.LGUI(KC.N0), KC.NO, 
+        KC.RELOAD, KC.LGUI(KC.N1), KC.LGUI(KC.N2), KC.LGUI(KC.N3), KC.LGUI(KC.N4), KC.LGUI(KC.N5),  KC.LGUI(KC.N6), KC.LGUI(KC.N7), KC.LGUI(KC.N8), KC.LGUI(KC.N9), KC.LGUI(KC.N0), KC.NO, 
         KC.TRNS, KC.LCTRL(KC.LSFT(KC.TAB)), KC.LCTRL(KC.K) , KC.LCTRL(KC.TAB), KC.NO, KC.NO,     KC.NO, KC.NO, KC.NO, KC.LGUI(KC.P), KC.NO, KC.NO, 
-        KC.NO, KC.LCTRL(KC.P), KC.LCTRL(KC.COMMA) , KC.LGUI(KC.C), KC.LGUI(KC.V), KC.NO,      KC.NO, KC.LGUI(KC.J), KC.NO, KC.NO, KC.NO, KC.NO, 
+        KC.RESET, KC.LCTRL(KC.P), KC.LCTRL(KC.COMMA) , KC.LGUI(KC.C), KC.LGUI(KC.V), KC.NO,      KC.NO, KC.LGUI(KC.J), KC.NO, KC.NO, KC.NO, KC.NO, 
         KC.NO, KC.NO, KC.NO, KC.TRIGGERL, KC.NO, KC.NO,       KC.NO, KC.NO, KC.TRIGGERR, KC.NO, KC.NO, KC.NO, 
         ],
     
@@ -169,18 +170,14 @@ keyboard.keymap = [
 # also, the backspace hold thing is a bit annoying - can't hold backspace through words!
 
 # why does ctrl++ not trigger alacritty scaling? 
-
-# Weird double-hand taipo
-# Low row is on the left hand, high row is on the right - 4 fingers each that never have to move
-# With the no-diagonal taipo this isn't bad, but very left-heavy
-[
-        KC.NO, KC.NO, KC.NO, KC.NO, KC.NO, KC.NO,          KC.NO, KC.NO, KC.NO, KC.NO, KC.NO, KC.TG(5), 
-        KC.NO, KC.TP_TLP, KC.TP_TLR, KC.TP_TLM, KC.TP_TLI, KC.NO,     KC.NO, KC.TP_TRI, KC.TP_TRM, KC.TP_TRR, KC.TP_TRP, KC.NO, 
-        KC.NO, KC.TP_BLP, KC.TP_BLR, KC.TP_BLM, KC.TP_BLI, KC.NO,      KC.NO, KC.TP_TLI, KC.TP_TLM, KC.TP_TLR, KC.TP_TLP, KC.NO, 
-        KC.NO, KC.NO, KC.NO, KC.TRIGGERL, KC.TP_LIT, KC.TP_LOT,       KC.TP_ROT, KC.TP_RIT, KC.TRIGGERR, KC.NO, KC.NO, KC.NO, 
-        ],
 # Extra layer: Gaming layout
 # arrow keys, z, x, and the like hanging out nearby
+    [
+        NORMAL_OFF, KC.LSFT(KC.N1), KC.LSFT(KC.N2), KC.LSFT(KC.N3), KC.LSFT(KC.N4), KC.LSFT(KC.N5),    KC.TG(LAYER_GAME), KC.NO, KC.UP, KC.NO, KC.INSERT, KC.DELETE, 
+        KC.TRNS, KC.N1, KC.N2, KC.N3, KC.N4, KC.N5,          KC.NO, KC.LEFT, KC.DOWN, KC.RIGHT, KC.GRAVE, KC.BSLASH, 
+        KC.TRNS, KC.NO, KC.NO, KC.NO, KC.END, KC.NO,       KC.END, KC.PGDN, KC.LEFT, KC.I, KC.B, KC.SLASH, 
+        KC.NO, KC.NO, KC.NO, KC.NO, KC.NO, KC.NO,       KC.SLASH, KC.B, KC.I, KC.NO, KC.NO, KC.NO, 
+    ]
                    ]
 
 #combos = Combos()
