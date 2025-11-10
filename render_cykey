@@ -1,0 +1,4 @@
+sed -n '/KEYMAP_START/,/KEYMAP_END/p' cykey.py | sed 's/#.*$//' | sed -n '/:/p' | ruby render_cykey.rb
+# And in the end use ruby...
+
+

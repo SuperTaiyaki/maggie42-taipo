@@ -315,6 +315,11 @@ s3 = 1 << 13
 # W [X] [X] [X] [ ] [X]_[ ]
 # X [X] [X] [X] [X] [ ]_[ ]
 
+# should change the top row to work like ardux, each key trips a layer
+# especially the symbol layer, this version is messy and hard to remember
+# I don't like the upper reach but that's a hardware issue.
+# what's the thing where the backspace gets jammed?
+
 
 class KeyPress:
     keycode = KC.NO
@@ -346,7 +351,7 @@ class State:
 class Cykey(Module):
     # sticky_timeout is now configured in the stickykeys module, this is unused
     # TODO: take an RGB and use it to display the current shift mode
-    def __init__(self, rgb = None, tap_timeout=600, sticky_timeout=1000, ghost_timeout=50):
+    def __init__(self, rgb = None, tap_timeout=600, sticky_timeout=1000, ghost_timeout=40):
         self.rgb = rgb
         self.tap_timeout = tap_timeout
         self.sticky_timeout=sticky_timeout
@@ -425,41 +430,7 @@ class Cykey(Module):
             #it | o | t | e: TaipoMacro([DV.I, DV.N]), # [IN]
             it | t | e: TaipoMacro([DV.E, DV.R]), # [ER]
             it | e | t | a: TaipoMacro([DV.Q, DV.U]), # [Q] -> Q,U
-
         }
-
-        keymap_numbers = {
-            it: KC.MOD_SHIFT, # Should this be a permanent?
-            it | t | o: KC.MOD_N_LOCK,  # [Y]/[N]
-
-            # Not in the original layout, but since I have more keys...
-            # This is mostly useful because they can be shifted for symbols
-            e: DV.N1,
-            e | ot: DV.N2,
-            e | ot | t: DV.N3,
-            e | ot | t | o: DV.N4,
-            e | ot | t | o | a: DV.N5,
-            a: DV.N6,
-            a | o: DV.N7,
-            a | o | t: DV.N8,
-            a | o | t | e: DV.N9,
-            t: DV.N0,
-
-            ot | a | o | e: DV.COLN,
-            ot | o | e: DV.SCLN,
-            ot | o | a: DV.EQUAL, # "J"ust the same
-            a | t: KC.LEFT_PAREN,
-            t | ot: KC.RIGHT_PAREN,
-            ot | a: KC.QUOT, # DV.MINUS, # Don't know why this doesn't work via DV.
-
-            # LSFTing stuff doesn't work in here - need to use the constructor directly.
-            t | o: KC.LSFT(KC.Q), # DOUBLE_QUOTE
-            e | t | a: KC.EXCLAIM, # Wasn't this in the top layer...? (all five)
-            ot | t | o:  KC.LSFT(KC.LBRACKET), # QUESTION,
-            ot | o: DV.BSLS, # re-slanted because left hand
-            a | e: DV.SLSH,
-            # TODO: need an escape key somewhere (or just a hardware escape...
-        } # KEYMAP_END
 
         keymap_permanent = {
             # Shifted commands
@@ -503,6 +474,40 @@ class Cykey(Module):
             r | a | s | o | i | e: KC.MOD_GAS,
             r | a | n | t | i | e: KC.MOD_GCS,
             s | o | n | t | i | e: KC.MOD_ACS,
+        } # KEYMAP_END
+
+        keymap_numbers = {
+            it: KC.MOD_SHIFT, # Should this be a permanent?
+            it | t | o: KC.MOD_N_LOCK,  # [Y]/[N]
+
+            # Not in the original layout, but since I have more keys...
+            # This is mostly useful because they can be shifted for symbols
+            e: DV.N1,
+            e | ot: DV.N2,
+            e | ot | t: DV.N3,
+            e | ot | t | o: DV.N4,
+            e | ot | t | o | a: DV.N5,
+            a: DV.N6,
+            a | o: DV.N7,
+            a | o | t: DV.N8,
+            a | o | t | e: DV.N9,
+            t: DV.N0,
+
+            
+            ot | a | o | e: DV.COLN,
+            ot | o | e: DV.SCLN,
+            ot | o | a: DV.EQUAL, # "J"ust the same
+            a | t: KC.LEFT_PAREN,
+            t | ot: KC.RIGHT_PAREN,
+            ot | a: KC.QUOT, # DV.MINUS, # Don't know why this doesn't work via DV.
+
+            # LSFTing stuff doesn't work in here - need to use the constructor directly.
+            t | o: KC.LSFT(KC.Q), # DOUBLE_QUOTE
+            e | t | a: KC.EXCLAIM, # Wasn't this in the top layer...? (all five)
+            ot | t | o:  KC.LSFT(KC.LBRACKET), # QUESTION,
+            ot | o: DV.BSLS, # re-slanted because left hand
+            a | e: DV.SLSH,
+            # TODO: need an escape key somewhere (or just a hardware escape...
         }
 
         keymap_extra = {
@@ -600,6 +605,10 @@ class Cykey(Module):
     def after_matrix_scan(self, keyboard):
         pass
 
+    def _print_chord(self, chord, other = None):
+        bits = [" " if chord & (1 << i) == 0 else "X" for i in range(4, 10)]
+        print(f"[{bits[0]}] [{bits[1]}] [{bits[2]}] [{bits[3]}]__[{bits[5]}] [{bits[4]}] {other}")
+
     def process_key(self, keyboard, key, is_pressed, int_coord):
         if not isinstance(key, TaipoKey):
             return key
@@ -619,17 +628,33 @@ class Cykey(Module):
             self.state[side].combo |= 1 << (key.taipo_code & 0xF)
             self.state[side].timer = ticks_ms() + self.tap_timeout
 
+            self._print_chord(self.state[side].combo)
+
             self.state[side].releasing = False
         else:
 
             anti_ghost = False
 
+            # Hrm. Mashing backspace causes the hold to trigger, and then the held thumb becomes a mode shift.
+            # timer not resetting it may be part of it
+            # but clear_state is called at the end there, which resets the timer
+            # ARGH so the anti-ghost is catching the thumb keypress as the pre-image
+            # need to check direction - AB^BA (B tapped over A) and AB^AB (A-B roll) are not the same
+
+            # simply, if last_combo is not the same as the now-released combo - not an anti-ghost?
+            # lili triggers this easily - the second l becomes a pi
+            # Need to do a timing diagram...
+            # Basically this is too messy, if it's restricted to single chars it might be better
+            # g->n (ignite) exists so that's not a great rule
+
             if not self.state[side].key.hold and not self.state[side].releasing:
                 # Key was not pressed long enough to trigger 'hold'
 
                 combo = self.state[side].combo
+                next_combo = combo & ~(1 << (key.taipo_code & 0xF))
                 if (self.state[side].last_keypress_timestamp > ticks_ms() - self.ghost_timeout and
-                    self.state[side].last_combo != 0):
+                    self.state[side].last_combo != 0 and next_combo != self.state[side].last_combo and
+                    next_combo.bit_count() == 1 and self.state[side].last_combo.bit_count() == 1):
                     combo = self.state[side].last_combo
                     self.state[side].last_keypress_timestamp = 0
                     anti_ghost = True
@@ -655,6 +680,7 @@ class Cykey(Module):
             # At some point I need logic to one-shot the mode shifts
             # But for now I have multiple rows to use so it doesn't actually matter
             self.state[side].combo &= ~(1 << (key.taipo_code & 0xF)) # Remove the released key from the combo block
+            self._print_chord(self.state[side].combo, self.state[side].key.keycode)
 
             if anti_ghost:
                 self.state[side].releasing = False
