@@ -1,7 +1,7 @@
 # rsync would be better but ehhhh
 install:
 	test -f /mnt/sda1/WRITER && echo "ERROR: Wrong board" && exit 1 || true
-	cp cykey.py code.py /mnt/sda1/ && sync
+	cp cykey.py jackdaw.py code.py /mnt/sda1/ && sync
 
 writer:
 	cp code-board.py /mnt/sda1/code.py
@@ -14,4 +14,7 @@ keyer:
 term:
 	picocom /dev/ttyACM0
 
+keymap:
+	./render_cykey
 # TODO: adafruit libraries as required
+

@@ -14,10 +14,13 @@ from kmk.modules.holdtap import HoldTap
 from kmk.modules.mouse_keys import MouseKeys
 from kmk.modules.rapidfire import RapidFire
 
-
 from kmk.extensions.rgb import RGB
 
+from kmk.utils import Debug
+debug = Debug(__name__)
+
 from cykey import Cykey
+from jackdaw import Jackdaw
 
 keyboard = KMKKeyboard()
 
@@ -41,12 +44,15 @@ rgb = RGB(pixel_pin = board.NEOPIXEL, num_pixels = 1, hue_default = 176, sat_def
 keyboard.extensions.append(rgb)
 
 keyboard.modules.append(Cykey(rgb))
+keyboard.modules.append(Jackdaw())
+
 
 LAYER_NORMAL = 2
 LAYER_BROWSER = 3
 LAYER_RAISED = 4
 LAYER_LOWERED = 5
 LAYER_GAME = 6
+LAYER_JACKDAW = 7
 
 holdtap = HoldTap()
 holdtap.tap_time = 150
@@ -91,7 +97,7 @@ MWDOWN = KC.RF(KC.MW_DOWN, interval = 800, timeout = 20)
 
 keyboard.keymap = [
         [
-        KC.NO, KC.TP_TLP, KC.TP_TLR, KC.TP_TLM, KC.TP_TLI,  MWUP,          KC.TG(LAYER_GAME), KC.TP_TRI, KC.TP_TRM, KC.TP_TRR, KC.TP_BRP, KC.NO, 
+        KC.NO, KC.TP_TLP, KC.TP_TLR, KC.TP_TLM, KC.TP_TLI,  MWUP,          KC.TG(LAYER_GAME), KC.TP_TRI, KC.TP_TRM, KC.TP_TRR, KC.TP_BRP, KC.TG(LAYER_JACKDAW), 
         KC.NO, KC.TP_TLP, KC.TP_BLR, KC.TP_BLM, KC.TP_BLI, MWDOWN,         KC.NO, KC.TP_BRI, KC.TP_BRI, KC.TP_BRM, KC.TP_BRR, KC.NO, 
         KC.NO, KC.TP_BLP, KC.TP_BLR, KC.LAYER2, KC.LAYER1, KC.TP_LUT,      KC.NO, KC.TP_BRI, KC.TP_BRI, KC.TP_BRM, KC.TP_BRR, KC.TP_BRP, 
         KC.NO, KC.NO, KC.NO, KC.SK(KC.MO(LAYER_BROWSER)), KC.TP_LOT, KC.TP_LIT,       KC.TP_RIT, KC.TP_ROT, KC.MO(1), KC.NO, KC.NO, KC.NO, 
@@ -177,6 +183,13 @@ keyboard.keymap = [
         KC.TRNS, KC.N1, KC.N2, KC.N3, KC.N4, KC.N5,          KC.NO, KC.LEFT, KC.DOWN, KC.RIGHT, KC.GRAVE, KC.BSLASH, 
         KC.TRNS, KC.NO, KC.NO, KC.NO, KC.END, KC.NO,       KC.END, KC.PGDN, KC.LEFT, KC.I, KC.B, KC.SLASH, 
         KC.NO, KC.NO, KC.NO, KC.NO, KC.NO, KC.NO,       KC.SLASH, KC.B, KC.I, KC.NO, KC.NO, KC.NO, 
+    ],
+# Jackdaw experimental
+[
+                   KC.BSPACE, KC.JD_4, KC.JD_C, KC.JD_W, KC.JD_N, KC.JD_X,       KC.JD_x, KC.JD_r, KC.JD_l, KC.JD_c, KC.JD_t, KC.JD_e,
+                   KC.JD_BS,  KC.JD_S, KC.JD_T, KC.JD_H, KC.JD_R, KC.JD_z,       KC.JD_z, KC.JD_n, KC.JD_g, KC.JD_h, KC.JD_s, KC.JD_y, 
+        KC.TG(LAYER_JACKDAW), KC.JD_S, KC.JD_T, KC.JD_H, KC.JD_I, KC.JD_E,       KC.JD_o, KC.JD_u, KC.JD_g, KC.JD_h, KC.JD_s, KC.JD_y, 
+        KC.TG(LAYER_JACKDAW), KC.NO, KC.NO, KC.SPC, KC.JD_UO, KC.JD_A,            KC.JD_a, KC.JD_ei, KC.BSPACE, KC.NO, KC.NO, KC.NO, 
     ]
                    ]
 
@@ -188,6 +201,7 @@ keyboard.keymap = [
 #    ]
 
 if __name__ == '__main__':
+    #debug.enabled = False
     keyboard.go()
 
 # Slightly annoying thing: HT causes a bit of lag. Layer switch doesn't (but that's a bit different....)
