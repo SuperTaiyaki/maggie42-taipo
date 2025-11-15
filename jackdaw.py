@@ -45,6 +45,16 @@ M: NGH
 _ _ _ _
 * * * _
 P: LC (same as left hand)
+V: NH
+_ _ _ _
+* _ * _
+W: RH
+* _ _ _
+_ _ * _
+X: LGH
+_ * _ _
+_ * * _
+
 
 
 
@@ -71,10 +81,16 @@ M=NGH
 P=LC
 S=NL or S
 V=NH
+W=RH
 X=LGH
 Z=LH
 
 sf <-- should be GH (scth)
+
+Stuff to fix:
+    MP is a lot more common than PM, override the ordering (right hand)
+    (this is in the patent, actually)
+    
 """
 
 
@@ -352,15 +368,21 @@ rules_dict = {		# left hand obvious
 		'chs': 'd',
 		'gch': 'f',
 		'gt': 'k',
+        'rnl': 'll', # in the patent!
 		'ngh': 'm',
 		'lc': 'p',
 		'nh': 'v',
 		'rh': 'w',
 		'lgh': 'x',
+        # Y is a hard key
 		'lh': 'z',
+        'nl': 's'  # in the patent
+
+        # right hand extra
          }
+
+# Oh hey in the patent keymap LL is available (RNL)
 rules = sorted(rules_dict.items(), key = lambda x: -len(x[0]))
-print(rules)
 
 class Chord():
     def __init__(self):
@@ -399,7 +421,6 @@ class Jackdaw(Module):
         self.chord = Chord()
         self.send_next = []
         self.last_stroke = 1
-        pass
 
 
     def process_key(self, keyboard, key, is_pressed, int_coord):
@@ -418,6 +439,8 @@ class Jackdaw(Module):
         else:
             # keys_pressed is the USB report; coordkeys is real keys (kmk internal)
             if len(keyboard._coordkeys_pressed) == 0:
+
+                # OH HEY this isn't just JD keys
                 self.handle_chord(self.chord.result())
                 self.chord.reset()
 

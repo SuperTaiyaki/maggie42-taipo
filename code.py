@@ -21,6 +21,7 @@ debug = Debug(__name__)
 
 from cykey import Cykey
 from jackdaw import Jackdaw
+from geminipr import Gemini
 
 keyboard = KMKKeyboard()
 
@@ -45,6 +46,7 @@ keyboard.extensions.append(rgb)
 
 keyboard.modules.append(Cykey(rgb))
 keyboard.modules.append(Jackdaw())
+keyboard.modules.append(Gemini())
 
 
 LAYER_NORMAL = 2
@@ -53,6 +55,7 @@ LAYER_RAISED = 4
 LAYER_LOWERED = 5
 LAYER_GAME = 6
 LAYER_JACKDAW = 7
+LAYER_GEMINI = 8
 
 holdtap = HoldTap()
 holdtap.tap_time = 150
@@ -98,7 +101,7 @@ MWDOWN = KC.RF(KC.MW_DOWN, interval = 800, timeout = 20)
 keyboard.keymap = [
         [
         KC.NO, KC.TP_TLP, KC.TP_TLR, KC.TP_TLM, KC.TP_TLI,  MWUP,          KC.TG(LAYER_GAME), KC.TP_TRI, KC.TP_TRM, KC.TP_TRR, KC.TP_BRP, KC.TG(LAYER_JACKDAW), 
-        KC.NO, KC.TP_TLP, KC.TP_BLR, KC.TP_BLM, KC.TP_BLI, MWDOWN,         KC.NO, KC.TP_BRI, KC.TP_BRI, KC.TP_BRM, KC.TP_BRR, KC.NO, 
+        KC.NO, KC.TP_TLP, KC.TP_BLR, KC.TP_BLM, KC.TP_BLI, MWDOWN,         KC.NO, KC.TP_BRI, KC.TP_BRI, KC.TP_BRM, KC.TP_BRR, KC.TG(LAYER_GEMINI), 
         KC.NO, KC.TP_BLP, KC.TP_BLR, KC.LAYER2, KC.LAYER1, KC.TP_LUT,      KC.NO, KC.TP_BRI, KC.TP_BRI, KC.TP_BRM, KC.TP_BRR, KC.TP_BRP, 
         KC.NO, KC.NO, KC.NO, KC.SK(KC.MO(LAYER_BROWSER)), KC.TP_LOT, KC.TP_LIT,       KC.TP_RIT, KC.TP_ROT, KC.MO(1), KC.NO, KC.NO, KC.NO, 
         ],
@@ -190,7 +193,16 @@ keyboard.keymap = [
                    KC.JD_BS,  KC.JD_S, KC.JD_T, KC.JD_H, KC.JD_R, KC.JD_z,       KC.JD_z, KC.JD_n, KC.JD_g, KC.JD_h, KC.JD_s, KC.JD_y, 
         KC.TG(LAYER_JACKDAW), KC.JD_S, KC.JD_T, KC.JD_H, KC.JD_I, KC.JD_E,       KC.JD_o, KC.JD_u, KC.JD_g, KC.JD_h, KC.JD_s, KC.JD_y, 
         KC.TG(LAYER_JACKDAW), KC.NO, KC.NO, KC.SPC, KC.JD_UO, KC.JD_A,            KC.JD_a, KC.JD_ei, KC.BSPACE, KC.NO, KC.NO, KC.NO, 
-    ]
+    ],
+# Gemini steno
+[
+                   KC.BSPACE, KC.G_S1, KC.G_LT, KC.G_LP, KC.G_LH, KC.G_ST1,       KC.G_ST3, KC.G_RF, KC.G_RP, KC.G_RL, KC.G_RT, KC.G_RD,
+                   KC.BSPACE, KC.G_S2, KC.G_LK, KC.G_LW, KC.G_LR, KC.G_ST2,       KC.G_ST4, KC.G_RR, KC.G_RB, KC.G_RG, KC.G_RS, KC.G_RZ, 
+        KC.TG(LAYER_GEMINI), KC.JD_S, KC.JD_T, KC.JD_H, KC.JD_I, KC.JD_E,       KC.JD_o, KC.JD_u, KC.JD_g, KC.JD_h, KC.JD_s, KC.JD_y, 
+        KC.TG(LAYER_JACKDAW), KC.NO, KC.NO, KC.SPC, KC.G_LA, KC.G_LO,            KC.G_RE, KC.G_RU, KC.BSPACE, KC.NO, KC.NO, KC.NO, 
+    ],
+
+
                    ]
 
 #combos = Combos()
