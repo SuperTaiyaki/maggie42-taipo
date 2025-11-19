@@ -1,22 +1,24 @@
+# TODO: remove unused layers, it's maybe slowing down the response. How fast does this go if nothing but Jackdaw is running?
 # Keying memo:
 """
 A C W N (XZ)    |    (zx) r l c t (e)
 S T H R (UO)    |    (ei) n g h s (y)
    (I) I E (A)     (A) o u (u)
 
+    AO-eu
+AI=AEU AU=AU
+EA=AE EE=AOE
+I=EU   IE=OE  IO=AO
+OI=OEU OO=AOU OU=OU OA=AOEU?
+Ux=
 
-F: CTH
-_ * _ _
-_ * * _
+
 G: SCT
 _ * _ _
 * * _ _
 J: TWN
 _ _ * *
 _ * _ _
-K: TWH
-_ _ * -
-_ * * _
 Q: TNR    QU: TWR
 _ _ _ *      _ _ * _
 _ * _ *      _ * _ *
@@ -30,11 +32,12 @@ Z: CN
 _ * _ *
 _ _ _ _
 
-_ _ _ _
-_ _ _ _
-D: CHS
+B: GC
 _ _ * _
-_ _ * *
+_ * _ _
+D: CHS or NLG
+_ _ * _   _ * _ _
+_ _ * *   * * _ _
 F: GCH
 _ _ * _
 _ * * _
@@ -54,9 +57,16 @@ _ _ * _
 X: LGH
 _ * _ _
 _ * * _
+Z: LH
+_ * _ _
+_ _ * _
+LL: RNL
+CK: GCT
+ST: NLT
 
 
-
+_ _ _ _
+_ _ _ _
 
 B=CTWH
 D=CT
@@ -86,13 +96,35 @@ X=LGH
 Z=LH
 
 sf <-- should be GH (scth)
+RH: ST = NLT (alternate S)
 
 Stuff to fix:
     MP is a lot more common than PM, override the ordering (right hand)
     (this is in the patent, actually)
     
+
+Customization: single characters don't auto-space!
+    need a combo for that... 
+
+wtf: CL on the left doesn't work?
+    I'm getting ZR instead
+    .... this is why the patent has the full chart defined
+
 """
 
+"""
+This vowel reaching sucks
+
+I think this is based on an ae-ou layout
+no its not consistent
+ao eu
+
+
+AI=AEU AU=AU
+EA=AE  EE=AOE
+I=EU   IE=OE  IO=AO
+OI=OEU OO=AOU OU=OU
+"""
 
 try:
     from typing import Optional, Tuple, Union
@@ -256,6 +288,10 @@ class JackdawKey(Key):
 # Top centers (T/Y) for asterisk joiner key, below that for.... something
 
 
+# Cross to -S->-E and -T-> -Y are basically impossible, relocating the Y is an option (down, as per the Plover wiki page)
+# TODO: JD_BS + something for single backspace
+
+
 # JD_4 is an A key
 # This is in steno order! Need to be more careful...
 jd_keycodes = [
@@ -270,14 +306,18 @@ jd_keycodes = [
 'X',
 'Z',
 
-'I',
-'UO',
-'E',
-'A',
+#'I',
+#'UO',
+#'E',
+#'A',
 
-'a',
-'o',
-'ei',
+#'a',
+#'o',
+#'ei',
+#'u',
+'A',
+'O',
+'E',
 'u',
 
 'x', # These are maybe special
@@ -294,7 +334,8 @@ jd_keycodes = [
 
 'e', # special right-hand ones (special logic isn't applied yet)
 'y',
-'BS'
+'BS',
+'SHIFT',
 ]
 
 for key in jd_keycodes:
@@ -302,6 +343,139 @@ for key in jd_keycodes:
 
 class State:
     combo = 0
+
+""" Vowel silliness
+AO - EU is reasonable...
+    That's the steno order
+    The patent order is ei-a-ou
+A
+O
+E
+U
+ao
+ae
+au
+oe
+ou
+eu
+
+aoe
+aou
+aeu
+oeu
+
+aoeu
+
+Hey the jackdaw chart can't generate EU, that's kind of annoying
+in order:
+    ou
+    ea
+
+SO the existent 2-chars are:
+    ARGH there are ordering issues too, eu and ue both exist...
+    so 5*5, 25 combinations!
+aa
+ae*
+ai*
+ao*
+au*
+
+ea**
+ee**
+ei**
+eo
+eu*
+
+ia* trial
+ie** field
+ii
+io** prior
+iu?
+
+oa* boar
+oe?
+oi* toil
+oo**
+ou**
+
+ua
+ue* fuel
+ui?
+uo 
+uu
+at least 16 combinations in use
+
+Maybe take a reasonable set and just let the rest break strokes up...?
+    "ou": 17457,
+    "ea": 13361,
+    "io": 12278,
+    "ee": 7446,
+    "ai": 6880,
+    "ie": 6832,
+    "oo": 4910,
+    "ia": 4867,
+    "ei": 3441,
+    "ue": 2439,
+    "ua": 2205,
+    "au": 2136,
+    "ui": 1974,
+    "oi": 1837,
+
+    "oa": 1692, <-- less than 10%
+    "eo": 1497,
+    "oe": 734,
+    "eu": 340,
+    "ae": 266,
+    "iu": 221,
+
+    "uo": 150, < -- less than 1%
+    "ao": 75,
+    "ii": 57,
+    "aa": 53,
+    "uu": 11,
+
+roughly, ao - ie looks reasonable
+ao doesn't exist, so that's fine for u
+but then we can't generate ou...
+    that's crucial enough that I want it top-layer
+    ao - eu lets that generate easily enough. Maybe why it's there?
+    use ae to generate ea... (or just outright swap them)
+        uo doesn't exist so auto-swap that?
+ou: ou
+ea: ae
+io: ao is fine (super low occurence)
+ee: aoe is fine?
+ai: aeu
+ie: oe (same logic as ea?)
+oo: aou
+ia: ao
+ei: no generation???
+ue, ua, : nothing
+au: why???
+ui: nothing!
+oi: oeu (this one exists)
+
+oa: nothing
+
+
+Ah. So the missing OA is a <10%
+    all-4 for that?
+
+One thought: breaking a stroke in the middle isn't much of a penalty
+    in which case, fucking break everything...?
+
+ue$ (and any other e$) can be generated using the rightmost e
+
+I'm missing ei quite a lot (it's in the top 100 words)
+and it's in the top 100 list
+so I should probably exchange it into the set somewhere
+    I have space for one more button (thumb rear), use it for vowel swap...?
+        the vowel double would be handy, then I can unlock a few combos
+            That alone might help (only 2 combos though - ee, oo)
+            AO is super not useful, so make that also generate I and then with the swap we can get any vowel pair!
+
+
+"""
 
 rules_dict = {		# left hand obvious
 		'4': 'a',
@@ -330,25 +504,60 @@ rules_dict = {		# left hand obvious
 		'HN': 'y',
 		'CN': 'z',
 
-         # Left vowels
-		'I': 'i',
-        #'IE': 'u',
-        #'IA': 'u', # For my triangle thumb cluster
-        'IUO': 'u',
-        'UOE': 'o',
-		'E': 'e',
-        #'EA': 'o',
-		'A': 'a',
+        # override because they don't work right
+        'CNR': 'cl',
+        'CWNR': 'pl',
 
-        # right hand
-		'a': 'a',
-        #'ao': 'e',
-		'o': 'o',
-        'oei': 'e',
-        'eiu': 'i',
-        #'ou': 'i',
-        #'au': 'i',
-		'u': 'u',
+# AI=AEU AU=AU
+# EA=AE  EE=AOE
+# I=EU   IE=OE  IO=AO
+# OI=OEU OO=AOU OU=OU
+
+# Nothing generates OA?
+# What's still open?
+# ARGH I want something that can be figured out using heuristics...
+
+# UNrelated: Maybe I can shift this over one to the right - right hand needs to stretch right anyway
+
+        # E is right-hand, it's uppercased so it doesn't conflict with far-right e
+        # AO-eu
+        'AEu': 'ai',
+        'Au': 'au',
+        'AE': 'ea',
+        'AOE': 'ee',
+        'Eu': 'i',
+        'OE': 'ie',
+        'AO': 'io',
+        'OEu': 'oi',
+        'AOu': 'oo',
+        'Ou': 'ou',
+        'AOEu': 'oa',
+
+        'A': 'a',
+        'O': 'o',
+        'E': 'e',
+        'u': 'u',
+
+
+####     # Left vowels
+####	'I': 'i',
+####    #'IE': 'u',
+####    #'IA': 'u', # For my triangle thumb cluster
+####    'IUO': 'u',
+####    'UOE': 'o',
+####	'E': 'e',
+####    #'EA': 'o',
+####	'A': 'a',
+
+####    # right hand
+####	'a': 'a',
+####    #'ao': 'e',
+####	'o': 'o',
+####    'oei': 'e',
+####    'eiu': 'i',
+####    #'ou': 'i',
+####    #'au': 'i',
+####	'u': 'u',
 
         # right hand obvious
 		'r': 'r',
@@ -368,7 +577,6 @@ rules_dict = {		# left hand obvious
 		'chs': 'd',
 		'gch': 'f',
 		'gt': 'k',
-        'rnl': 'll', # in the patent!
 		'ngh': 'm',
 		'lc': 'p',
 		'nh': 'v',
@@ -376,16 +584,20 @@ rules_dict = {		# left hand obvious
 		'lgh': 'x',
         # Y is a hard key
 		'lh': 'z',
-        'nl': 's'  # in the patent
+        'nl': 's',  # in the patent
 
         # right hand extra
+        'ht': 'th',
+        'rnl': 'll', # in the patent!
+        'gct': 'ck',
          }
 
 # Oh hey in the patent keymap LL is available (RNL)
 rules = sorted(rules_dict.items(), key = lambda x: -len(x[0]))
 
 class Chord():
-    def __init__(self):
+    def __init__(self, compact):
+        self.compact = compact
         self.reset()
 
     def reset(self):
@@ -395,32 +607,70 @@ class Chord():
         self.chord[key] = True
 
     def result(self):
+
         pressed = "".join([c for c in jd_keycodes if self.chord[c]])
+        # Otherwise backspace causes trouble
+        if len(pressed) == 0:
+            return ""
+
+        print("Chord: ", pressed)
+
+        if pressed == "S" and self.compact:
+            return [KC.BSPACE]
 
         stripped = pressed
         for x in ['x', 'X', 'z', 'Z']:
             stripped = stripped.replace(x, '')
 
-        if pressed != stripped and stripped == "":
-            #if pressed == stripped:
+        add_space = (pressed != stripped)
+        shifted = stripped.endswith('SHIFT')
+        if shifted:
+            # TODO: this is tail replace
+            stripped = stripped.replace('SHIFT', '')
+        
+        #if pressed != stripped and stripped == "":
+        #if pressed == stripped:
             # HRM not working...
 
             # This is actually backwards. It should be for joining, not for unjoining
             #stripped = " " + stripped
-            stripped = " " # for now
+            #stripped = " " # for now
 
         for x in rules:
             if (x[0] != x[1]):
                 stripped = stripped.replace(x[0], x[1])
 
-        return stripped
+        if len(stripped) == 0: # At current, only space and shift
+            if add_space:
+                return [KC.SPC]
+            elif shifted:
+                return [KC.BSPACE]
+            else:
+                return ""
 
 
+        keys = ([KC.LSFT(DVP[stripped[0]]) if shifted else DVP[stripped[0]]] +
+                [DVP[c] for c in stripped[1:]])
+
+        # TODO: cleaner expression of this
+        return keys + [KC.SPC] if add_space else keys
+
+
+## Compact mode: left S tapped alone is backspace
+# Also the IE -> O, OU -> E chords are enabled (because the board has no space for UO and EI buttons)
 class Jackdaw(Module):
-    def __init__(self):
-        self.chord = Chord()
-        self.send_next = []
+    def __init__(self, compact = False):
+        self.chord = Chord(compact)
+        self.compact = compact
         self.last_stroke = 1
+
+        self.held = set()
+
+        # Stream the output
+        self.send_next = []
+        # Try to work around the tap_key weirdness
+        self.now_pressed = None
+
 
 
     def process_key(self, keyboard, key, is_pressed, int_coord):
@@ -430,6 +680,7 @@ class Jackdaw(Module):
         code = key.code
 
         if is_pressed:
+            self.held.add(code)
             if code == 'BS':
                 self.send_next = [KC.BSPACE] * self.last_stroke
                 self.chord.reset()
@@ -437,12 +688,20 @@ class Jackdaw(Module):
             else:
                 self.chord.add(code)
         else:
+            self.held.remove(code)
             # keys_pressed is the USB report; coordkeys is real keys (kmk internal)
             if len(keyboard._coordkeys_pressed) == 0:
 
                 # OH HEY this isn't just JD keys
-                self.handle_chord(self.chord.result())
+                result = self.chord.result()
+                if result == [KC.BSPACE]:
+                    result *= self.last_stroke
+                    self.last_stroke = 1
+                else:
+                    self.last_stroke = len(result)
+                self.handle_chord(result)
                 self.chord.reset()
+        print("Held: ", self.held)
 
     def handle_chord(self, chord):
         if chord == "":
@@ -452,13 +711,12 @@ class Jackdaw(Module):
         # And then.... just execute every replace?
         # And then spit out the remainder?
         # print(chord)
-        out = [DVP[c] for c in list(chord)]
+        out = [c for c in list(chord)]
         out.reverse()
 
         # TODO: need to lead with a space, probably
         # Unless one of the XYZs is included...?
         self.send_next = out
-        self.last_stroke = len(out)
 
     def during_bootup(self, keyboard):
         pass
@@ -469,9 +727,14 @@ class Jackdaw(Module):
         pass
 
     def before_hid_send(self, keyboard):
-        if len(self.send_next) > 0:
-            keyboard.tap_key(self.send_next.pop())
-            #keyboard.tap_key(KC[self.send_next.pop()])
+        # ARGH this is kind of buggy on KMK. The upstrokes can get lost...?
+        if self.now_pressed != None:
+            keyboard.remove_key(self.now_pressed)
+            self.now_pressed = None
+        elif len(self.send_next) > 0:
+            key = self.send_next.pop()
+            keyboard.add_key(key)
+            self.now_pressed = key
 
     def after_hid_send(self, keyboard):
         pass
@@ -483,3 +746,4 @@ class Jackdaw(Module):
         pass
 
 
+# In the end this is a lot closer to the original Shelton patent than the Jackdaw theory
