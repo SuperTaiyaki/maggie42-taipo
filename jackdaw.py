@@ -271,9 +271,11 @@ class DVP():
         return self.keys[name.upper()]
 DVP = DVP()
 
+# Block will be used for L/Vowels/R/special
 class JackdawKey(Key):
-    def __init__(self, code):
+    def __init__(self, code, block):
         self.code = code
+        self.block = block
         super().__init__()
 
 
@@ -289,12 +291,11 @@ class JackdawKey(Key):
 
 
 # Cross to -S->-E and -T-> -Y are basically impossible, relocating the Y is an option (down, as per the Plover wiki page)
-# TODO: JD_BS + something for single backspace
-
 
 # JD_4 is an A key
-# This is in steno order! Need to be more careful...
-jd_keycodes = [
+# This is in steno order!
+
+lh_keycodes = [
 '4',
 'S',
 'C',
@@ -305,21 +306,17 @@ jd_keycodes = [
 'R',
 'X',
 'Z',
+]
 
-#'I',
-#'UO',
-#'E',
-#'A',
-
-#'a',
-#'o',
-#'ei',
-#'u',
+center_keycodes = [
+'UO', # Because this is a modifier
 'A',
 'O',
 'E',
 'u',
+]
 
+rh_keycodes =  [
 'x', # These are maybe special
 'z',
 
@@ -331,15 +328,21 @@ jd_keycodes = [
 'h',
 't',
 's',
+]
 
+special_keycodes = [
+'te',
 'e', # special right-hand ones (special logic isn't applied yet)
 'y',
 'BS',
 'SHIFT',
 ]
 
+jd_keycodes = lh_keycodes + center_keycodes + rh_keycodes + special_keycodes
+consonant_keycodes = lh_keycodes + rh_keycodes + special_keycodes
+
 for key in jd_keycodes:
-    make_key(names = ("JD_" + key,), constructor = JackdawKey, code = key)
+    make_key(names = ("JD_" + key,), constructor = JackdawKey, code = key, block = 0)
 
 class State:
     combo = 0
@@ -414,14 +417,14 @@ Maybe take a reasonable set and just let the rest break strokes up...?
     "ie": 6832,
     "oo": 4910,
     "ia": 4867,
-    "ei": 3441,
-    "ue": 2439,
-    "ua": 2205,
-    "au": 2136,
+    "ei": 3441, <-- missing
+    "ue": 2439, <-- missing
+    "ua": 2205, <-- missing
+    "au": 2136, <-- present?
     "ui": 1974,
-    "oi": 1837,
-
-    "oa": 1692, <-- less than 10%
+    "oi": 1837, <-- present
+V-- all missing
+    "oa": 1692, <-- less than 10% (I added it in...)
     "eo": 1497,
     "oe": 734,
     "eu": 340,
@@ -433,6 +436,9 @@ Maybe take a reasonable set and just let the rest break strokes up...?
     "ii": 57,
     "aa": 53,
     "uu": 11,
+
+Generating -e and a- are less important for lower-frequency combinations because the board corners can kind of make up....
+    IE is the only one anyway
 
 roughly, ao - ie looks reasonable
 ao doesn't exist, so that's fine for u
@@ -521,22 +527,22 @@ rules_dict = {		# left hand obvious
 
         # E is right-hand, it's uppercased so it doesn't conflict with far-right e
         # AO-eu
-        'AEu': 'ai',
-        'Au': 'au',
-        'AE': 'ea',
-        'AOE': 'ee',
-        'Eu': 'i',
-        'OE': 'ie',
-        'AO': 'io',
-        'OEu': 'oi',
-        'AOu': 'oo',
-        'Ou': 'ou',
-        'AOEu': 'oa',
+#       'AEu': 'ai',
+#       'Au': 'au',
+#       'AE': 'ea',
+#       'AOE': 'ee',
+#       'Eu': 'i',
+#       'OE': 'ie',
+#       'AO': 'io',
+#       'OEu': 'oi',
+#       'AOu': 'oo',
+#       'Ou': 'ou',
+#       'AOEu': 'oa',
 
-        'A': 'a',
-        'O': 'o',
-        'E': 'e',
-        'u': 'u',
+#       'A': 'a',
+#       'O': 'o',
+#       'E': 'e',
+#       'u': 'u',
 
 
 ####     # Left vowels
@@ -590,10 +596,73 @@ rules_dict = {		# left hand obvious
         'ht': 'th',
         'rnl': 'll', # in the patent!
         'gct': 'ck',
+
+        'ght': 'ght', # These tend to generate other things (the k takes priority)
+        'ghs': 'ghs',
          }
 
+rules_vowels_raw = {
+        # E is right-hand, it's uppercased so it doesn't conflict with far-right e
+        # AO-eu
+        'AEu': 'ai',
+        'Au': 'au',
+        'AE': 'ea',
+        'AOE': 'ee',
+        'Eu': 'i',
+        'OE': 'ie',
+        'AO': 'io',
+        'OEu': 'oi',
+        'AOu': 'oo',
+        'Ou': 'ou',
+        'AOEu': 'oa',
+
+        'A': 'a',
+        'O': 'o',
+        'E': 'e',
+        'u': 'u',
+
+        }
+rules_vowels_shifted_raw = {
+        'AEu': 'ia',
+        'Au': 'ua',
+        'AE': 'ae',
+        'AOE': 'ee',
+        'Eu': 'ii',
+        'OE': 'ei',
+        'AO': 'oi',
+        'OEu': 'io',
+        'AOu': 'oo',
+        'Ou': 'uo',
+        'AOEu': 'ao',
+
+        'Ou': 'uo',
+
+        'A': 'aa',
+        'O': 'oo',
+        'E': 'ee',
+        'u': 'uu',
+        }
+# uaOU generates uua instead of au
+
+rules = {x: list() for x in jd_keycodes}
+for rule in rules_dict.items():
+    rules[rule[0][0]].append(rule)
+
+for rule in rules:
+    rules[rule] = sorted(rules[rule], key = lambda x: -len(x[0]))
+
 # Oh hey in the patent keymap LL is available (RNL)
-rules = sorted(rules_dict.items(), key = lambda x: -len(x[0]))
+rules_vowels = {x: list() for x in center_keycodes}
+for rule in rules_vowels_raw.items():
+    rules_vowels[rule[0][0]].append(rule)
+    
+rules_vowels_shifted = {x: list() for x in center_keycodes}
+for rule in rules_vowels_shifted_raw.items():
+    rules_vowels_shifted[rule[0][0]].append(rule)
+
+for v in center_keycodes:
+    rules_vowels[v] = sorted(rules_vowels[v], key = lambda x: -len(x[0]))
+    rules_vowels_shifted[v] = sorted(rules_vowels_shifted[v], key = lambda x: -len(x[0]))
 
 class Chord():
     def __init__(self, compact):
@@ -607,40 +676,82 @@ class Chord():
         self.chord[key] = True
 
     def result(self):
+        blocks = ["".join([c for c in keys if self.chord[c]]) for keys in (center_keycodes, lh_keycodes, rh_keycodes, special_keycodes)]
+        combined = blocks[1] + blocks[0] + blocks[2] + blocks[3]
 
-        pressed = "".join([c for c in jd_keycodes if self.chord[c]])
-        # Otherwise backspace causes trouble
-        if len(pressed) == 0:
+        if len(combined) == 0:
             return ""
 
-        print("Chord: ", pressed)
+        print("Chord: ", blocks)
 
-        if pressed == "S" and self.compact:
+        if combined == "S" and self.compact:
             return [KC.BSPACE]
 
-        stripped = pressed
-        for x in ['x', 'X', 'z', 'Z']:
-            stripped = stripped.replace(x, '')
+        # stripped = pressed
 
-        add_space = (pressed != stripped)
-        shifted = stripped.endswith('SHIFT')
-        if shifted:
-            # TODO: this is tail replace
-            stripped = stripped.replace('SHIFT', '')
-        
-        #if pressed != stripped and stripped == "":
-        #if pressed == stripped:
-            # HRM not working...
+        # TODO: not here
+        shifted = blocks[3].endswith('SHIFT')
 
-            # This is actually backwards. It should be for joining, not for unjoining
-            #stripped = " " + stripped
-            #stripped = " " # for now
+        output_v = []
+        vowel_shift = blocks[0].startswith("UO")
+        vrules = rules_vowels_shifted if vowel_shift else rules_vowels
+        idx = 2 if vowel_shift else 0
+        while idx < len(blocks[0]):
+            initial_idx = idx
+            if blocks[0][idx] not in rules:
+                output_v += blocks[0][idx]
+                idx += 1
+                continue
+            candidates = vrules[blocks[0][idx]]
+            for c in candidates:
+                if blocks[0].startswith(c[0], idx):
+                    output_v += list(c[1])
+                    idx += len(c[0])
+                    break
 
-        for x in rules:
-            if (x[0] != x[1]):
-                stripped = stripped.replace(x[0], x[1])
+            # TODO: just to stop the vowels from breaking
+            if idx == initial_idx:
+                output_v += blocks[0][idx]
+                idx += 1
 
-        if len(stripped) == 0: # At current, only space and shift
+        add_space = False
+        generated = []
+        for block in range(1, 4):
+            output = []
+            idx = 0
+            while idx < len(blocks[block]):
+                initial_idx = idx
+
+                if blocks[block][idx] not in rules:
+                    output += list(blocks[block][idx])
+                    idx += 1
+                    continue
+
+                # TODO: can break up rules
+                candidates = rules[blocks[block][idx]]
+                if blocks[block].startswith(('x', 'X', 'z', 'Z'), idx):
+                    add_space = True
+                    idx += 1
+                    continue
+                if blocks[block].startswith('SHIFT', idx):
+                    idx += 5 # len('shift')
+                    break # not continue because SHIFT is at the end
+                    # Flag is already set
+
+                for c in candidates:
+                    if blocks[block].startswith(c[0], idx):
+                        output += list(c[1])
+                        idx += len(c[0])
+                        break
+
+                # TODO: is this still useful?
+                if idx == initial_idx:
+                    output += list(blocks[block][idx])
+                    idx += 1
+            generated.append(output)
+
+        output = generated[0] + output_v + generated[1] + generated[2]
+        if len(output) == 0: # At current, only space and shift
             if add_space:
                 return [KC.SPC]
             elif shifted:
@@ -648,13 +759,11 @@ class Chord():
             else:
                 return ""
 
-
-        keys = ([KC.LSFT(DVP[stripped[0]]) if shifted else DVP[stripped[0]]] +
-                [DVP[c] for c in stripped[1:]])
+        keys = ([KC.LSFT(DVP[output[0]]) if shifted else DVP[output[0]]] +
+                [DVP[c] for c in output[1:]])
 
         # TODO: cleaner expression of this
         return keys + [KC.SPC] if add_space else keys
-
 
 ## Compact mode: left S tapped alone is backspace
 # Also the IE -> O, OU -> E chords are enabled (because the board has no space for UO and EI buttons)
@@ -727,12 +836,15 @@ class Jackdaw(Module):
         pass
 
     def before_hid_send(self, keyboard):
-        # ARGH this is kind of buggy on KMK. The upstrokes can get lost...?
+        was_pressed = self.now_pressed 
         if self.now_pressed != None:
+            print(self.now_pressed, " up")
             keyboard.remove_key(self.now_pressed)
             self.now_pressed = None
-        elif len(self.send_next) > 0:
+        # up/down in the same frame is possible unless it's the same key
+        if len(self.send_next) > 0 and self.send_next[-1] != was_pressed:
             key = self.send_next.pop()
+            print(key, "down")
             keyboard.add_key(key)
             self.now_pressed = key
 
