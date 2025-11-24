@@ -1,4 +1,4 @@
-
+# KMK has a built in steno module! But in this version of kmk it's not working...
 try:
     from typing import Optional, Tuple, Union
 except ImportError:
@@ -70,7 +70,6 @@ class GeminiKey(Key):
         self.code = code
         super().__init__()
 
-print("Generating keycodes")
 for key in keycodes:
     make_key(names = ("G_" + key,), constructor = GeminiKey, code = key)
 

@@ -220,7 +220,8 @@ class DVP():
         #self.DOUBLE_QUOTE = KC.LSFT(KC.Q), # When I send one of these to the Taipo code it explodes. WHY.
         self.QUESTION = KC.LSFT(KC.LBRACKET),
 
-# DV = KC # To get a straight QWERTY mappign. Maybe!
+
+# DV = KC # To get a straight QWERTY mapping. Maybe!
 DV = DVP()
 
 # These are taipo key names, they don't make much sense for Cykey
@@ -319,6 +320,16 @@ s3 = 1 << 13
 # especially the symbol layer, this version is messy and hard to remember
 # I don't like the upper reach but that's a hardware issue.
 # what's the thing where the backspace gets jammed?
+
+# More macro space -
+# [E] for TH (half of the T), [T] for THE?
+# AG is inefficient due to the liftoff, target non-rolling bigrams like that?
+# ER feels common enough to benefit (but it rolls fine)
+# ON is an annoying one! but [N] is used for something...
+# [D] is available and it kind of an N
+# Really want the trigram data, bah
+# THE/AND/ENT are the big ones
+# Should skim the top 200 word list too
 
 
 class KeyPress:

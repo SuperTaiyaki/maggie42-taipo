@@ -1,7 +1,7 @@
 # TODO: remove unused layers, it's maybe slowing down the response. How fast does this go if nothing but Jackdaw is running?
 # Keying memo:
 """
-A C W N (XZ)    |    (zx) r l c t (e)
+A C W N (XZ)    |    (zx) r l c t (tE)
 S T H R (UO)    |    (ei) n g h s (y)
    (I) I E (A)     (A) o u (u)
 
@@ -11,7 +11,7 @@ EA=AE EE=AOE
 I=EU   IE=OE  IO=AO
 OI=OEU OO=AOU OU=OU OA=AOEU?
 Ux=
-
+# Hey I have an open slot for AOEU-reverse
 
 G: SCT
 _ * _ _
@@ -65,6 +65,9 @@ CK: GCT
 ST: NLT
 
 
+T+TE -> TE
+TE alone -> Y
+(just for de-conflicting reasons)
 _ _ _ _
 _ _ _ _
 
@@ -97,33 +100,7 @@ Z=LH
 
 sf <-- should be GH (scth)
 RH: ST = NLT (alternate S)
-
-Stuff to fix:
-    MP is a lot more common than PM, override the ordering (right hand)
-    (this is in the patent, actually)
     
-
-Customization: single characters don't auto-space!
-    need a combo for that... 
-
-wtf: CL on the left doesn't work?
-    I'm getting ZR instead
-    .... this is why the patent has the full chart defined
-
-"""
-
-"""
-This vowel reaching sucks
-
-I think this is based on an ae-ou layout
-no its not consistent
-ao eu
-
-
-AI=AEU AU=AU
-EA=AE  EE=AOE
-I=EU   IE=OE  IO=AO
-OI=OEU OO=AOU OU=OU
 """
 
 try:
@@ -328,12 +305,14 @@ rh_keycodes =  [
 'h',
 't',
 's',
+
+'tE',
+'e', # special right-hand ones (special logic isn't applied yet)
+'y',
+
 ]
 
 special_keycodes = [
-'te',
-'e', # special right-hand ones (special logic isn't applied yet)
-'y',
 'BS',
 'SHIFT',
 ]
@@ -525,46 +504,6 @@ rules_dict = {		# left hand obvious
 
 # UNrelated: Maybe I can shift this over one to the right - right hand needs to stretch right anyway
 
-        # E is right-hand, it's uppercased so it doesn't conflict with far-right e
-        # AO-eu
-#       'AEu': 'ai',
-#       'Au': 'au',
-#       'AE': 'ea',
-#       'AOE': 'ee',
-#       'Eu': 'i',
-#       'OE': 'ie',
-#       'AO': 'io',
-#       'OEu': 'oi',
-#       'AOu': 'oo',
-#       'Ou': 'ou',
-#       'AOEu': 'oa',
-
-#       'A': 'a',
-#       'O': 'o',
-#       'E': 'e',
-#       'u': 'u',
-
-
-####     # Left vowels
-####	'I': 'i',
-####    #'IE': 'u',
-####    #'IA': 'u', # For my triangle thumb cluster
-####    'IUO': 'u',
-####    'UOE': 'o',
-####	'E': 'e',
-####    #'EA': 'o',
-####	'A': 'a',
-
-####    # right hand
-####	'a': 'a',
-####    #'ao': 'e',
-####	'o': 'o',
-####    'oei': 'e',
-####    'eiu': 'i',
-####    #'ou': 'i',
-####    #'au': 'i',
-####	'u': 'u',
-
         # right hand obvious
 		'r': 'r',
 		'n': 'n',
@@ -589,6 +528,10 @@ rules_dict = {		# left hand obvious
 		'rh': 'w',
 		'lgh': 'x',
         # Y is a hard key
+
+        'ttE': 'te',
+        'tE': 'y',
+
 		'lh': 'z',
         'nl': 's',  # in the patent
 
@@ -599,6 +542,11 @@ rules_dict = {		# left hand obvious
 
         'ght': 'ght', # These tend to generate other things (the k takes priority)
         'ghs': 'ghs',
+        'rnlchs': 'ld', # really??
+        'rnlct': 'lp',
+        'rnlc': 'pl',
+
+        'nlgch': 'mp', # reversed
          }
 
 rules_vowels_raw = {
@@ -642,7 +590,6 @@ rules_vowels_shifted_raw = {
         'E': 'ee',
         'u': 'uu',
         }
-# uaOU generates uua instead of au
 
 rules = {x: list() for x in jd_keycodes}
 for rule in rules_dict.items():
@@ -651,7 +598,6 @@ for rule in rules_dict.items():
 for rule in rules:
     rules[rule] = sorted(rules[rule], key = lambda x: -len(x[0]))
 
-# Oh hey in the patent keymap LL is available (RNL)
 rules_vowels = {x: list() for x in center_keycodes}
 for rule in rules_vowels_raw.items():
     rules_vowels[rule[0][0]].append(rule)
@@ -750,6 +696,8 @@ class Chord():
                     idx += 1
             generated.append(output)
 
+        print(output_v, generated)
+
         output = generated[0] + output_v + generated[1] + generated[2]
         if len(output) == 0: # At current, only space and shift
             if add_space:
@@ -797,7 +745,7 @@ class Jackdaw(Module):
             else:
                 self.chord.add(code)
         else:
-            self.held.remove(code)
+            self.held.discard(code)
             # keys_pressed is the USB report; coordkeys is real keys (kmk internal)
             if len(keyboard._coordkeys_pressed) == 0:
 
@@ -838,13 +786,11 @@ class Jackdaw(Module):
     def before_hid_send(self, keyboard):
         was_pressed = self.now_pressed 
         if self.now_pressed != None:
-            print(self.now_pressed, " up")
             keyboard.remove_key(self.now_pressed)
             self.now_pressed = None
         # up/down in the same frame is possible unless it's the same key
         if len(self.send_next) > 0 and self.send_next[-1] != was_pressed:
             key = self.send_next.pop()
-            print(key, "down")
             keyboard.add_key(key)
             self.now_pressed = key
 
