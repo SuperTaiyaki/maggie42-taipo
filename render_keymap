@@ -1,0 +1,4 @@
+sed -n '/KEYMAP_START/,/KEYMAP_END/p' taipo.py | sed 's/#.*$//' | sed -n '/|/p' | ruby render.rb
+# And in the end use ruby...
+
+

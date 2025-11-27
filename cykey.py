@@ -90,138 +90,140 @@ for key, code in taipo_keycodes.items():
 # Reverse mapping to get correct taipo keystrokes to come out in dvorak
 # This should probably have done another way so it's switchable (i.e. reverse just by dropping KC back in)
 # Can replace the DV = below with KC, maybe
-class DVP():
-    def __init__(self):
-        self.A = KC.A
-        self.AMPR = KC.AMPR
-        self.ASTR = KC.ASTR
-        self.AT = KC.AT
-        self.AUDIO_VOL_DOWN = KC.AUDIO_VOL_DOWN
-        self.AUDIO_VOL_UP = KC.AUDIO_VOL_UP
-        self.B = KC.N
-        self.BRIGHTNESS_DOWN = KC.BRIGHTNESS_DOWN
-        self.BRIGHTNESS_UP = KC.BRIGHTNESS_UP
-        self.BSLS = KC.BSLS
-        self.BSPC = KC.BSPC
-        self.C = KC.I
-        self.CIRC = KC.CIRC # ^
-        self.COLN = KC.LSFT(KC.Z) # uhhhh does this work? since it's a shifted key
-        self.COMM = KC.W
-        self.D = KC.H
-        self.DEL = KC.DEL
-        self.DLR = KC.DLR
-        self.DOT = KC.E
-        self.DOWN = KC.DOWN
-        self.DQT = KC.LSFT(KC.Q)# doublequote - but it's shifted... TODO
-        self.E = KC.D
-        self.END = KC.END
-        self.ENTER = KC.ENTER
-        self.EQL = KC.RBRACKET
-        self.ESC = KC.ESC
-        self.EXLM = KC.EXLM # ? 
-        self.F = KC.Y
-        self.F1 = KC.F1
-        self.F10 = KC.F10
-        self.F11 = KC.F11
-        self.F12 = KC.F12
-        self.F2 = KC.F2
-        self.F3 = KC.F3
-        self.F4 = KC.F4
-        self.F5 = KC.F5
-        self.F6 = KC.F6
-        self.F7 = KC.F7
-        self.F8 = KC.F8
-        self.F9 = KC.F9
-        self.G = KC.U
-        self.GRV = KC.GRV
-        self.H = KC.J
-        self.HASH = KC.HASH
-        self.HOME = KC.HOME
-        self.I = KC.G
-        self.INS = KC.INS
-        self.J = KC.C
-        self.K = KC.V
-        self.L = KC.P
-        self.LABK = KC.LABK
-        self.LALT = KC.LALT
-        self.LAYER0 = KC.LAYER0
-        self.LAYER1 = KC.LAYER1
-        self.LAYER2 = KC.LAYER2
-        self.LAYER3 = KC.LAYER3
-        self.LBRC = KC.LBRC
-        self.LCBR = KC.LCBR
-        self.LCTL = KC.LCTL
-        self.LEFT = KC.LEFT
-        self.LGUI = KC.LGUI
-        self.LPRN = KC.LPRN
-        self.LSFT = KC.LSFT
-        self.M = KC.M
-        self.MINS = KC.QUOTE # minus
-        self.MOD_AC = KC.MOD_AC # ARGH this isn't defined yet
-        self.MOD_ACS = KC.MOD_ACS
-        self.MOD_AS = KC.MOD_AS
-        self.MOD_CS = KC.MOD_CS
-        self.MOD_GA = KC.MOD_GA
-        self.MOD_GAC = KC.MOD_GAC
-        self.MOD_GACS = KC.MOD_GACS
-        self.MOD_GAS = KC.MOD_GAS
-        self.MOD_GC = KC.MOD_GC
-        self.MOD_GCS = KC.MOD_GCS
-        self.MOD_GS = KC.MOD_GS
-        self.N = KC.L
-        self.N0 = KC.N0
-        self.N1 = KC.N1
-        self.N2 = KC.N2
-        self.N3 = KC.N3
-        self.N4 = KC.N4
-        self.N5 = KC.N5
-        self.N6 = KC.N6
-        self.N7 = KC.N7
-        self.N8 = KC.N8
-        self.N9 = KC.N9
-        self.NO = KC.NO
-        self.O = KC.S
-        #self.OS(mod = KC.OS(mod
-        self.P = KC.R
-        self.PERC = KC.PERC
-        self.PGDN = KC.PGDN
-        self.PGUP = KC.PGUP
-        self.PIPE = KC.PIPE
-        self.PLUS = KC.PLUS # shifted TODO
-        self.PRINT_SCREEN = KC.PRINT_SCREEN
-        self.Q = KC.X
-        self.QUES = KC.LSFT(KC.LBRACKET) # shifted. It puts out a capital Z, so it should be ... 
-        self.QUOT = KC.Q
-        self.R = KC.O
-        self.RABK = KC.RABK
-        self.RALT = KC.RALT
-        self.RBRC = KC.RBRC
-        self.RCBR = KC.RCBR
-        self.RIGHT = KC.RIGHT
-        self.RPRN = KC.RPRN # right paren
-        self.S = KC.SCLN # probably?
-        self.SCLN = KC.Z
-        self.SLSH = KC.LBRACKET
-        self.SPC = KC.SPC
-        self.T = KC.K
-        self.TAB = KC.TAB
-        self.TILD = KC.TILD # shifted
-        self.U = KC.F
-        self.UNDS = KC.UNDS # shifted
-        self.UP = KC.UP
-        self.V = KC.DOT
-        self.W = KC.COMMA # wut, not used in the main map?
-        self.X = KC.B
-        self.Y = KC.T
-        self.Z = KC.SLASH
-
-        self.MINUS = KC.QUOT,
-        self.EQUAL = KC.LSFT(KC.RBRACKET),
-        #self.DOUBLE_QUOTE = KC.LSFT(KC.Q), # When I send one of these to the Taipo code it explodes. WHY.
-        self.QUESTION = KC.LSFT(KC.LBRACKET),
-
-
+#
+#class DVP():
+#    def __init__(self):
+#        self.A = KC.A
+#        self.AMPR = KC.AMPR
+#        self.ASTR = KC.ASTR
+#        self.AT = KC.AT
+#        self.AUDIO_VOL_DOWN = KC.AUDIO_VOL_DOWN
+#        self.AUDIO_VOL_UP = KC.AUDIO_VOL_UP
+#        self.B = KC.N
+#        self.BRIGHTNESS_DOWN = KC.BRIGHTNESS_DOWN
+#        self.BRIGHTNESS_UP = KC.BRIGHTNESS_UP
+#        self.BSLS = KC.BSLS
+#        self.BSPC = KC.BSPC
+#        self.C = KC.I
+#        self.CIRC = KC.CIRC # ^
+#        self.COLN = KC.LSFT(KC.Z) # uhhhh does this work? since it's a shifted key
+#        self.COMM = KC.W
+#        self.D = KC.H
+#        self.DEL = KC.DEL
+#        self.DLR = KC.DLR
+#        self.DOT = KC.E
+#        self.DOWN = KC.DOWN
+#        self.DQT = KC.LSFT(KC.Q)# doublequote - but it's shifted... TODO
+#        self.E = KC.D
+#        self.END = KC.END
+#        self.ENTER = KC.ENTER
+#        self.EQL = KC.RBRACKET
+#        self.ESC = KC.ESC
+#        self.EXLM = KC.EXLM # ? 
+#        self.F = KC.Y
+#        self.F1 = KC.F1
+#        self.F10 = KC.F10
+#        self.F11 = KC.F11
+#        self.F12 = KC.F12
+#        self.F2 = KC.F2
+#        self.F3 = KC.F3
+#        self.F4 = KC.F4
+#        self.F5 = KC.F5
+#        self.F6 = KC.F6
+#        self.F7 = KC.F7
+#        self.F8 = KC.F8
+#        self.F9 = KC.F9
+#        self.G = KC.U
+#        self.GRV = KC.GRV
+#        self.H = KC.J
+#        self.HASH = KC.HASH
+#        self.HOME = KC.HOME
+#        self.I = KC.G
+#        self.INS = KC.INS
+#        self.J = KC.C
+#        self.K = KC.V
+#        self.L = KC.P
+#        self.LABK = KC.LABK
+#        self.LALT = KC.LALT
+#        self.LAYER0 = KC.LAYER0
+#        self.LAYER1 = KC.LAYER1
+#        self.LAYER2 = KC.LAYER2
+#        self.LAYER3 = KC.LAYER3
+#        self.LBRC = KC.LBRC
+#        self.LCBR = KC.LCBR
+#        self.LCTL = KC.LCTL
+#        self.LEFT = KC.LEFT
+#        self.LGUI = KC.LGUI
+#        self.LPRN = KC.LPRN
+#        self.LSFT = KC.LSFT
+#        self.M = KC.M
+#        self.MINS = KC.QUOTE # minus
+#        self.MOD_AC = KC.MOD_AC # ARGH this isn't defined yet
+#        self.MOD_ACS = KC.MOD_ACS
+#        self.MOD_AS = KC.MOD_AS
+#        self.MOD_CS = KC.MOD_CS
+#        self.MOD_GA = KC.MOD_GA
+#        self.MOD_GAC = KC.MOD_GAC
+#        self.MOD_GACS = KC.MOD_GACS
+#        self.MOD_GAS = KC.MOD_GAS
+#        self.MOD_GC = KC.MOD_GC
+#        self.MOD_GCS = KC.MOD_GCS
+#        self.MOD_GS = KC.MOD_GS
+#        self.N = KC.L
+#        self.N0 = KC.N0
+#        self.N1 = KC.N1
+#        self.N2 = KC.N2
+#        self.N3 = KC.N3
+#        self.N4 = KC.N4
+#        self.N5 = KC.N5
+#        self.N6 = KC.N6
+#        self.N7 = KC.N7
+#        self.N8 = KC.N8
+#        self.N9 = KC.N9
+#        self.NO = KC.NO
+#        self.O = KC.S
+#        #self.OS(mod = KC.OS(mod
+#        self.P = KC.R
+#        self.PERC = KC.PERC
+#        self.PGDN = KC.PGDN
+#        self.PGUP = KC.PGUP
+#        self.PIPE = KC.PIPE
+#        self.PLUS = KC.PLUS # shifted TODO
+#        self.PRINT_SCREEN = KC.PRINT_SCREEN
+#        self.Q = KC.X
+#        self.QUES = KC.LSFT(KC.LBRACKET) # shifted. It puts out a capital Z, so it should be ... 
+#        self.QUOT = KC.Q
+#        self.R = KC.O
+#        self.RABK = KC.RABK
+#        self.RALT = KC.RALT
+#        self.RBRC = KC.RBRC
+#        self.RCBR = KC.RCBR
+#        self.RIGHT = KC.RIGHT
+#        self.RPRN = KC.RPRN # right paren
+#        self.S = KC.SCLN # probably?
+#        self.SCLN = KC.Z
+#        self.SLSH = KC.LBRACKET
+#        self.SPC = KC.SPC
+#        self.T = KC.K
+#        self.TAB = KC.TAB
+#        self.TILD = KC.TILD # shifted
+#        self.U = KC.F
+#        self.UNDS = KC.UNDS # shifted
+#        self.UP = KC.UP
+#        self.V = KC.DOT
+#        self.W = KC.COMMA # wut, not used in the main map?
+#        self.X = KC.B
+#        self.Y = KC.T
+#        self.Z = KC.SLASH
+#
+#        self.MINUS = KC.QUOT,
+#        self.EQUAL = KC.LSFT(KC.RBRACKET),
+#        #self.DOUBLE_QUOTE = KC.LSFT(KC.Q), # When I send one of these to the Taipo code it explodes. WHY.
+#        self.QUESTION = KC.LSFT(KC.LBRACKET),
+#
+#
 # DV = KC # To get a straight QWERTY mapping. Maybe!
+from dvp import DVP
 DV = DVP()
 
 # These are taipo key names, they don't make much sense for Cykey
@@ -383,12 +385,12 @@ class Cykey(Module):
 
         keymap_main = { # KEYMAP_START
             it: KC.MOD_SHIFT, # Next char is capital
-            ot: DV.SPC, # is this a permanent...?
-            it | e | o: DV.TAB, # [T]
+            ot: DV['SPC'], # is this a permanent...?
+            it | e | o: DV['TAB'], # [T]
             # These two are also in the punctuation mode...?
             # (and space)
-            e | o | a: DV.COMM,
-            e | t | o: DV.DOT,
+            e | o | a: DV['COMM'],
+            e | t | o: DV['DOT'],
             # Wasn't there one or two more...?
             it | t | o: KC.MOD_N,  # [Y]/[N]
             it | t | a: KC.MOD_S, # [C]/[M] mod_s layer: left/right brackets, easily accessible arrow keys...
@@ -400,80 +402,80 @@ class Cykey(Module):
 
             a | it: KC.ESC, # [H] for escape (or [A], either way)
 
-            ot | e: DV.I,
-            ot | e | a: DV.L,
-            a | o: DV.G,
-            ot | o | a: DV.J,
-            e | o: DV.T,
-            a | ot: DV.H,
-            e: DV.E,
-            t: DV.O,
-            o: DV.S,
-            a: DV.A,
-            e | t: DV.U,
-            t | o: DV.N,
-            ot | e | o: DV.V,
-            ot | o: DV.K,
-            ot | e | t | o: DV.F,
-            ot | e | t: DV.B,
-            t | o | a: DV.D,
-            ot | t: DV.R,
-            t | a: DV.C,
-            e | a: DV.P,
-            ot | t | o: DV.Y,
-            ot | t | o | a: DV.W,
-            ot | e | o | a: DV.Z,
-            e | t | o | a: DV.X,
-            ot | t | a: DV.M,
-            e | t | a: DV.Q,
+            ot | e: DV['I'],
+            ot | e | a: DV['L'],
+            a | o: DV['G'],
+            ot | o | a: DV['J'],
+            e | o: DV['T'],
+            a | ot: DV['H'],
+            e: DV['E'],
+            t: DV['O'],
+            o: DV['S'],
+            a: DV['A'],
+            e | t: DV['U'],
+            t | o: DV['N'],
+            ot | e | o: DV['V'],
+            ot | o: DV['K'],
+            ot | e | t | o: DV['F'],
+            ot | e | t: DV['B'],
+            t | o | a: DV['D'],
+            ot | t: DV['R'],
+            t | a: DV['C'],
+            e | a: DV['P'],
+            ot | t | o: DV['Y'],
+            ot | t | o | a: DV['W'],
+            ot | e | o | a: DV['Z'],
+            e | t | o | a: DV['X'],
+            ot | t | a: DV['M'],
+            e | t | a: DV['Q'],
 
             # Non-permanent punctuation
-            #e | t | a: KC.QUOT, # DV.MINUS, DV.MINUS doesn't work!
-            ot | e | t | a: DV.QUOT,
+            #e | t | a: KC.QUOT, # DV['MINUS'], DV.MINUS doesn't work!
+            ot | e | t | a: DV['QUOT'],
             ot | e | t | o | a: KC.EXCLAIM,
 
             # Experimental bigram macros
             # TODO: simplify these
             # [T] -> TH, [H] -> HE (escape needs to go somewhere else), [I] for IN...?
             # [R] for ER is possible but hard to catch. Maybe leave that as-is
-            it | o | e: TaipoMacro([DV.T, DV.H]), # [T] -> T,H     actually these probably shouldn't be descended from TaipoKey
-            it | a | e: TaipoMacro([DV.H, DV.E]), # [HE]
-            #it | o | t | e: TaipoMacro([DV.I, DV.N]), # [IN]
-            it | t | e: TaipoMacro([DV.E, DV.R]), # [ER]
-            it | e | t | a: TaipoMacro([DV.Q, DV.U]), # [Q] -> Q,U
+            it | o | e: TaipoMacro([DV['T'], DV['H']]), # [T] -> T,H     actually these probably shouldn't be descended from TaipoKey
+            it | a | e: TaipoMacro([DV['H'], DV['E']]), # [HE]
+            #it | o | t | e: TaipoMacro([DV['I'], DV.N]), # [IN]
+            it | t | e: TaipoMacro([DV['E'], DV['R']]), # [ER]
+            it | e | t | a: TaipoMacro([DV['Q'], DV['U']]), # [Q] -> Q,U
         }
 
         keymap_permanent = {
             # Shifted commands
             # These seem to be permanents in Microwriter
-            it | o: DV.BSPC,
-            it | t: DV.TAB, # [C] Tab
-            #it | n: DV.ENTER, # [C] Carriage return
-            it | o | t | e: DV.ENTER,
+            it | o: DV['BSPC'],
+            it | t: DV['TAB'], # [C] Tab
+            #it | n: DV['ENTER'], # [C] Carriage return
+            it | o | t | e: DV['ENTER'],
             # Want something main-row but safer...
             # [M] or [.]?
 
             # Want an escape here just in case I happen to be vim-ing for some reason...
-            it | i: DV.ESC, # [E] for escape (level shifted up)
+            it | i: DV['ESC'], # [E] for escape (level shifted up)
             # Should move this so I can have the combo for HE bigram instead
 
             it | ot: KC.MOD_CLEAR,
             s1: KC.MOD_CLEAR, # Since mashing thumbs together on this board is an annoying reach
             s2: KC.MOD_N,
             s3: KC.MOD_S,
-            s1 | s2 | s3: DV.ENTER,
-            s1 | s2 | o: DV.ENTER, # since the mapping changed ugh
+            s1 | s2 | s3: DV['ENTER'],
+            s1 | s2 | o: DV['ENTER'], # since the mapping changed ugh
 
             # Taipo arrow keys since they don't clash
-            ot | t | n : DV.UP,
-            ot | o | s : DV.DOWN,
-            ot | a | r : DV.LEFT,
-            ot | e | i : DV.RIGHT, # why is this not DV? oh well
+            ot | t | n : DV['UP'],
+            ot | o | s : DV['DOWN'],
+            ot | a | r : DV['LEFT'],
+            ot | e | i : DV['RIGHT'], # why is this not DV? oh well
 
             # Taipo modifier block since it works well
-            t | n : DV.LCTL,
-            o | s : DV.LALT,
-            a | r : DV.LGUI,
+            t | n : DV['LCTL'],
+            o | s : DV['LALT'],
+            a | r : DV['LGUI'],
             e | i : KC.LSFT, # why is this not DV? oh well
             r | a | s | o: KC.MOD_GA,
             r | a | n | t: KC.MOD_GC,
@@ -493,31 +495,31 @@ class Cykey(Module):
 
             # Not in the original layout, but since I have more keys...
             # This is mostly useful because they can be shifted for symbols
-            e: DV.N1,
-            e | ot: DV.N2,
-            e | ot | t: DV.N3,
-            e | ot | t | o: DV.N4,
-            e | ot | t | o | a: DV.N5,
-            a: DV.N6,
-            a | o: DV.N7,
-            a | o | t: DV.N8,
-            a | o | t | e: DV.N9,
-            t: DV.N0,
+            e: DV['N1'],
+            e | ot: DV['N2'],
+            e | ot | t: DV['N3'],
+            e | ot | t | o: DV['N4'],
+            e | ot | t | o | a: DV['N5'],
+            a: DV['N6'],
+            a | o: DV['N7'],
+            a | o | t: DV['N8'],
+            a | o | t | e: DV['N9'],
+            t: DV['N0'],
 
             
-            ot | a | o | e: DV.COLN,
-            ot | o | e: DV.SCLN,
-            ot | o | a: DV.EQUAL, # "J"ust the same
+            ot | a | o | e: DV['COLN'],
+            ot | o | e: DV['SCLN'],
+            ot | o | a: DV['EQL'], # "J"ust the same
             a | t: KC.LEFT_PAREN,
             t | ot: KC.RIGHT_PAREN,
-            ot | a: KC.QUOT, # DV.MINUS, # Don't know why this doesn't work via DV.
+            ot | a: KC.QUOT, # DV['MINUS'], # Don't know why this doesn't work via DV.
 
             # LSFTing stuff doesn't work in here - need to use the constructor directly.
             t | o: KC.LSFT(KC.Q), # DOUBLE_QUOTE
             e | t | a: KC.EXCLAIM, # Wasn't this in the top layer...? (all five)
             ot | t | o:  KC.LSFT(KC.LBRACKET), # QUESTION,
-            ot | o: DV.BSLS, # re-slanted because left hand
-            a | e: DV.SLSH,
+            ot | o: DV['BSLS'], # re-slanted because left hand
+            a | e: DV['SLSH'],
             # TODO: need an escape key somewhere (or just a hardware escape...
         }
 
@@ -526,10 +528,10 @@ class Cykey(Module):
             # delete, insert, home, end, pgup, pgdn... where's my tilde?
             # F keys?
 
-            a: DV.LEFT,
-            o: DV.DOWN,
-            t: DV.UP,
-            e: DV.RIGHT,
+            a: DV['LEFT'],
+            o: DV['DOWN'],
+            t: DV['UP'],
+            e: DV['RIGHT'],
 
             a | t: KC.MINUS, # [
             t | ot: KC.EQUAL, # ]
@@ -762,7 +764,7 @@ class Cykey(Module):
         mods = []
 
         # Should these be KC?
-        if key.keycode in [ DV.LGUI, DV.LALT, DV.RALT, DV.LCTL, DV.LSFT ]:
+        if key.keycode in [ DV['LGUI'], DV['LALT'], DV['RALT'], DV['LCTL'], DV['LSFT'] ]:
             mods = [key.keycode]
         elif key.keycode == KC.MOD_GA:
             mods = [KC.LGUI, KC.LALT]

@@ -7,7 +7,8 @@ from kmk.kmk_keyboard import KMKKeyboard
 from kmk.keys import KC, Key, make_key
 from kmk.scanners import DiodeOrientation
 from kmk.modules.layers import Layers
-from kmk.modules.split import Split, SplitSide
+#from kmk.modules.split import Split, SplitSide
+from thicksplit import ThickSplit, SplitSide
 from kmk.modules.sticky_keys import StickyKeys # requirement for Taipo (formerly oneshot, KC.OS)
 from kmk.modules.holdtap import HoldTap
 # Mouse stuff
@@ -19,7 +20,6 @@ from kmk.extensions.rgb import RGB
 from kmk.utils import Debug
 debug = Debug(__name__)
 
-from cykey import Cykey
 from jackdaw import Jackdaw
 from geminipr import Gemini
 
@@ -29,7 +29,7 @@ keyboard.col_pins = (board.GP10,board.GP9,board.GP8,board.GP7,board.GP6,board.GP
 keyboard.row_pins = (board.GP27,board.GP26,board.GP15,board.GP14,)
 keyboard.diode_orientation = DiodeOrientation.COL2ROW
 
-split = Split(data_pin = board.GP0, use_pio = True, split_flip = False)
+split = ThickSplit(data_pin = board.GP0, use_pio = False, split_flip = False)
 keyboard.modules.append(split)
 
 keyboard.modules.append(StickyKeys(release_after = 3000))
@@ -44,9 +44,15 @@ keyboard.modules.append(layers)
 rgb = RGB(pixel_pin = board.NEOPIXEL, num_pixels = 1, hue_default = 176, sat_default = 30, val_default = 128, val_limit = 128,)
 keyboard.extensions.append(rgb)
 
+from cykey import Cykey
 keyboard.modules.append(Cykey(rgb))
+
+#from taipo import Taipo
+#keyboard.modules.append(Taipo())
+
 keyboard.modules.append(Jackdaw())
 keyboard.modules.append(Gemini())
+
 
 
 LAYER_NORMAL = 2
@@ -61,16 +67,6 @@ holdtap = HoldTap()
 holdtap.tap_time = 150
 keyboard.modules.append(holdtap)
 
-# dummy keys for combos
-# TODO delete these
-make_key(
-    names=('TRIGGERL',),
-    on_press=lambda *args: print('TRIGGERL'),
-)
-make_key(
-    names=('TRIGGERR',),
-    on_press=lambda *args: print('TRIGGERR'),
-)
 
 # Flip the LED depending on the layout. This only affects the USB-connected half.
 class RGBKey1(Key):
@@ -99,12 +95,31 @@ MWUP = KC.RF(KC.MW_UP, interval = 800, timeout = 20)
 MWDOWN = KC.RF(KC.MW_DOWN, interval = 800, timeout = 20)
 
 keyboard.keymap = [
+# Jackdaw
+[
+       KC.BSPACE, KC.JD_4, KC.JD_C, KC.JD_W, KC.JD_N, KC.JD_X,       KC.JD_x, KC.JD_r, KC.JD_l, KC.JD_c, KC.JD_t, KC.JD_tE, # y/TE
+       KC.JD_SHIFT,  KC.JD_S, KC.JD_T, KC.JD_H, KC.JD_R, KC.JD_z,       KC.JD_z, KC.JD_n, KC.JD_g, KC.JD_h, KC.JD_s, KC.JD_e, 
+        KC.Q, KC.Q, KC.W, KC.E, KC.NO, KC.JD_A,       KC.JD_u, KC.NO, KC.NO, KC.E, KC.JD_SHIFT, KC.JD_y, 
+        KC.TG(LAYER_JACKDAW), KC.NO, KC.NO, KC.TG(1), KC.JD_UO, KC.JD_O,            KC.JD_E, KC.JD_UO, KC.BSPACE, KC.NO, KC.NO, KC.NO, 
+    ],
+
+# Taipo
         [
-        KC.NO, KC.TP_TLP, KC.TP_TLR, KC.TP_TLM, KC.TP_TLI,  MWUP,          KC.TG(LAYER_GAME), KC.TP_TRI, KC.TP_TRM, KC.TP_TRR, KC.TP_BRP, KC.TG(LAYER_JACKDAW), 
-        KC.NO, KC.TP_TLP, KC.TP_BLR, KC.TP_BLM, KC.TP_BLI, MWDOWN,         KC.NO, KC.TP_BRI, KC.TP_BRI, KC.TP_BRM, KC.TP_BRR, KC.TG(LAYER_GEMINI), 
-        KC.NO, KC.TP_BLP, KC.TP_BLR, KC.LAYER2, KC.LAYER1, KC.TP_LUT,      KC.NO, KC.TP_BRI, KC.TP_BRI, KC.TP_BRM, KC.TP_BRR, KC.TP_BRP, 
+        KC.NO, KC.TP_TLP, KC.TP_TLR, KC.TP_TLM, KC.TP_TLI,  MWUP,          KC.TG(LAYER_GAME), KC.TP_TRI, KC.TP_TRM, KC.TP_TRR, KC.TP_TRP, KC.TG(1), 
+        KC.NO, KC.TP_BLP, KC.TP_BLR, KC.TP_BLM, KC.TP_BLI, MWDOWN,         KC.NO, KC.TP_BRI, KC.TP_BRM, KC.TP_BRR, KC.TP_BRP, KC.TG(LAYER_GEMINI), 
+        KC.NO, KC.TP_BLP, KC.TP_BLR, KC.LAYER2, KC.TP_LIT, KC.TP_LOT,      KC.TP_ROT, KC.TP_RIT, KC.TP_BRI, KC.TP_BRM, KC.TP_BRR, KC.TP_BRP, 
         KC.NO, KC.NO, KC.NO, KC.SK(KC.MO(LAYER_BROWSER)), KC.TP_LOT, KC.TP_LIT,       KC.TP_RIT, KC.TP_ROT, KC.MO(1), KC.NO, KC.NO, KC.NO, 
         ],
+
+# Most everything after this is unused
+
+# TP but Cykey
+#       [
+#       KC.NO, KC.TP_TLP, KC.TP_TLR, KC.TP_TLM, KC.TP_TLI,  MWUP,          KC.TG(LAYER_GAME), KC.TP_TRI, KC.TP_TRM, KC.TP_TRR, KC.TP_BRP, KC.TG(LAYER_JACKDAW), 
+#       KC.NO, KC.TP_TLP, KC.TP_BLR, KC.TP_BLM, KC.TP_BLI, MWDOWN,         KC.NO, KC.TP_BRI, KC.TP_BRI, KC.TP_BRM, KC.TP_BRR, KC.TG(LAYER_GEMINI), 
+#       KC.NO, KC.TP_BLP, KC.TP_BLR, KC.LAYER2, KC.LAYER1, KC.TP_LUT,      KC.NO, KC.TP_BRI, KC.TP_BRI, KC.TP_BRM, KC.TP_BRR, KC.TP_BRP, 
+#       KC.NO, KC.NO, KC.NO, KC.SK(KC.MO(LAYER_BROWSER)), KC.TP_LOT, KC.TP_LIT,       KC.TP_RIT, KC.TP_ROT, KC.MO(1), KC.NO, KC.NO, KC.NO, 
+#       ],
         # bottom-left should probably change to a oneshot since it's a pain to reach
         # Taipo macro layer - useful browser stuff
         # tab left/right
@@ -148,7 +163,7 @@ keyboard.keymap = [
         KC.RELOAD, KC.LGUI(KC.N1), KC.LGUI(KC.N2), KC.LGUI(KC.N3), KC.LGUI(KC.N4), KC.LGUI(KC.N5),  KC.LGUI(KC.N6), KC.LGUI(KC.N7), KC.LGUI(KC.N8), KC.LGUI(KC.N9), KC.LGUI(KC.N0), KC.NO, 
         KC.TRNS, KC.LCTRL(KC.LSFT(KC.TAB)), KC.LCTRL(KC.K) , KC.LCTRL(KC.TAB), KC.NO, KC.NO,     KC.NO, KC.NO, KC.NO, KC.LGUI(KC.P), KC.NO, KC.NO, 
         KC.RESET, KC.LCTRL(KC.P), KC.LCTRL(KC.COMMA) , KC.LGUI(KC.C), KC.LGUI(KC.V), KC.NO,      KC.NO, KC.LGUI(KC.J), KC.NO, KC.NO, KC.NO, KC.NO, 
-        KC.NO, KC.NO, KC.NO, KC.TRIGGERL, KC.NO, KC.NO,       KC.NO, KC.NO, KC.TRIGGERR, KC.NO, KC.NO, KC.NO, 
+        KC.NO, KC.NO, KC.NO, KC.NO, KC.NO, KC.NO,       KC.NO, KC.NO, KC.NO, KC.NO, KC.NO, KC.NO, 
         ],
     
     # Raised layer
@@ -159,7 +174,7 @@ keyboard.keymap = [
         # Pipe should probably be somewhere so it's not hiding under the backspace + shift
         # Splitting backtick and tilde like this is liable to break my brain
         KC.TRNS, KC.LSHIFT(KC.GRAVE), KC.NO, KC.LSHIFT(KC.MINUS), KC.MINUS, KC.NO,      KC.NO, KC.EQUAL, KC.LSHIFT(KC.EQUAL), KC.NO, KC.GRAVE, KC.TRNS, 
-        KC.NO, KC.NO, KC.NO, KC.TRIGGERL, KC.NO, KC.NO,       KC.NO, KC.NO, KC.TRIGGERR, KC.NO, KC.NO, KC.NO, 
+        KC.NO, KC.NO, KC.NO, KC.NO, KC.NO, KC.NO,       KC.NO, KC.NO, KC.NO, KC.NO, KC.NO, KC.NO, 
         ],
         # outside the brackets, angle brackets
 
@@ -187,30 +202,20 @@ keyboard.keymap = [
         KC.TRNS, KC.NO, KC.NO, KC.NO, KC.END, KC.NO,       KC.END, KC.PGDN, KC.LEFT, KC.I, KC.B, KC.SLASH, 
         KC.NO, KC.NO, KC.NO, KC.NO, KC.NO, KC.NO,       KC.SLASH, KC.B, KC.I, KC.NO, KC.NO, KC.NO, 
     ],
-# Jackdaw experimental
-[
-                   KC.BSPACE, KC.JD_4, KC.JD_C, KC.JD_W, KC.JD_N, KC.JD_X,       KC.JD_x, KC.JD_r, KC.JD_l, KC.JD_c, KC.JD_t, KC.JD_e,
-                   KC.JD_BS,  KC.JD_S, KC.JD_T, KC.JD_H, KC.JD_R, KC.JD_z,       KC.JD_z, KC.JD_n, KC.JD_g, KC.JD_h, KC.JD_s, KC.JD_y, 
-        KC.TG(LAYER_JACKDAW), KC.JD_S, KC.JD_T, KC.JD_H, KC.JD_I, KC.JD_E,       KC.JD_o, KC.JD_u, KC.JD_g, KC.JD_h, KC.JD_s, KC.JD_y, 
-        KC.TG(LAYER_JACKDAW), KC.NO, KC.NO, KC.SPC, KC.JD_UO, KC.JD_A,            KC.JD_a, KC.JD_ei, KC.BSPACE, KC.NO, KC.NO, KC.NO, 
-    ],
+
+# Maybe lower middle fingers should be shifts, that get applied to the far side...?
+# Numbers, symbols, etc. Same style as Cykey
+
 # Gemini steno
 [
                    KC.BSPACE, KC.G_S1, KC.G_LT, KC.G_LP, KC.G_LH, KC.G_ST1,       KC.G_ST3, KC.G_RF, KC.G_RP, KC.G_RL, KC.G_RT, KC.G_RD,
                    KC.BSPACE, KC.G_S2, KC.G_LK, KC.G_LW, KC.G_LR, KC.G_ST2,       KC.G_ST4, KC.G_RR, KC.G_RB, KC.G_RG, KC.G_RS, KC.G_RZ, 
-        KC.TG(LAYER_GEMINI), KC.JD_S, KC.JD_T, KC.JD_H, KC.JD_I, KC.JD_E,       KC.JD_o, KC.JD_u, KC.JD_g, KC.JD_h, KC.JD_s, KC.JD_y, 
-        KC.TG(LAYER_JACKDAW), KC.NO, KC.NO, KC.SPC, KC.G_LA, KC.G_LO,            KC.G_RE, KC.G_RU, KC.BSPACE, KC.NO, KC.NO, KC.NO, 
+        KC.TG(LAYER_GEMINI), KC.JD_S, KC.JD_T, KC.JD_H, KC.JD_I, KC.G_LA,       KC.G_RU, KC.JD_u, KC.JD_g, KC.JD_h, KC.JD_s, KC.JD_y, 
+        KC.TG(LAYER_JACKDAW), KC.NO, KC.NO, KC.SPC, KC.G_LA, KC.G_LO,            KC.G_RE, KC.G_RU, KC.ENTER, KC.NO, KC.NO, KC.NO, 
     ],
 
 
                    ]
-
-#combos = Combos()
-#keyboard.modules.append(combos)
-#combos.combos = [
-#        Chord((KC.TRIGGERL, KC.TRIGGERR), NORMAL_ON),
-#        Chord((KC.BSPACE, KC.TRIGGERR), NORMAL_OFF),
-#    ]
 
 if __name__ == '__main__':
     #debug.enabled = False
