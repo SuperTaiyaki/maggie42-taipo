@@ -63,6 +63,7 @@ _ _ * _
 LL: RNL
 CK: GCT
 ST: NLT
+SS: NLS
 
 
 T+TE -> TE
@@ -333,6 +334,7 @@ so I should probably exchange it into the set somewhere
 I have the doublers, should I eliminate OO and EE...?
 """
 
+"""
 rules_dict = {		# left hand obvious
 		'4': 'a',
 		'S': 's',
@@ -354,7 +356,7 @@ rules_dict = {		# left hand obvious
 		'WN': 'm',
 		'CW': 'p',
 		'TNR': 'q',
-		'TWR': 'qu',
+		'TWR': 'qu', # maybe the only thing not in the patent (other than the vowel blocks)
 		'TN': 'v',
 		'STW': 'x',
 		'HN': 'y',
@@ -403,28 +405,39 @@ rules_dict = {		# left hand obvious
         # Y is a hard key
 
         'ttE': 'te',
+        'tEe': 'ey',
         'tE': 'y',
 
 		'lh': 'z',
         'nl': 's',  # in the patent
 
         # right hand extra
-        'ht': 'th',
-        'rnl': 'll', # in the patent!
-        'gct': 'ck',
+       'ht': 'th',
+       'rnl': 'll', # in the patent!
+       'gct': 'ck',
 
-        'ght': 'ght', # These tend to generate other things (the k takes priority)
-        'ghs': 'ghs',
-        'rnlchs': 'ld', # really??
-        'rnlct': 'lp',
-        'rnlc': 'pl',
+       'ght': 'ght', # These tend to generate other things (the k takes priority)
+       'ghs': 'ghs',
+       'rnlchs': 'ld', # really??
+       'rnlct': 'lp',
+       'rnlc': 'pl',
 
-        'nlgch': 'mp', # reversed
-        'rnh': 'wn',
-        'rnch': 'rv', # rnh generates WN instead
-        
+       'nlgch': 'mp', # reversed
+       'rnh': 'wn',
+       'rnch': 'rv', # rnh generates WN instead
+       'nht': 'nth',
+       'nght': 'ngth',
+# From the patent, the non-trivial combos
+# .... which, unfortunately runs out of memory. CRAP.
+# Probably more efficient to do it the same way as the arduino implementation. BAH.
          }
+         """
 
+# One thing to try: UO alone and the alternate to generate more vowel pairs
+# and both together?
+# IE is EI + flip
+# UE/UA are missing, 
+# both for UI
 rules_vowels_raw = {
         # E is right-hand, it's uppercased so it doesn't conflict with far-right e
         # AO-eu
@@ -467,12 +480,15 @@ rules_vowels_shifted_raw = {
         'u': 'uu',
         }
 
-rules = {x: list() for x in jd_keycodes}
-for rule in rules_dict.items():
-    rules[rule[0][0]].append(rule)
+#rules = {x: list() for x in jd_keycodes}
+#for rule in rules_dict.items():
+#    rules[rule[0][0]].append(rule)
 
-for rule in rules:
-    rules[rule] = sorted(rules[rule], key = lambda x: -len(x[0]))
+#for rule in rules:
+#    rules[rule] = sorted(rules[rule], key = lambda x: -len(x[0]))
+
+# Pre-generated out of jackdaw_map.rb to save memory
+rules = {'r': [('rnlchts', 'lds'),('rnlchs', 'ld'),('rlchts', 'rlds'),('rnchts', 'wds'),('rnchs', 'wd'),('rnlcs', 'ples'),('rnlct', 'lp'),('rnlhs', 'lves'),('rnlgt', 'lk'),('rnlch', 'lch'),('rlghs', 'rld'),('rnlgc', 'lb'),('rnlgh', 'lm'),('rngh', 'rm'),('rght', 'wk'),('rnlt', 'rst'),('rnlg', 'dl'),('rnch', 'rv'),('rnlc', 'pl'),('rnlh', 'lv'),('rnht', 'wth'),('rht', 'rth'),('rnl', 'll'),('rnh', 'wn'),('rlh', 'wl'),('rng', 'gn'),('rh', 'w'),('r', 'r'),],'4': [('4SCTWNR', 'aggl'),('4CTWHNR', 'abl'),('4SCTHNR', 'affl'),('4SCWNR', 'appl'),('4SCTHN', 'aft'),('4SCWHN', 'asphy'),('4CTHNR', 'afl'),('4CTWHN', 'aby'),('4CTWNR', 'addl'),('4SCTWH', 'abb'),('4SCTWN', 'adj'),('4SCTHR', 'affr'),('4CTHN', 'aff'),('4CHNR', 'accl'),('4SCTW', 'agg'),('4CTNR', 'acq'),('4CTWN', 'adm'),('4THNR', 'athl'),('4SCWR', 'appr'),('4CTWH', 'ab'),('4CWNR', 'apl'),('4SCWN', 'app'),('4TWHN', 'ackn'),('4CTW', 'add'),('4CHN', 'acc'),('4SNR', 'asl'),('4CWN', 'amm'),('4CHR', 'accr'),('4CTN', 'adv'),('4WNR', 'all'),('4TWH', 'ak'),('4TWN', 'aj'),('4SR', 'arr'),('4SN', 'ann'),('4TW', 'att'),('4', 'a'),],'C': [('CTWHNR', 'bl'),('CTWHN', 'by'),('CWHNR', 'phl'),('CTHNR', 'fl'),('CTWR', 'der'),('CTHN', 'dy'),('CTNR', 'del'),('CHNR', 'cry'),('CTWH', 'b'),('CTWN', 'dem'),('CWHR', 'phr'),('CTH', 'f'),('CTN', 'dev'),('CHR', 'chr'),('CNR', 'cl'),('CT', 'd'),('CN', 'z'),('CW', 'p'),('C', 'c'),],'S': [('STWNR', 'serv'),('STWHN', 'xy'),('STWH', 'sk'),('SHR', 'shr'),('SCT', 'g'),('STW', 'x'),('SCN', 'ss'),('SR', 'ser'),('S', 's'),],'l': [('lgcts', 'ckles'),('lgch', 'lf'),('lgcs', 'bles'),('lgct', 'ckl'),('lghs', 'xes'),('lgt', 'kl'),('lhs', 'zes'),('lgc', 'bl'),('lgh', 'x'),('lht', 'lth'),('lgy', 'logy'),('lc', 'p'),('lh', 'z'),('l', 'l'),],'n': [('nlgch', 'mp'),('nlght', 'dth'),('nlgh', 'sm'),('nlhs', 'shes'),('ngct', 'bt'),('ngch', 'mb'),('nlgt', 'sk'),('nlct', 'nst'),('nght', 'ngth'),('nct', 'tion'),('nht', 'nth'),('ngc', 'gg'),('nhs', 'ves'),('nlg', 'd'),('nlc', 'sp'),('ngh', 'm'),('ncs', 'nces'),('nh', 'v'),('nl', 's'),('n', 'n'),],'c': [('chts', 'ds'),('chs', 'd'),('cht', 'tch'),('cte', 'cate'),('c', 'c'),],'T': [('THNR', 'try'),('TWNR', 'jer'),('TWN', 'j'),('TNR', 'q'),('TWH', 'k'),('THR', 'thr'),('TN', 'v'),('T', 't'),],'g': [('gchs', 'dg'),('gtse', 'kes'),('gch', 'f'),('gct', 'ck'),('gc', 'b'),('gt', 'k'),('g', 'g'),],'t': [('tsy', 'ys'),('t', 't'),],'H': [('HNR', 'ly'),('HN', 'y'),('HR', 'rh'),('H', 'h'),],'W': [('WHN', 'my'),('WN', 'm'),('W', 'w'),],'h': [('ht', 'th'),('h', 'h'),],'N': [('NR', 'l'),('N', 'n'),],'y': [('y', 'y'),],'s': [('s', 's'),],'e': [('e', 'e'),],'R': [('R', 'r'),],}
 
 rules_vowels = {x: list() for x in center_keycodes}
 for rule in rules_vowels_raw.items():
