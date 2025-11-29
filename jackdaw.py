@@ -1,4 +1,20 @@
-# TODO: remove unused layers, it's maybe slowing down the response. How fast does this go if nothing but Jackdaw is running?
+# Copyright Jeremy Chin, 2025.
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+
+# Uses code from https://github.com/user202729/plover-jackdaw-alt1 , hence the GPLv3.
+
 # Keying memo:
 """
 A C W N (XZ)    |    (zx) r l c t (tE)
@@ -488,7 +504,7 @@ rules_vowels_shifted_raw = {
 #    rules[rule] = sorted(rules[rule], key = lambda x: -len(x[0]))
 
 # Pre-generated out of jackdaw_map.rb to save memory
-rules = {'r': [('rnlchts', 'lds'),('rnlchs', 'ld'),('rlchts', 'rlds'),('rnchts', 'wds'),('rnchs', 'wd'),('rnlcs', 'ples'),('rnlct', 'lp'),('rnlhs', 'lves'),('rnlgt', 'lk'),('rnlch', 'lch'),('rlghs', 'rld'),('rnlgc', 'lb'),('rnlgh', 'lm'),('rngh', 'rm'),('rght', 'wk'),('rnlt', 'rst'),('rnlg', 'dl'),('rnch', 'rv'),('rnlc', 'pl'),('rnlh', 'lv'),('rnht', 'wth'),('rnl', 'll'),('rnh', 'wn'),('rng', 'gn'),('rlh', 'wl'),('rht', 'rth'),('rh', 'w'),('r', 'r'),],'4': [('4SCTWNR', 'aggl'),('4CTWHNR', 'abl'),('4SCTHNR', 'affl'),('4SCWNR', 'appl'),('4SCTHN', 'aft'),('4SCWHN', 'asphy'),('4CTHNR', 'afl'),('4CTWHN', 'aby'),('4CTWNR', 'addl'),('4SCTWH', 'abb'),('4SCTWN', 'adj'),('4SCTHR', 'affr'),('4CTHN', 'aff'),('4CHNR', 'accl'),('4SCTW', 'agg'),('4CTNR', 'acq'),('4CTWN', 'adm'),('4THNR', 'athl'),('4SCWR', 'appr'),('4CTWH', 'ab'),('4CWNR', 'apl'),('4SCWN', 'app'),('4TWHN', 'ackn'),('4CTN', 'adv'),('4TWH', 'ak'),('4CHN', 'acc'),('4CTW', 'add'),('4WNR', 'all'),('4CHR', 'accr'),('4CWN', 'amm'),('4SNR', 'asl'),('4TWN', 'aj'),('4SR', 'arr'),('4SN', 'ann'),('4TW', 'att'),('4', 'a'),],'C': [('CTWHNR', 'bl'),('CTWHN', 'by'),('CWHNR', 'phl'),('CTHNR', 'fl'),('CHNR', 'cry'),('CTNR', 'del'),('CTWH', 'b'),('CTHN', 'dy'),('CTWR', 'der'),('CTWN', 'dem'),('CWHR', 'phr'),('CTH', 'f'),('CTN', 'dev'),('CNR', 'cl'),('CHR', 'chr'),('CT', 'd'),('CN', 'z'),('CW', 'p'),('C', 'c'),],'S': [('STWNR', 'serv'),('STWHN', 'xy'),('STWH', 'sk'),('SCN', 'ss'),('SHR', 'shr'),('SCT', 'g'),('STW', 'x'),('SR', 'ser'),('S', 's'),],'l': [('lgcts', 'ckles'),('lgch', 'lf'),('lgcs', 'bles'),('lgct', 'ckl'),('lghs', 'xes'),('lgy', 'logy'),('lhs', 'zes'),('lgt', 'kl'),('lgc', 'bl'),('lgh', 'x'),('lht', 'lth'),('lc', 'p'),('lh', 'z'),('l', 'l'),],'n': [('nlgch', 'mp'),('nlght', 'dth'),('nlgh', 'sm'),('nlhs', 'shes'),('ngct', 'bt'),('ngch', 'mb'),('nlgt', 'sk'),('nlct', 'nst'),('nght', 'ngth'),('ngh', 'm'),('nlc', 'sp'),('nlg', 'd'),('nct', 'tion'),('ncs', 'nces'),('nht', 'nth'),('ngc', 'gg'),('nhs', 'ves'),('nh', 'v'),('nl', 's'),('n', 'n'),],'c': [('chts', 'ds'),('cte', 'cate'),('chs', 'd'),('cht', 'tch'),('c', 'c'),],'T': [('TWNR', 'jer'),('THNR', 'try'),('THR', 'thr'),('TWH', 'k'),('TNR', 'q'),('TWN', 'j'),('TN', 'v'),('T', 't'),],'g': [('gchs', 'dg'),('gtse', 'kes'),('gch', 'f'),('gct', 'ck'),('gt', 'k'),('gc', 'b'),('g', 'g'),],'H': [('HNR', 'ly'),('HR', 'rh'),('HN', 'y'),('H', 'h'),],'W': [('WHN', 'my'),('WN', 'm'),('W', 'w'),],'t': [('tEe', 'ey'),('ttE', 'te'),('tsy', 'ys'),('tE', 'y'),('t', 't'),],'N': [('NR', 'l'),('N', 'n'),],'h': [('ht', 'th'),('h', 'h'),],'s': [('s', 's'),],'e': [('e', 'e'),],'y': [('y', 'y'),],'R': [('R', 'r'),],}
+rules = {'r': [('rnlchts', 'lds'),('rnlchs', 'ld'),('rlchts', 'rlds'),('rnchts', 'wds'),('rnchs', 'wd'),('rnlcs', 'ples'),('rnlct', 'lp'),('rnlhs', 'lves'),('rnlgt', 'lk'),('rnlch', 'lch'),('rlghs', 'rld'),('rnlgc', 'lb'),('rnlgh', 'lm'),('rngh', 'rm'),('rght', 'wk'),('rnlt', 'rst'),('rnlg', 'dl'),('rnch', 'rv'),('rnlc', 'pl'),('rnlh', 'lv'),('rnht', 'wth'),('rnl', 'll'),('rht', 'rth'),('rnh', 'wn'),('rng', 'gn'),('rlh', 'wl'),('rh', 'w'),('r', 'r'),],'4': [('4SCTWNR', 'aggl'),('4CTWHNR', 'abl'),('4SCTHNR', 'affl'),('4SCTWH', 'abb'),('4CTWHN', 'aby'),('4SCTHR', 'affr'),('4CTWNR', 'addl'),('4SCTHN', 'aft'),('4CTHNR', 'afl'),('4SCWNR', 'appl'),('4SCTWN', 'adj'),('4SCWHN', 'asphy'),('4CWNR', 'apl'),('4SCWN', 'app'),('4CTHN', 'aff'),('4CTWN', 'adm'),('4CTWH', 'ab'),('4CTNR', 'acq'),('4TWHN', 'ackn'),('4THNR', 'athl'),('4SCTW', 'agg'),('4CHNR', 'accl'),('4SCWR', 'appr'),('4CTW', 'add'),('4CHN', 'acc'),('4SNR', 'asl'),('4CWN', 'amm'),('4TWN', 'aj'),('4CHR', 'accr'),('4WNR', 'all'),('4TWH', 'ak'),('4CTN', 'adv'),('4TW', 'att'),('4SN', 'ann'),('4SR', 'arr'),('4', 'a'),],'C': [('CTWHNR', 'bl'),('CTWHN', 'by'),('CTHNR', 'fl'),('CWHNR', 'phl'),('CHNR', 'cry'),('CWHR', 'phr'),('CTWR', 'der'),('CTWN', 'dem'),('CTNR', 'del'),('CTWH', 'b'),('CTHN', 'dy'),('CNR', 'cl'),('CTH', 'f'),('CTN', 'dev'),('CHR', 'chr'),('CW', 'p'),('CT', 'd'),('CN', 'z'),('C', 'c'),],'S': [('STWHN', 'xy'),('STWNR', 'serv'),('STWH', 'sk'),('SCN', 'ss'),('SCT', 'g'),('SHR', 'shr'),('STW', 'x'),('SR', 'ser'),('S', 's'),],'l': [('lgcts', 'ckles'),('lgch', 'lf'),('lgcs', 'bles'),('lgct', 'ckl'),('lghs', 'xes'),('lgy', 'logy'),('lgc', 'bl'),('lht', 'lth'),('lgt', 'kl'),('lhs', 'zes'),('lgh', 'x'),('lc', 'p'),('lh', 'z'),('l', 'l'),],'n': [('nlgch', 'mp'),('nlght', 'dth'),('nlgh', 'sm'),('nlhs', 'shes'),('ngct', 'bt'),('ngch', 'mb'),('nlgt', 'sk'),('nlct', 'nst'),('nght', 'ngth'),('nht', 'nth'),('ngc', 'gg'),('nlc', 'sp'),('ngh', 'm'),('nlg', 'd'),('nct', 'tion'),('ncs', 'nces'),('nhs', 'ves'),('nl', 's'),('nh', 'v'),('n', 'n'),],'c': [('chts', 'ds'),('cte', 'cate'),('chs', 'd'),('cht', 'tch'),('c', 'c'),],'T': [('TWNR', 'jer'),('THNR', 'try'),('THR', 'thr'),('TWH', 'k'),('TWN', 'j'),('TNR', 'q'),('TN', 'v'),('T', 't'),],'g': [('gchs', 'dg'),('gtse', 'kes'),('gct', 'ck'),('gch', 'f'),('ght', 'ght'),('gc', 'b'),('gt', 'k'),('g', 'g'),],'H': [('HNR', 'ly'),('HR', 'rh'),('HN', 'y'),('H', 'h'),],'t': [('ttE', 'te'),('tsy', 'ys'),('tEe', 'ey'),('tE', 'y'),('t', 't'),],'W': [('WHN', 'my'),('WN', 'm'),('W', 'w'),],'h': [('ht', 'th'),('h', 'h'),],'N': [('NR', 'l'),('N', 'n'),],'e': [('e', 'e'),],'R': [('R', 'r'),],'s': [('s', 's'),],'y': [('y', 'y'),],}
 
 
 rules_vowels = {x: list() for x in center_keycodes}
@@ -585,12 +601,13 @@ class Chord():
                         break
 
                 # TODO: is this still useful?
+                # Guarantees no infinite look, at least
                 if idx == initial_idx:
                     output += list(blocks[block][idx])
                     idx += 1
             generated.append(output)
 
-        print(output_v, generated)
+        # print(output_v, generated)
 
         output = generated[0] + output_v + generated[1] + generated[2]
         if len(output) == 0: # At current, only space and shift
@@ -622,8 +639,6 @@ class Jackdaw(Module):
         # Try to work around the tap_key weirdness
         self.now_pressed = None
 
-
-
     def process_key(self, keyboard, key, is_pressed, int_coord):
         if not isinstance(key, JackdawKey):
             return key
@@ -652,21 +667,14 @@ class Jackdaw(Module):
                     self.last_stroke = len(result)
                 self.handle_chord(result)
                 self.chord.reset()
-        print("Held: ", self.held)
 
+    # Not really chord, this is the output string
     def handle_chord(self, chord):
         if chord == "":
             return
-
-        # SO. Chord should be ordered like that
-        # And then.... just execute every replace?
-        # And then spit out the remainder?
-        # print(chord)
         out = [c for c in list(chord)]
         out.reverse()
 
-        # TODO: need to lead with a space, probably
-        # Unless one of the XYZs is included...?
         self.send_next = out
 
     def during_bootup(self, keyboard):

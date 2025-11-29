@@ -725,47 +725,47 @@ rh_sorted = rh.map {|k, v| [k.downcase, v.downcase]}.sort_by { |k, v|
   val
 }
 
-changed = true
-while changed == true
-  changed = false
-  lh_sorted.each do |k, v|
-    next if v == "-" || k == v
-    generated = generate(k)
-    if generated != v
-      #print "Diff: #{k} generates #{generated} (not #{v})\n"
-      #print "'#{k.upcase.sub('A', '4')}': '#{v}',\n" if v.size > 1
-      $base_rules.push([v, k])
-      $base_rules.sort_by! { |k, v| v.size * -1 }
+if ARGV.size == 0
+  changed = true
+  while changed == true
+    changed = false
+    lh_sorted.each do |k, v|
+      next if v == "-" #|| k == v
+      generated = generate(k)
+      if generated != v
+        #print "Diff: #{k} generates #{generated} (not #{v})\n"
+        #print "'#{k.upcase.sub('A', '4')}': '#{v}',\n" if v.size > 1
+        $base_rules.push([v, k])
+        $base_rules.sort_by! { |k, v| v.size * -1 }
 
-      changed = true
-      break
+        changed = true
+        break
+      end
+      #print("#{v} = #{k}\n")
     end
-    #print("#{v} = #{k}\n")
   end
-end
 
 
-# Same with rh_sorted
-changed = true
-while changed == true
-  changed = false
-  rh_sorted.each do |k, v|
-    next if v == "-" || k == v
-    generated = generate(k)
-    if generated != v
-      #print "Diff: #{k} generates #{generated} (not #{v})\n"
-      #print "'#{k.upcase.sub('A', '4')}': '#{v}',\n" if v.size > 1
-      $base_rules.push([v, k])
-      $base_rules.sort_by! { |k, v| v.size * -1 }
+  # Same with rh_sorted
+  changed = true
+  while changed == true
+    changed = false
+    rh_sorted.each do |k, v|
+      next if v == "-" #|| k == v
+      generated = generate(k)
+      if generated != v
+        #print "Diff: #{k} generates #{generated} (not #{v})\n"
+        #print "'#{k.upcase.sub('A', '4')}': '#{v}',\n" if v.size > 1
+        $base_rules.push([v, k])
+        $base_rules.sort_by! { |k, v| v.size * -1 }
 
-      changed = true
-      break
+        changed = true
+        break
+      end
+      #print("#{v} = #{k}\n")
     end
-    #print("#{v} = #{k}\n")
   end
-end
 
-if false
   # Generate the full chord map
   # Or generate the non-natural chords for using in the circuitpy source
   output_rules = {}
@@ -809,6 +809,8 @@ if false
   # Find the stuff that doesn't generate naturally
   # Same algorithm as the circuitpy version
 else
+  # More useful stuff: 
+  # For each position in a word, display the available chords to generate the next block
   word = ARGV[0]
   print("#{word}\n")
   word.size.times do |i|
