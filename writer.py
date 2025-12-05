@@ -116,6 +116,9 @@ class DisplayMode:
     def backspace(self):
         pass
 
+    def setup(self):
+        display.clear()
+
 # Probably need an intermediate class that flattens out the display memory
 class Editor(DisplayMode):
     def __init__(self):
@@ -213,6 +216,58 @@ class Editor(DisplayMode):
         self.cursor_row = 3
         self.cursor_column = 0
 
+# On tab key, call this to break across lines
+# TODO: paragraph breaks, manual line breaks, whatever
+# ALSO: this leaves the last line empty to continue typing, is that ok?
+# ARGH. Ideally we want to backfill this, so it ... uhh... 
+# Was going to be, finishes in the right place, but maybe use scroll up/down for that
+# up/down should forcefully reformat, I guess
+# Also what to do about line alignment, kind of difficult.
+    def _reformat(self):
+        # Roughly equivalent to fill_lines...
+        offset = self.pointer_head
+        word = [' '] * 20
+        word_index = 0
+
+        line = 0
+        line_index = 0
+        overflow = False
+
+        while line < 3:
+            if offset > 2047:
+                break
+            if self.buffer[offset] == ord(' '):
+                for i in range(word_index):
+                    self.lines[line * 20 + line_index] = word[i]
+                    line_index += 1
+                word_index = 0
+                offset += 1
+
+                # TODO: overflow? If this is at 20, don't need it
+                self.lines[line * 20 + line_index] = ord(' ')
+
+                overflow = False
+
+                line_index += 1
+            else:
+                word[word_index] = self.buffer[offset]
+                offset += 1
+                word_index += 1
+                if word_index > 20:
+                    # Give up - dump it out to the screen and just keep writing until the next space
+                    overflow = True
+                if word_index + line_index > 18:
+                    for x in range(line_index, 19):
+                        self.lines[line * 20 + x] = ord(' ')
+
+                    self.line_lengths[line] = line_index
+                    line += 1
+                    line_index = 0
+                    if line == 4:
+                        pass # TODO something
+
+
+
 class Trainer(DisplayMode):
     def __init__(self):
         self.pointer_head = 0
@@ -228,6 +283,8 @@ class Trainer(DisplayMode):
 
         self.line_lengths = [0] * 4
 
+        self.errors = 5
+
     def setup(self):
         self.buffer = bytearray([ord(x) for x in " ".join(random.choice(wordlist) for x in range(100))])
         self._fill_lines(0)
@@ -236,7 +293,6 @@ class Trainer(DisplayMode):
         if self.buffer[self.pointer_head] == ord(char):
             self.pointer_head += 1
             # Kick one right
-            print("Current: ", self.cursor_column, " EOL: ", self.line_lengths[self.cursor_row])
             self.cursor_column += 1
 
             if self.cursor_column == self.line_lengths[self.cursor_row]:
@@ -244,7 +300,7 @@ class Trainer(DisplayMode):
                 self.cursor_column = 0
                 display.setpos(self.cursor_row, self.cursor_column)
 
-                if self.cursor_row == 4:
+                if self.cursor_row == 3:
                     self._fill_lines(self.pointer_head)
                     self.cursor_row = 0
                     self.cursor_column = 0
@@ -253,7 +309,11 @@ class Trainer(DisplayMode):
                 display.write_cmd([0x4 | 0x2, 0x14]) # Normal direction then one to the right
 
         else:
-            print("WRONG")
+            self.errors -= 1
+            self.lines[60 + self.errors * 2 + 1] = 20
+            display.setpos(3, self.errors * 2)
+            display.write_chars("  ")
+            display.setpos(self.cursor_row, self.cursor_column)
 
     def _fill_lines(self, offset):
         word = [' '] * 20
@@ -262,7 +322,7 @@ class Trainer(DisplayMode):
         line = 0
         line_index = 0
 
-        while line < 4:
+        while line < 3:
             if offset > 2047:
                 break
             if self.buffer[offset] == ord(' '):
@@ -282,10 +342,17 @@ class Trainer(DisplayMode):
                 if word_index > 20:
                     print(word)
                 if word_index + line_index > 18:
-                    self.lines[line * 20 + line_index] = ord(' ')
+                    for x in range(line_index, 19):
+                        self.lines[line * 20 + x] = ord(' ')
+                    # self.lines[line * 20 + line_index] = ord(' ')
+
                     self.line_lengths[line] = line_index
                     line += 1
                     line_index = 0
+
+        for x in range(0, self.errors * 2, 2):
+            self.lines[60 + x] = 20
+            self.lines[60 + x + 1] = 0b11110111
 
         display.write_row(0, self.lines[0:20])
         display.write_row(1, self.lines[20:40])
@@ -333,13 +400,29 @@ class Writer(Extension):
     def on_powersave_disable(self, keyboard):
         return
 
+class Menu(DisplayMode):
+    def __init__(self):
+        pass
+
+    def setup(self):
+        display.setpos(0, 0)
+        display.write_chars("a. Writer")
+        display.setpos(1, 0)
+        display.write_chars("s. Practice")
 
 
-# Keyboard scan codes: 0x1 = a, 0x81 is A
+    def receive(self, char):
+        global mode
+        if char == 'a':
+            mode = Editor()
+            mode.setup()
+        elif char == 's':
+            mode = Trainer()
+            mode.setup()
+
 
 display = Display()
-#mode = Editor()
-mode = Trainer()
+mode = Menu()
 
 sequence = [random.choice(wordlist) for x in range(8)]
 sample = " ".join(sequence[0:4])

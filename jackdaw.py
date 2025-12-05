@@ -569,5 +569,4 @@ class Jackdaw(Module):
     def on_powersave_disable(self, keyboard):
         pass
 
-
 # In the end this is a lot closer to the original Shelton patent than the Jackdaw theory
