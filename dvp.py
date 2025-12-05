@@ -126,10 +126,14 @@ class DVP():
             'Y': KC.T,
             'Z': KC.SLASH,
             ' ': KC.SPC,
+
+            '\'': KC.Q,
+            ',': KC.W,
+            '.': KC.E,
                  }
     def __getitem__(self, name):
-        if name in self.keys:
+        #if name in self.keys:
             return self.keys[name.upper()]
-        else:
-            return KC[name]
+        #else:
+        #    return KC[name]
 

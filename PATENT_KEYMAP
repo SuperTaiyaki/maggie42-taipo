@@ -738,5 +738,7 @@ CHTS DS
 
 
 And then:
+Convert to a more useful format in JACKDAW_PATENT_COMBOS
 Make into a ruby data structure
 and then I can do whatever
+

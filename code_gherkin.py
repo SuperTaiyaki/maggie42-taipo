@@ -57,10 +57,10 @@ LAYER_GAME = 6
 keyboard.keymap = [
 # Jackdaw
 [
-KC.JD_4, KC.JD_C, KC.JD_W, KC.JD_N,      KC.JD_x, KC.JD_r, KC.JD_l, KC.JD_c, KC.JD_t, KC.JD_e,
-KC.JD_S, KC.JD_T, KC.JD_H, KC.JD_R,      KC.JD_z, KC.JD_n, KC.JD_g, KC.JD_h, KC.JD_s, KC.JD_y, 
-KC.Q, KC.W, KC.E, KC.JD_UO, KC.JD_x,    KC.JD_UO,  KC.JD_u, KC.TG(4), KC.TG(3), KC.KC_DOT,
-KC.NO , KC.JD_A, KC.JD_O, KC.JD_E, KC.JD_u,    KC.ENTER # thumb row
+KC.JD_4, KC.JD_C, KC.JD_W, KC.JD_N,      KC.JD_X,    KC.JD_r, KC.JD_l, KC.JD_c, KC.JD_t, KC.JD_dE,
+KC.JD_S, KC.JD_T, KC.JD_H, KC.JD_R,      KC.JD_z,    KC.JD_n, KC.JD_g, KC.JD_h, KC.JD_s, KC.JD_e, 
+KC.JD_xQUOTE, KC.JD_xCOMMA, KC.JD_xDOT, KC.JD_UO,     KC.JD_x,    KC.JD_UO,  KC.JD_u, KC.TG(4), KC.TG(3), KC.JD_y,
+                        KC.NO , KC.JD_A, KC.JD_O, KC.JD_E, KC.JD_u,    KC.ENTER # thumb row
 ],
 
 # GeminiPR steno
@@ -72,7 +72,7 @@ KC.NO, KC.NO, KC.SPC, KC.G_LA, KC.G_LO,         KC.G_RE, KC.G_RU,   KC.ENTER, KC
 
 # Taipo
 [
-KC.TP_TLP, KC.TP_TLR, KC.TP_TLM, KC.TP_TLI,  MWUP,          KC.TG(LAYER_GAME), KC.TP_TRI, KC.TP_TRM, KC.TP_TRR, KC.TP_BRP,
+KC.TP_TLP, KC.TP_TLR, KC.TP_TLM, KC.TP_TLI,  MWUP,          KC.TG(3), KC.TP_TRI, KC.TP_TRM, KC.TP_TRR, KC.TP_BRP,
 KC.TP_BLP, KC.TP_BLR, KC.TP_BLM, KC.TP_BLI, MWDOWN,         KC.NO, KC.TP_BRI, KC.TP_BRI, KC.TP_BRM, KC.TP_BRR,
 KC.TP_BLP, KC.TP_BLR, KC.LAYER2, KC.TP_LIT, KC.TP_LOT,      KC.TP_LIT, KC.TP_BRI, KC.TP_BRI, KC.TP_BRM, KC.TP_BRR,
 KC.NO , KC.TP_LIT, KC.TP_LOT, KC.JD_E, KC.JD_u, KC.JD_C # thumb row
@@ -80,22 +80,76 @@ KC.NO , KC.TP_LIT, KC.TP_LOT, KC.JD_E, KC.JD_u, KC.JD_C # thumb row
 
 # Cykey
 [
-KC.TP_TLP, KC.TP_TLR, KC.TP_TLM, KC.TP_TLI,  MWUP,          KC.TG(LAYER_GAME), KC.TP_TRI, KC.TP_TRM, KC.TP_TRR, KC.TP_BRP,
-KC.TP_BLP, KC.TP_BLR, KC.TP_BLM, KC.TP_BLI, MWDOWN,         KC.NO, KC.TP_BRI, KC.TP_BRI, KC.TP_BRM, KC.TP_BRR,
-KC.TP_BLP, KC.TP_BLR, KC.LAYER2, KC.TP_LIT, KC.TP_LOT,      KC.TP_LIT, KC.TP_BRI, KC.TP_BRI, KC.TP_BRM, KC.TP_BRR,
+KC.TP_TLP, KC.TP_TLR, KC.TP_TLM, KC.TP_TLI,     MWUP,          KC.TG(3), KC.TP_TRI, KC.TP_TRM, KC.TP_TRR,       KC.TP_BRP,
+KC.TP_BLP, KC.TP_BLR, KC.TP_BLM, KC.TP_BLI,     MWDOWN,         KC.NO, KC.TP_BRI, KC.TP_BRI, KC.TP_BRM, KC.     TP_BRR,
+KC.TP_BLP, KC.TP_BLR, KC.LAYER2, KC.TP_LIT,     KC.TP_LOT,      KC.TP_LIT, KC.TP_BRI, KC.TP_BRI, KC.TP_BRM,     KC.TP_BRR,
 KC.NO , KC.TP_LIT, KC.TP_LIT, KC.TP_LOT, KC.TP_LOT, KC.JD_C # thumb row
 ],
 
 
 # Something resembling a normal layout. This will require tuning!
-# TODO: double Z/shift?
     [
         KC.Q,    KC.W,    KC.E,    KC.R,   KC.T,     KC.Y,    KC.U,    KC.I,    KC.O,    KC.P,
         KC.A,    KC.S,    KC.D,    KC.F,   KC.G,     KC.H,    KC.J,    KC.K,    KC.L,    KC.SCLN,
-        KC.Z,    KC.X,    KC.C,    KC.V,   KC.B,     KC.N,    KC.M,    KC.COMMA,    KC.DOT,    KC.SLASH,
-KC.NO,      KC.BSPACE, KC.SPACE, KC.SPACE, KC.ENTER, KC.NO
+KC.HT(KC.Z, KC.LSFT),    KC.X,    KC.C,    KC.V,   KC.B,     KC.N,    KC.M,    KC.COMMA,    KC.DOT,    KC.SLASH,
+KC.NO,      KC.MO(5), KC.SPACE, KC.SPACE, KC.ENTER, KC.LT(6, KC.BSPACE),
+    ],
+
+[
+  KC.LSFT(KC.N1), KC.LSFT(KC.N2), KC.LSFT(KC.N3), KC.LSFT(KC.N4),   KC.LSFT(KC.N5),  KC.LSFT(KC.N6), KC.LSFT(KC.N7), KC.LSFT(KC.N8), KC.LSFT(KC.N9), KC.LSFT(KC.N0),
+        KC.N1,    KC.N2,    KC.N3,    KC.N4,   KC.N5,     KC.N6,    KC.N7,    KC.N8,    KC.N9,    KC.N0,
+        # Drop symbols into the next row
+KC.LSFT,    KC.GRAVE,    KC.QUOTE,    KC.MINUS,        KC.B,         KC.EQUAL,    KC.LBRC,    KC.RBRC,    KC.EQUAL,    KC.BSLASH,
+KC.NO,      KC.NO, KC.SPACE, KC.LCTRL, KC.ENTER, KC.LGUI
+    ],
+# Layer 6: browser layer and layer switches
+[
+  KC.LSFT(KC.N1), KC.LSFT(KC.N2), KC.LSFT(KC.N3), KC.LSFT(KC.N4),   KC.LSFT(KC.N5),  KC.LSFT(KC.N6), KC.LSFT(KC.N7), KC.LSFT(KC.N8), KC.LSFT(KC.N9), KC.TO(0),
+        KC.N1,    KC.N2,    KC.N3,    KC.N4,   KC.N5,     KC.N6,    KC.N7,    KC.N8,    KC.N9,    KC.N0,
+        # Drop symbols into the next row
+KC.LSFT,    KC.GRAVE,    KC.QUOTE,    KC.MINUS,        KC.B,         KC.EQUAL,    KC.LBRC,    KC.RBRC,    KC.EQUAL,    KC.BSLASH,
+KC.NO,      KC.NO, KC.SPACE, KC.LCTRL, KC.ENTER, KC.LGUI
     ],
 ]
+# Oops can't ctrl-C
+
+# bottom leftmost -> layer shift
+
+# Combo design:
+# SPACER + something -> enter
+# Shift.... semicolon (shift) and z hold? (maybe not Z, put the right hand side elsewhere)
+# Based on kkga's layout (https://keymapdb.com/keymaps/kkga/)
+# W + S -> escape
+# s + x -> tab?
+
+#combos = [
+#        Chord((KC.W, KC.S), KC.ESCAPE),
+#        Chord((KC.S, KC.X), KC.TAB),
+#        ]
+        
+
+
+# How to build a sane layout onto this...
+# top left are punctuation anyway, so
+# a+' -> escape?
+# o + , -> ?
+# e + # -> ?
+# a + ; -> ?
+# shift... on space?
+# enter -> double right thumb
+# outer right thumb -> fn
+# outer left thumb -> also fn?
+# ; hold -> ctrl
+# q hold -> cmd? bit weird, maybe
+# Don't want to cause too much confusion with my ergodash, may need to merge the layouts later
+# and probably don't even try to merge the maggie, leave it for crazier stuff
+# Would be nice if the layer setup merged with cykey so I can choose my key layer and then drop stuff on top
+
+# What would I ever need a normal layout for, on a chorded/jackdaw/whatever keyboard?
+# WM controls
+# browser controls? (99% browser + cykey though)
+# super minor console stuff (tab, vim, a bit more)
+# .... throw all that stuff on the Handyman, and use the gherkin and maggie purely for typing?
 
 if __name__ == '__main__':
     #debug.enabled = False

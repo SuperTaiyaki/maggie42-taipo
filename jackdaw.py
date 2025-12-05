@@ -22,12 +22,13 @@ S T H R (UO)    |    (ei) n g h s (y)
    (I) I E (A)     (A) o u (u)
 
     AO-eu
+IE=OE  IO=AO  OA=AOEU
+
 AI=AEU AU=AU
 EA=AE EE=AOE
 I=EU   IE=OE  IO=AO
-OI=OEU OO=AOU OU=OU OA=AOEU?
+OI=OEU OO=AOU OU=OU OA=AOEU
 Ux=
-# Hey I have an open slot for AOEU-reverse
 
 G: SCT
 _ * _ _
@@ -81,7 +82,6 @@ CK: GCT
 ST: NLT
 SS: NLS
 
-
 T+TE -> TE
 TE alone -> Y
 (just for de-conflicting reasons)
@@ -115,7 +115,6 @@ W=RH
 X=LGH
 Z=LH
 
-sf <-- should be GH (scth)
 RH: ST = NLT (alternate S)
     
 """
@@ -143,19 +142,6 @@ class JackdawKey(Key):
         self.block = block
         super().__init__()
 
-
-# Oh wtf I have no punctuation!
-# Can do it outside Jackdaw, I guess...
-# Design some chords ...?
-# What needs to be layer, what can be under CMD?
-# Got 3 spare keys under each hand (ZXC), but they're hard to reach
-# the UO/EI keys are good for comboing
-# is EI used for anything?
-# actually standalone, they would make good space
-# Top centers (T/Y) for asterisk joiner key, below that for.... something
-
-
-# Cross to -S->-E and -T-> -Y are basically impossible, relocating the Y is an option (down, as per the Plover wiki page)
 
 # JD_4 is an A key
 # This is in steno order!
@@ -185,6 +171,8 @@ rh_keycodes =  [
 'x', # These are maybe special
 'z',
 
+'xQUOTE',
+
 'r',
 'n',
 'l',
@@ -194,9 +182,12 @@ rh_keycodes =  [
 't',
 's',
 
-'tE',
-'e', # special right-hand ones (special logic isn't applied yet)
+'dE', # Call this something else, the t breaks shit (generates Y or TE)
+'e',
 'y',
+
+'xDOT',
+'xCOMMA',
 
 ]
 
@@ -303,157 +294,20 @@ V-- all missing
     "ii": 57,
     "aa": 53,
     "uu": 11,
-
-Generating -e and a- are less important for lower-frequency combinations because the board corners can kind of make up....
-    IE is the only one anyway
-
-roughly, ao - ie looks reasonable
-ao doesn't exist, so that's fine for u
-but then we can't generate ou...
-    that's crucial enough that I want it top-layer
-    ao - eu lets that generate easily enough. Maybe why it's there?
-    use ae to generate ea... (or just outright swap them)
-        uo doesn't exist so auto-swap that?
-ou: ou
-ea: ae
-io: ao is fine (super low occurence)
-ee: aoe is fine?
-ai: aeu
-ie: oe (same logic as ea?)
-oo: aou
-ia: ao
-ei: no generation???
-ue, ua, : nothing
-au: why???
-ui: nothing!
-oi: oeu (this one exists)
-
-oa: nothing
-
-
-Ah. So the missing OA is a <10%
-    all-4 for that?
-
-One thought: breaking a stroke in the middle isn't much of a penalty
-    in which case, fucking break everything...?
-
-ue$ (and any other e$) can be generated using the rightmost e
-
-I'm missing ei quite a lot (it's in the top 100 words)
-and it's in the top 100 list
-so I should probably exchange it into the set somewhere
-    I have space for one more button (thumb rear), use it for vowel swap...?
-        the vowel double would be handy, then I can unlock a few combos
-            That alone might help (only 2 combos though - ee, oo)
-            AO is super not useful, so make that also generate I and then with the swap we can get any vowel pair!
-
-I have the doublers, should I eliminate OO and EE...?
 """
 
 """
-rules_dict = {		# left hand obvious
-		'4': 'a',
-		'S': 's',
-		'C': 'c',
-		'T': 't',
-		'W': 'w',
-		'H': 'h',
-		'N': 'n',
-		'R': 'r',
-
-		# left hand required
-		'CTWH': 'b',
-		'CT': 'd',
-		'CTH': 'f',
-		'SCT': 'g',
-		'TWN': 'j',
-		'TWH': 'k',
-		'NR': 'l',
-		'WN': 'm',
-		'CW': 'p',
-		'TNR': 'q',
-		'TWR': 'qu', # maybe the only thing not in the patent (other than the vowel blocks)
-		'TN': 'v',
-		'STW': 'x',
-		'HN': 'y',
-		'CN': 'z',
-
-        # override because they don't work right
-        'CNR': 'cl',
-        'CWNR': 'pl',
-
-        'STWH': 'sk',
-
-# AI=AEU AU=AU
-# EA=AE  EE=AOE
-# I=EU   IE=OE  IO=AO
-# OI=OEU OO=AOU OU=OU
-
-# Nothing generates OA?
-# What's still open?
-# ARGH I want something that can be figured out using heuristics...
-
-# UNrelated: Maybe I can shift this over one to the right - right hand needs to stretch right anyway
-
-        # right hand obvious
-		'r': 'r',
-		'n': 'n',
-		'l': 'l',
-		'g': 'g',
-		'c': 'c',
-		'h': 'h',
-		't': 't',
-		's': 's',
-		'e': 'e',
-		'y': 'y',
-
-		# right hand required (to be fair, you can type this with the left hand anyway, but it takes another stroke)
-		'gc': 'b',
-		'nlg': 'd',
-		'chs': 'd',
-		'gch': 'f',
-		'gt': 'k',
-		'ngh': 'm',
-		'lc': 'p',
-		'nh': 'v',
-		'rh': 'w',
-		'lgh': 'x',
-        # Y is a hard key
-
+rules_dict = {
+... mostly deleted, only this part is slightly weird
         'ttE': 'te',
         'tEe': 'ey',
         'tE': 'y',
-
-		'lh': 'z',
-        'nl': 's',  # in the patent
-
-        # right hand extra
-       'ht': 'th',
-       'rnl': 'll', # in the patent!
-       'gct': 'ck',
-
-       'ght': 'ght', # These tend to generate other things (the k takes priority)
-       'ghs': 'ghs',
-       'rnlchs': 'ld', # really??
-       'rnlct': 'lp',
-       'rnlc': 'pl',
-
-       'nlgch': 'mp', # reversed
-       'rnh': 'wn',
-       'rnch': 'rv', # rnh generates WN instead
-       'nht': 'nth',
-       'nght': 'ngth',
-# From the patent, the non-trivial combos
-# .... which, unfortunately runs out of memory. CRAP.
-# Probably more efficient to do it the same way as the arduino implementation. BAH.
-         }
-         """
+"""
 
 # One thing to try: UO alone and the alternate to generate more vowel pairs
 # and both together?
 # IE is EI + flip
 # UE/UA are missing, 
-# both for UI
 rules_vowels_raw = {
         # E is right-hand, it's uppercased so it doesn't conflict with far-right e
         # AO-eu
@@ -490,10 +344,10 @@ rules_vowels_shifted_raw = {
 
         'Ou': 'uo',
 
-        'A': 'aa',
-        'O': 'oo',
-        'E': 'ee',
-        'u': 'uu',
+        'A': 'ua',
+        'O': 'uo',
+        'E': 'ue',
+        'u': 'ui',
         }
 
 #rules = {x: list() for x in jd_keycodes}
@@ -504,8 +358,10 @@ rules_vowels_shifted_raw = {
 #    rules[rule] = sorted(rules[rule], key = lambda x: -len(x[0]))
 
 # Pre-generated out of jackdaw_map.rb to save memory
-rules = {'r': [('rnlchts', 'lds'),('rnlchs', 'ld'),('rlchts', 'rlds'),('rnchts', 'wds'),('rnchs', 'wd'),('rnlcs', 'ples'),('rnlct', 'lp'),('rnlhs', 'lves'),('rnlgt', 'lk'),('rnlch', 'lch'),('rlghs', 'rld'),('rnlgc', 'lb'),('rnlgh', 'lm'),('rngh', 'rm'),('rght', 'wk'),('rnlt', 'rst'),('rnlg', 'dl'),('rnch', 'rv'),('rnlc', 'pl'),('rnlh', 'lv'),('rnht', 'wth'),('rnl', 'll'),('rht', 'rth'),('rnh', 'wn'),('rng', 'gn'),('rlh', 'wl'),('rh', 'w'),('r', 'r'),],'4': [('4SCTWNR', 'aggl'),('4CTWHNR', 'abl'),('4SCTHNR', 'affl'),('4SCTWH', 'abb'),('4CTWHN', 'aby'),('4SCTHR', 'affr'),('4CTWNR', 'addl'),('4SCTHN', 'aft'),('4CTHNR', 'afl'),('4SCWNR', 'appl'),('4SCTWN', 'adj'),('4SCWHN', 'asphy'),('4CWNR', 'apl'),('4SCWN', 'app'),('4CTHN', 'aff'),('4CTWN', 'adm'),('4CTWH', 'ab'),('4CTNR', 'acq'),('4TWHN', 'ackn'),('4THNR', 'athl'),('4SCTW', 'agg'),('4CHNR', 'accl'),('4SCWR', 'appr'),('4CTW', 'add'),('4CHN', 'acc'),('4SNR', 'asl'),('4CWN', 'amm'),('4TWN', 'aj'),('4CHR', 'accr'),('4WNR', 'all'),('4TWH', 'ak'),('4CTN', 'adv'),('4TW', 'att'),('4SN', 'ann'),('4SR', 'arr'),('4', 'a'),],'C': [('CTWHNR', 'bl'),('CTWHN', 'by'),('CTHNR', 'fl'),('CWHNR', 'phl'),('CHNR', 'cry'),('CWHR', 'phr'),('CTWR', 'der'),('CTWN', 'dem'),('CTNR', 'del'),('CTWH', 'b'),('CTHN', 'dy'),('CNR', 'cl'),('CTH', 'f'),('CTN', 'dev'),('CHR', 'chr'),('CW', 'p'),('CT', 'd'),('CN', 'z'),('C', 'c'),],'S': [('STWHN', 'xy'),('STWNR', 'serv'),('STWH', 'sk'),('SCN', 'ss'),('SCT', 'g'),('SHR', 'shr'),('STW', 'x'),('SR', 'ser'),('S', 's'),],'l': [('lgcts', 'ckles'),('lgch', 'lf'),('lgcs', 'bles'),('lgct', 'ckl'),('lghs', 'xes'),('lgy', 'logy'),('lgc', 'bl'),('lht', 'lth'),('lgt', 'kl'),('lhs', 'zes'),('lgh', 'x'),('lc', 'p'),('lh', 'z'),('l', 'l'),],'n': [('nlgch', 'mp'),('nlght', 'dth'),('nlgh', 'sm'),('nlhs', 'shes'),('ngct', 'bt'),('ngch', 'mb'),('nlgt', 'sk'),('nlct', 'nst'),('nght', 'ngth'),('nht', 'nth'),('ngc', 'gg'),('nlc', 'sp'),('ngh', 'm'),('nlg', 'd'),('nct', 'tion'),('ncs', 'nces'),('nhs', 'ves'),('nl', 's'),('nh', 'v'),('n', 'n'),],'c': [('chts', 'ds'),('cte', 'cate'),('chs', 'd'),('cht', 'tch'),('c', 'c'),],'T': [('TWNR', 'jer'),('THNR', 'try'),('THR', 'thr'),('TWH', 'k'),('TWN', 'j'),('TNR', 'q'),('TN', 'v'),('T', 't'),],'g': [('gchs', 'dg'),('gtse', 'kes'),('gct', 'ck'),('gch', 'f'),('ght', 'ght'),('gc', 'b'),('gt', 'k'),('g', 'g'),],'H': [('HNR', 'ly'),('HR', 'rh'),('HN', 'y'),('H', 'h'),],'t': [('ttE', 'te'),('tsy', 'ys'),('tEe', 'ey'),('tE', 'y'),('t', 't'),],'W': [('WHN', 'my'),('WN', 'm'),('W', 'w'),],'h': [('ht', 'th'),('h', 'h'),],'N': [('NR', 'l'),('N', 'n'),],'e': [('e', 'e'),],'R': [('R', 'r'),],'s': [('s', 's'),],'y': [('y', 'y'),],}
+rules = {'r': [('rnlchts', 'lds'),('rnlchs', 'ld'),('rlchts', 'rlds'),('rnchts', 'wds'),('rnchs', 'wd'),('rnlcs', 'ples'),('rnlct', 'lp'),('rnlhs', 'lves'),('rnlgt', 'lk'),('rnlch', 'lch'),('rlghs', 'rld'),('rnlgc', 'lb'),('rnlgh', 'lm'),('rngh', 'rm'),('rght', 'wk'),('rnlt', 'rst'),('rnlg', 'dl'),('rnch', 'rv'),('rnlc', 'pl'),('rnlh', 'lv'),('rnht', 'wth'),('rht', 'rth'),('rng', 'gn'),('rnl', 'll'),('rlh', 'wl'),('rnh', 'wn'),('rh', 'w'),('r', 'r'),],'4': [('4SCTWNR', 'aggl'),('4CTWHNR', 'abl'),('4SCTHNR', 'affl'),('4SCTWH', 'abb'),('4CTWHN', 'aby'),('4SCTHR', 'affr'),('4CTWNR', 'addl'),('4SCTHN', 'aft'),('4CTHNR', 'afl'),('4SCWNR', 'appl'),('4SCTWN', 'adj'),('4SCWHN', 'asphy'),('4CWNR', 'apl'),('4SCWN', 'app'),('4CTHN', 'aff'),('4CTWN', 'adm'),('4CTWH', 'ab'),('4CTNR', 'acq'),('4TWHN', 'ackn'),('4THNR', 'athl'),('4SCTW', 'agg'),('4CHNR', 'accl'),('4SCWR', 'appr'),('4SNR', 'asl'),('4CHN', 'acc'),('4TWN', 'aj'),('4CWN', 'amm'),('4CTN', 'adv'),('4CTW', 'add'),('4CHR', 'accr'),('4WNR', 'all'),('4TWH', 'ak'),('4SR', 'arr'),('4TW', 'att'),('4SN', 'ann'),('4', 'a'),],'C': [('CTWHNR', 'bl'),('CTWHN', 'by'),('CTHNR', 'fl'),('CWHNR', 'phl'),('CTWH', 'b'),('CTWN', 'dem'),('CWHR', 'phr'),('CTWR', 'der'),('CTHN', 'dy'),('CTNR', 'del'),('CHNR', 'cry'),('CTN', 'dev'),('CTH', 'f'),('CHR', 'chr'),('CNR', 'cl'),('CT', 'd'),('CW', 'p'),('CN', 'z'),('C', 'c'),],'S': [('STWHN', 'xy'),('STWNR', 'serv'),('STWH', 'sk'),('STW', 'x'),('SHR', 'shr'),('SCT', 'g'),('SCN', 'ss'),('SR', 'ser'),('S', 's'),],'l': [('lgcts', 'ckles'),('lgch', 'lf'),('lgcs', 'bles'),('lgct', 'ckl'),('lghs', 'xes'),('lgh', 'x'),('lhs', 'zes'),('lht', 'lth'),('lgc', 'bl'),('lgy', 'logy'),('lgt', 'kl'),('lc', 'p'),('lh', 'z'),('l', 'l'),],'n': [('nlgch', 'mp'),('nlght', 'dth'),('nlgh', 'sm'),('nlhs', 'shes'),('ngct', 'bt'),('ngch', 'mb'),('nlgt', 'sk'),('nlct', 'nst'),('nght', 'ngth'),('nht', 'nth'),('nhs', 'ves'),('nlg', 'd'),('nlc', 'sp'),('ncs', 'nces'),('nct', 'tion'),('ngh', 'm'),('ngc', 'gg'),('nh', 'v'),('nl', 's'),('n', 'n'),],'c': [('chts', 'ds'),('cht', 'tch'),('chs', 'd'),('cte', 'cate'),('c', 'c'),],'T': [('TWNR', 'jer'),('THNR', 'try'),('THR', 'thr'),('TNR', 'q'),('TWR', 'qu'),('TWH', 'k'),('TWN', 'j'),('TN', 'v'),('T', 't'),],'g': [('gchs', 'dg'),('gtse', 'kes'),('gct', 'ck'),('ght', 'ght'),('gch', 'f'),('gt', 'k'),('gc', 'b'),('g', 'g'),],'t': [('tdE', 'te'),('tsy', 'ys'),('t', 't'),],'W': [('WHN', 'my'),('WN', 'm'),('W', 'w'),],'H': [('HNR', 'ly'),('HN', 'y'),('HR', 'rh'),('H', 'h'),],'d': [('dEe', 'ey'),('dE', 'y'),],'N': [('NR', 'l'),('N', 'n'),],'h': [('ht', 'th'),('h', 'h'),],'y': [('y', 'y'),],'R': [('R', 'r'),],'e': [('e', 'e'),],'s': [('s', 's'),],}
 
+# Extended rules that I don't want in the generator. Must be sorted by length.
+rules['x'] = [('xCOMMA', ','), ('xQUOTE', '\''), ('xDOT', '.'), ('x', '')]
 
 rules_vowels = {x: list() for x in center_keycodes}
 for rule in rules_vowels_raw.items():
@@ -536,6 +392,9 @@ class Chord():
 
         if len(combined) == 0:
             return ""
+        # if combined == .... do something special (commands and whatever)
+        # #. disable auto-space
+        # #. something
 
         print("Chord: ", blocks)
 
@@ -543,9 +402,6 @@ class Chord():
             return [KC.BSPACE]
 
         # stripped = pressed
-
-        # TODO: not here
-        shifted = blocks[3].endswith('SHIFT')
 
         output_v = []
         vowel_shift = blocks[0].startswith("UO")
@@ -576,14 +432,15 @@ class Chord():
             idx = 0
             while idx < len(blocks[block]):
 
-                if blocks[block].startswith(('x', 'X', 'z', 'Z'), idx):
+                # single x is used for things
+                if blocks[block].startswith(('X', 'z', 'Z'), idx):
                     add_space = True
                     idx += 1
                     continue
                 if blocks[block].startswith('SHIFT', idx):
                     idx += 5 # len('shift')
+                    shifted = True
                     break # not continue because SHIFT is at the end
-                    # Flag is already set
 
                 initial_idx = idx
 
@@ -592,7 +449,6 @@ class Chord():
                     idx += 1
                     continue
 
-                # TODO: can break up rules
                 candidates = rules[blocks[block][idx]]
                 for c in candidates:
                     if blocks[block].startswith(c[0], idx):
@@ -601,13 +457,21 @@ class Chord():
                         break
 
                 # TODO: is this still useful?
-                # Guarantees no infinite look, at least
+                # Guarantees no infinite loop, at least
                 if idx == initial_idx:
                     output += list(blocks[block][idx])
                     idx += 1
             generated.append(output)
 
         # print(output_v, generated)
+
+        # Experiment:
+        # if we finish with vowels, flip add_space
+        # Since vowel combos suck
+        #if len(output_v) > 0 and len(generated[1]) == 0 and len(generated[2]) == 0:
+        #    add_space = not add_space
+            # Too much mental load? Will have to try and see
+            # -> Nope, too confusing
 
         output = generated[0] + output_v + generated[1] + generated[2]
         if len(output) == 0: # At current, only space and shift
@@ -622,7 +486,7 @@ class Chord():
                 [DVP[c] for c in output[1:]])
 
         # TODO: cleaner expression of this
-        return keys + [KC.SPC] if add_space else keys
+        return keys + [KC.SPC] if not add_space else keys
 
 ## Compact mode: left S tapped alone is backspace
 # Also the IE -> O, OU -> E chords are enabled (because the board has no space for UO and EI buttons)
