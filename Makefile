@@ -1,4 +1,6 @@
 # rsync would be better but ehhhh
+
+# BOARD = $(cat /mnt/sda1/BOARD)
 install:
 	test -f /mnt/sda1/WRITER && echo "ERROR: Wrong board" && exit 1 || true
 	cp thicksplit.py cykey.py jackdaw.py geminipr.py taipo.py dvp.py code.py /mnt/sda1/ && sync

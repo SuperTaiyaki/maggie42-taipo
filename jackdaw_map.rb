@@ -649,6 +649,7 @@ $base_rules= [		# left hand obvious
 		['y', 'HN'],
 		['z', 'CN'],
 
+
         # right hand obvious
 		['r', 'r'],
 		['n', 'n'],
@@ -677,9 +678,11 @@ $base_rules= [		# left hand obvious
         ['s', 'nl'],  # in the patent
 
         # Not in the patent, just some silliness I use
-        ['te', 'ttE'],
-        ['ey', 'tEe'],
-        ['y', 'tE'],
+        ['te', 'tdE'],
+        ['ey', 'dEe'],
+        ['y', 'dE'],
+        # Only from the wiki, but crucial
+        ['qu', 'TWR'],
 
 
 ].sort_by { |k, v| v.size * -1 }
@@ -809,6 +812,7 @@ if ARGV.size == 0
   # Find the stuff that doesn't generate naturally
   # Same algorithm as the circuitpy version
 else
+
   # More useful stuff: 
   # For each position in a word, display the available chords to generate the next block
   word = ARGV[0]
