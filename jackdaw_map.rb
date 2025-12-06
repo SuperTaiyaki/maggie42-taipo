@@ -1,4 +1,6 @@
 #!/usr/bin/env ruby
+require 'pry'
+# Data out of the patent. Verified that this is comprehensive (but not necessarily correct)
 lh = [
 ['A', 'A'],
 ['CHR', 'CHR'],
@@ -330,7 +332,7 @@ rh = [
 ['G', 'G'],
 ['NLG', 'D'],
 ['RLCH', '-'],
-['NLGS', '-'],
+['RNLGS', '-'],
 ['LGCTS', 'CKLES'],
 
 ['C', 'C'],
@@ -468,13 +470,13 @@ rh = [
 ['GC', 'B'],
 ['LHS', 'ZES'],
 ['NLHT', '-'],
-['RLGHT', '-'],
+['RLCHT', '-'],
 ['RLCHTS', 'RLDS'],
 
 ['GH', 'GH'],
 ['LTS', 'LTS'],
 ['NLHS', 'SHES'],
-['RLGHS', 'RLD'],
+['RLCHS', 'RLD'],
 ['RGCHTS', '-'],
 
 ['GT', 'K'],
@@ -808,9 +810,28 @@ if ARGV.size == 0
   #lh_sorted.each do |k, v|
 
   #end
+elsif false
+  # Find open combos
 
-  # Find the stuff that doesn't generate naturally
-  # Same algorithm as the circuitpy version
+  lhk = %w"A S C T W H N R"
+  1.upto(lhk.size) do |len|
+    lhk.combination(len) do |combo|
+      combo = combo.join("")
+      if lh.none? {|x| x[0] == combo && x[1] != '-'}
+        print "#{combo}\n"
+      end
+    end
+  end
+  rhk = %w"R N L G C H T S"
+  1.upto(rhk.size) do |len|
+    rhk.combination(len) do |combo|
+      combo = combo.join("")
+      if rh.none? {|x| x[0] == combo && x[1] != '-'}
+        print "#{combo}\n"
+      end
+    end
+  end
+
 else
 
   # More useful stuff: 

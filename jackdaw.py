@@ -329,18 +329,19 @@ rules_vowels_raw = {
         'u': 'u',
 
         }
+# With this I can get virtually full coverage of the vowel bigram space!
 rules_vowels_shifted_raw = {
         'AEu': 'ia',
         'Au': 'ua',
         'AE': 'ae',
-        'AOE': 'ee',
-        'Eu': 'ii',
+        'AOE': 'ee', # redundant
+        'Eu': 'ei', # Alias of the below, but easier to type
         'OE': 'ei',
-        'AO': 'oi',
-        'OEu': 'io',
-        'AOu': 'oo',
-        'Ou': 'uo',
-        'AOEu': 'ao',
+        'AO': 'oi', # redundant . easy to type, should drop something useful in here
+        'OEu': 'io', # redundant
+        'AOu': 'oo', # redundant
+        'Ou': 'uo', # redundant
+        'AOEu': 'ao', # redundant
 
         'Ou': 'uo',
 
@@ -348,6 +349,7 @@ rules_vowels_shifted_raw = {
         'O': 'uo',
         'E': 'ue',
         'u': 'ui',
+        # want: oe (basically only for shoe?)
         }
 
 #rules = {x: list() for x in jd_keycodes}
@@ -358,7 +360,7 @@ rules_vowels_shifted_raw = {
 #    rules[rule] = sorted(rules[rule], key = lambda x: -len(x[0]))
 
 # Pre-generated out of jackdaw_map.rb to save memory
-rules = {'r': [('rnlchts', 'lds'),('rnlchs', 'ld'),('rlchts', 'rlds'),('rnchts', 'wds'),('rnchs', 'wd'),('rnlcs', 'ples'),('rnlct', 'lp'),('rnlhs', 'lves'),('rnlgt', 'lk'),('rnlch', 'lch'),('rlghs', 'rld'),('rnlgc', 'lb'),('rnlgh', 'lm'),('rngh', 'rm'),('rght', 'wk'),('rnlt', 'rst'),('rnlg', 'dl'),('rnch', 'rv'),('rnlc', 'pl'),('rnlh', 'lv'),('rnht', 'wth'),('rht', 'rth'),('rng', 'gn'),('rnl', 'll'),('rlh', 'wl'),('rnh', 'wn'),('rh', 'w'),('r', 'r'),],'4': [('4SCTWNR', 'aggl'),('4CTWHNR', 'abl'),('4SCTHNR', 'affl'),('4SCTWH', 'abb'),('4CTWHN', 'aby'),('4SCTHR', 'affr'),('4CTWNR', 'addl'),('4SCTHN', 'aft'),('4CTHNR', 'afl'),('4SCWNR', 'appl'),('4SCTWN', 'adj'),('4SCWHN', 'asphy'),('4CWNR', 'apl'),('4SCWN', 'app'),('4CTHN', 'aff'),('4CTWN', 'adm'),('4CTWH', 'ab'),('4CTNR', 'acq'),('4TWHN', 'ackn'),('4THNR', 'athl'),('4SCTW', 'agg'),('4CHNR', 'accl'),('4SCWR', 'appr'),('4SNR', 'asl'),('4CHN', 'acc'),('4TWN', 'aj'),('4CWN', 'amm'),('4CTN', 'adv'),('4CTW', 'add'),('4CHR', 'accr'),('4WNR', 'all'),('4TWH', 'ak'),('4SR', 'arr'),('4TW', 'att'),('4SN', 'ann'),('4', 'a'),],'C': [('CTWHNR', 'bl'),('CTWHN', 'by'),('CTHNR', 'fl'),('CWHNR', 'phl'),('CTWH', 'b'),('CTWN', 'dem'),('CWHR', 'phr'),('CTWR', 'der'),('CTHN', 'dy'),('CTNR', 'del'),('CHNR', 'cry'),('CTN', 'dev'),('CTH', 'f'),('CHR', 'chr'),('CNR', 'cl'),('CT', 'd'),('CW', 'p'),('CN', 'z'),('C', 'c'),],'S': [('STWHN', 'xy'),('STWNR', 'serv'),('STWH', 'sk'),('STW', 'x'),('SHR', 'shr'),('SCT', 'g'),('SCN', 'ss'),('SR', 'ser'),('S', 's'),],'l': [('lgcts', 'ckles'),('lgch', 'lf'),('lgcs', 'bles'),('lgct', 'ckl'),('lghs', 'xes'),('lgh', 'x'),('lhs', 'zes'),('lht', 'lth'),('lgc', 'bl'),('lgy', 'logy'),('lgt', 'kl'),('lc', 'p'),('lh', 'z'),('l', 'l'),],'n': [('nlgch', 'mp'),('nlght', 'dth'),('nlgh', 'sm'),('nlhs', 'shes'),('ngct', 'bt'),('ngch', 'mb'),('nlgt', 'sk'),('nlct', 'nst'),('nght', 'ngth'),('nht', 'nth'),('nhs', 'ves'),('nlg', 'd'),('nlc', 'sp'),('ncs', 'nces'),('nct', 'tion'),('ngh', 'm'),('ngc', 'gg'),('nh', 'v'),('nl', 's'),('n', 'n'),],'c': [('chts', 'ds'),('cht', 'tch'),('chs', 'd'),('cte', 'cate'),('c', 'c'),],'T': [('TWNR', 'jer'),('THNR', 'try'),('THR', 'thr'),('TNR', 'q'),('TWR', 'qu'),('TWH', 'k'),('TWN', 'j'),('TN', 'v'),('T', 't'),],'g': [('gchs', 'dg'),('gtse', 'kes'),('gct', 'ck'),('ght', 'ght'),('gch', 'f'),('gt', 'k'),('gc', 'b'),('g', 'g'),],'t': [('tdE', 'te'),('tsy', 'ys'),('t', 't'),],'W': [('WHN', 'my'),('WN', 'm'),('W', 'w'),],'H': [('HNR', 'ly'),('HN', 'y'),('HR', 'rh'),('H', 'h'),],'d': [('dEe', 'ey'),('dE', 'y'),],'N': [('NR', 'l'),('N', 'n'),],'h': [('ht', 'th'),('h', 'h'),],'y': [('y', 'y'),],'R': [('R', 'r'),],'e': [('e', 'e'),],'s': [('s', 's'),],}
+rules = {'r': [('rnlchts', 'lds'),('rnlchs', 'ld'),('rlchts', 'rlds'),('rnchts', 'wds'),('rnchs', 'wd'),('rnlcs', 'ples'),('rnlct', 'lp'),('rnlhs', 'lves'),('rnlgt', 'lk'),('rnlch', 'lch'),('rlchs', 'rld'),('rnlgc', 'lb'),('rnlgh', 'lm'),('rngh', 'rm'),('rght', 'wk'),('rnlt', 'rst'),('rnlg', 'dl'),('rnch', 'rv'),('rnlc', 'pl'),('rnlh', 'lv'),('rnht', 'wth'),('rht', 'rth'),('rng', 'gn'),('rnl', 'll'),('rlh', 'wl'),('rnh', 'wn'),('rh', 'w'),('r', 'r'),],'4': [('4SCTWNR', 'aggl'),('4CTWHNR', 'abl'),('4SCTHNR', 'affl'),('4SCTWH', 'abb'),('4CTWHN', 'aby'),('4SCTHR', 'affr'),('4CTWNR', 'addl'),('4SCTHN', 'aft'),('4CTHNR', 'afl'),('4SCWNR', 'appl'),('4SCTWN', 'adj'),('4SCWHN', 'asphy'),('4CWNR', 'apl'),('4SCWN', 'app'),('4CTHN', 'aff'),('4CTWN', 'adm'),('4CTWH', 'ab'),('4CTNR', 'acq'),('4TWHN', 'ackn'),('4THNR', 'athl'),('4SCTW', 'agg'),('4CHNR', 'accl'),('4SCWR', 'appr'),('4SNR', 'asl'),('4CHN', 'acc'),('4TWN', 'aj'),('4CWN', 'amm'),('4CTN', 'adv'),('4CTW', 'add'),('4CHR', 'accr'),('4WNR', 'all'),('4TWH', 'ak'),('4SR', 'arr'),('4TW', 'att'),('4SN', 'ann'),('4', 'a'),],'C': [('CTWHNR', 'bl'),('CTWHN', 'by'),('CTHNR', 'fl'),('CWHNR', 'phl'),('CTWH', 'b'),('CTWN', 'dem'),('CWHR', 'phr'),('CTWR', 'der'),('CTHN', 'dy'),('CTNR', 'del'),('CHNR', 'cry'),('CTN', 'dev'),('CTH', 'f'),('CHR', 'chr'),('CNR', 'cl'),('CT', 'd'),('CW', 'p'),('CN', 'z'),('C', 'c'),],'S': [('STWHN', 'xy'),('STWNR', 'serv'),('STWH', 'sk'),('STW', 'x'),('SHR', 'shr'),('SCT', 'g'),('SCN', 'ss'),('SR', 'ser'),('S', 's'),],'l': [('lgcts', 'ckles'),('lgch', 'lf'),('lgcs', 'bles'),('lgct', 'ckl'),('lghs', 'xes'),('lgh', 'x'),('lhs', 'zes'),('lht', 'lth'),('lgc', 'bl'),('lgy', 'logy'),('lgt', 'kl'),('lc', 'p'),('lh', 'z'),('l', 'l'),],'n': [('nlgch', 'mp'),('nlght', 'dth'),('nlgh', 'sm'),('nlhs', 'shes'),('ngct', 'bt'),('ngch', 'mb'),('nlgt', 'sk'),('nlct', 'nst'),('nght', 'ngth'),('nht', 'nth'),('nhs', 'ves'),('nlg', 'd'),('nlc', 'sp'),('ncs', 'nces'),('nct', 'tion'),('ngh', 'm'),('ngc', 'gg'),('nh', 'v'),('nl', 's'),('n', 'n'),],'c': [('chts', 'ds'),('cht', 'tch'),('chs', 'd'),('cte', 'cate'),('c', 'c'),],'T': [('TWNR', 'jer'),('THNR', 'try'),('THR', 'thr'),('TNR', 'q'),('TWR', 'qu'),('TWH', 'k'),('TWN', 'j'),('TN', 'v'),('T', 't'),],'g': [('gchs', 'dg'),('gtse', 'kes'),('gct', 'ck'),('ght', 'ght'),('gch', 'f'),('gt', 'k'),('gc', 'b'),('g', 'g'),],'t': [('tdE', 'te'),('tsy', 'ys'),('t', 't'),],'W': [('WHN', 'my'),('WN', 'm'),('W', 'w'),],'H': [('HNR', 'ly'),('HN', 'y'),('HR', 'rh'),('H', 'h'),],'d': [('dEe', 'ey'),('dE', 'y'),],'N': [('NR', 'l'),('N', 'n'),],'h': [('ht', 'th'),('h', 'h'),],'y': [('y', 'y'),],'R': [('R', 'r'),],'e': [('e', 'e'),],'s': [('s', 's'),],}
 
 # Extended rules that I don't want in the generator. Must be sorted by length.
 rules['x'] = [('xCOMMA', ','), ('xQUOTE', '\''), ('xDOT', '.'), ('x', '')]
