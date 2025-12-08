@@ -1,5 +1,12 @@
 #!/usr/bin/env ruby
 require 'pry'
+
+# Things to try:
+# leading E...
+# ex is the main use, so change ax -> ex?
+# It takes up too much space and doesn't chain to much, though. Maybe good for extra flexibility alone...
+# ex pect
+
 # Data out of the patent. Verified that this is comprehensive (but not necessarily correct)
 lh = [
 ['A', 'A'],
@@ -27,7 +34,7 @@ lh = [
 ['ASWNR', '-'],
 
 ['W', 'W'],
-['TWR', '-'],
+#['TWR', '-'], # this and STWR removed because I want more useful things for them
 ['SCHNR', '-'],
 ['ASCR', 'ASCR'],
 ['ASHNR', '-'],
@@ -147,7 +154,7 @@ lh = [
 ['ASCTHN', 'AFT'],
 
 ['WN', 'M'],
-['STWR', 'XR'],
+#['STWR', 'XR'],
 ['AS', 'AS'],
 ['ACNR', '-'],
 ['ASCTHR', 'AFFR'],
@@ -682,9 +689,12 @@ $base_rules= [		# left hand obvious
         # Not in the patent, just some silliness I use
         ['te', 'tdE'],
         ['ey', 'dEe'],
+        ['er', 'ey'], # maybe useful?
         ['y', 'dE'],
         # Only from the wiki, but crucial
         ['qu', 'TWR'],
+        ['squ', 'STWR'],
+        # On top of the above, about the only combination that follows with qu?
 
 
 ].sort_by { |k, v| v.size * -1 }

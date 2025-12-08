@@ -332,11 +332,11 @@ rules_vowels_raw = {
 # With this I can get virtually full coverage of the vowel bigram space!
 rules_vowels_shifted_raw = {
         'AEu': 'ia',
-        'Au': 'ua',
+        'Au': 'ua', # redundant
         'AE': 'ae',
         'AOE': 'ee', # redundant
-        'Eu': 'ei', # Alias of the below, but easier to type
-        'OE': 'ei',
+        'Eu': 'oe', # not great, but generating a single is a bit useless
+        'OE': 'ei', # regular flip
         'AO': 'oi', # redundant . easy to type, should drop something useful in here
         'OEu': 'io', # redundant
         'AOu': 'oo', # redundant
@@ -364,6 +364,7 @@ from jackdaw_rules import rules
 
 # Extended rules that I don't want in the generator. Must be sorted by length.
 rules['x'] = [('xCOMMA', ','), ('xQUOTE', '\''), ('xDOT', '.'), ('x', '')]
+punctuation = [',', '\'', '.'] # Special space treatment. These stick to the word before
 
 rules_vowels = {x: list() for x in center_keycodes}
 for rule in rules_vowels_raw.items():
@@ -383,9 +384,9 @@ class Chord():
         self.reset()
 
         # Things that flow into the next chord
-        self.next_space = False
-        self.next_shift = False
-        self.suppress_space = False
+        #self.next_shift = False # for full stops... or buffering shifts? NYI.
+        self.suppress_space = True
+        self.last_stroke = 1 # for backspacing
 
     def reset(self):
         self.chord = {x: False for x in jd_keycodes}
@@ -405,11 +406,12 @@ class Chord():
 
         print("Chord: ", blocks)
 
-        if combined == "S" and self.compact:
-            return [KC.BSPACE]
-
-        # stripped = pressed
-
+        if combined == "S" and self.compact or combined == "BS" or combined == "SHIFT":
+            result = [KC.BSPACE] * self.last_stroke
+            self.last_stroke = 1
+            self.suppress_space = True
+            return result
+       
         output_v = []
         vowel_shift = blocks[0].startswith("UO")
         vrules = rules_vowels_shifted if vowel_shift else rules_vowels
@@ -432,7 +434,7 @@ class Chord():
                 output_v += blocks[0][idx]
                 idx += 1
 
-        add_space = False
+        join_block = False
         shifted = False
         generated = []
         for block in range(1, 4):
@@ -442,7 +444,7 @@ class Chord():
 
                 # single x is used for things
                 if blocks[block].startswith(('X', 'z', 'Z'), idx):
-                    add_space = True
+                    join_block = True
                     idx += 1
                     continue
                 if blocks[block].startswith('SHIFT', idx):
@@ -483,18 +485,41 @@ class Chord():
 
         output = generated[0] + output_v + generated[1] + generated[2]
         if len(output) == 0: # At current, only space and shift
-            if add_space:
+            if shifted:
+                # this should be unreachable
+                result = [KC.BSPACE] * self.last_stroke
+                self.last_stroke = 1
+                return result
+            elif join_block:
                 return [KC.SPC]
-            elif shifted:
-                return [KC.BSPACE]
             else:
                 return ""
 
         keys = ([KC.LSFT(DVP[output[0]]) if shifted else DVP[output[0]]] +
                 [DVP[c] for c in output[1:]])
 
+        # TODO: If the stroke included a space need to go all the way through it
+        self.last_stroke = len(keys)
+
+        generated = ""
+        if not self.suppress_space:
+            # ewww the way this crosses the arrays is fragile
+            if output[0] in punctuation:
+                if len(output) == 1:
+                    generated = keys
+                else:
+                    generated = [keys[0], KC.SPC] + keys[1:]
+            else:
+                generated = [KC.SPC] + keys
+        else:
+            generated = keys
+
         # TODO: cleaner expression of this
-        return keys + [KC.SPC] if not add_space else keys
+        #output = keys + [KC.SPC] if not join_block else keys
+        #output = [KC.SPC] + keys if not self.suppress_space else keys
+        self.suppress_space = join_block
+
+        return generated
 
 ## Compact mode: left S tapped alone is backspace
 # Also the IE -> O, OU -> E chords are enabled (because the board has no space for UO and EI buttons)
@@ -502,7 +527,6 @@ class Jackdaw(Module):
     def __init__(self, compact = False):
         self.chord = Chord(compact)
         self.compact = compact
-        self.last_stroke = 1
 
         self.held = set()
 
@@ -518,26 +542,16 @@ class Jackdaw(Module):
         code = key.code
 
         if is_pressed:
-            self.held.add(code)
-            if code == 'BS':
-                self.send_next = [KC.BSPACE] * self.last_stroke
-                self.chord.reset()
-                self.last_stroke = 1
-            else:
-                self.chord.add(code)
+            self.held.add(code) # currently unused, but will be handy for non-spacing mode
+            self.chord.add(code)
         else:
             self.held.discard(code)
             # keys_pressed is the USB report; coordkeys is real keys (kmk internal)
             if len(keyboard._coordkeys_pressed) == 0:
 
                 # OH HEY this isn't just JD keys
-                result = self.chord.result()
-                if result == [KC.BSPACE]:
-                    result *= self.last_stroke
-                    self.last_stroke = 1
-                else:
-                    self.last_stroke = len(result)
-                self.handle_chord(result)
+                output = self.chord.result()
+                self.handle_chord(output)
                 self.chord.reset()
 
     # Not really chord, this is the output string
