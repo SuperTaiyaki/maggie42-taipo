@@ -491,6 +491,8 @@ class Chord():
                 self.last_stroke = 1
                 return result
             elif join_block:
+                self.last_stroke = 1
+                self.suppress_space = True
                 return [KC.SPC]
             else:
                 return ""
@@ -508,6 +510,8 @@ class Chord():
                 if len(output) == 1:
                     generated = keys
                 else:
+                    # Wonder if this will actually get used, punctuation + chars is pretty drastic
+                    # maybe quote, but that's a bit special
                     generated = [keys[0], KC.SPC] + keys[1:]
             else:
                 generated = [KC.SPC] + keys
