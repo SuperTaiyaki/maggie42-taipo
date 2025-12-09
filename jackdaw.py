@@ -383,8 +383,10 @@ class Chord():
         self.compact = compact
         self.reset()
 
+        self.auto_space = True
+
         # Things that flow into the next chord
-        #self.next_shift = False # for full stops... or buffering shifts? NYI.
+        self.next_shift = False # for full stops... or buffering shifts? NYI.
         self.suppress_space = True
         self.last_stroke = 1 # for backspacing
 
@@ -411,6 +413,18 @@ class Chord():
             self.last_stroke = 1
             self.suppress_space = True
             return result
+
+        if combined == "rnghts":
+            self.last_stroke = 1
+            self.suppress_space = True
+            return [KC.ENTER]
+        elif combined == "STHR":
+            self.next_shift = not self.next_shift
+            return []
+        elif combined == "WHNRrnlg":
+            self.auto_space = not self.auto_space
+            self.suppress_space = True
+            return []
        
         output_v = []
         vowel_shift = blocks[0].startswith("UO")
@@ -497,11 +511,12 @@ class Chord():
             else:
                 return ""
 
-        keys = ([KC.LSFT(DVP[output[0]]) if shifted else DVP[output[0]]] +
-                [DVP[c] for c in output[1:]])
+        keys = ([KC.LSFT(DVP[output[0]]) if (shifted or self.next_shift) else
+                 DVP[output[0]]] + [DVP[c] for c in output[1:]])
 
         # TODO: If the stroke included a space need to go all the way through it
         self.last_stroke = len(keys)
+        self.next_shift = False
 
         generated = ""
         if not self.suppress_space:
@@ -518,10 +533,7 @@ class Chord():
         else:
             generated = keys
 
-        # TODO: cleaner expression of this
-        #output = keys + [KC.SPC] if not join_block else keys
-        #output = [KC.SPC] + keys if not self.suppress_space else keys
-        self.suppress_space = join_block
+        self.suppress_space = join_block == self.auto_space
 
         return generated
 
