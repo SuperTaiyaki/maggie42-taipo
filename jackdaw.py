@@ -142,11 +142,13 @@ class JackdawKey(Key):
         self.block = block
         super().__init__()
 
-
 # JD_4 is an A key
 # This is in steno order!
 
 lh_keycodes = [
+# Not LH but needs to be up first
+'F', # Function?
+
 '4',
 'S',
 'C',
@@ -188,6 +190,17 @@ rh_keycodes =  [
 
 'xDOT',
 'xCOMMA',
+# Required for typey type: colon, quote
+# q is TWR, something similar looking?
+# CTWNR ?
+# and then add a character for double quote?
+# A lines up better, S is less of a stretch
+
+# colon/scln, use the c/l
+# Either that or just build a KMK layer and make them available...
+# Layer key, shift key (that extends though)
+# target boards aren't likely to change (or end up with fewer keys) so should be fine
+# some modifier + cykey row 2 punctuation...?
 
 ]
 
@@ -332,32 +345,29 @@ rules_vowels_raw = {
 # With this I can get virtually full coverage of the vowel bigram space!
 rules_vowels_shifted_raw = {
         'AEu': 'ia',
-        'Au': 'ua', # redundant
-        'AE': 'ae',
-        'AOE': 'ee', # redundant
-        'Eu': 'oe', # not great, but generating a single is a bit useless
+        'Au': 'ua', # redundant, but I dont' want to use this (outer + thumb modifier is a bad reach)
+        'AE': 'ae', # regular reverse
+        'AOE': 'ee', # redundant (in main layer)
+        'Eu': 'oe', # not great (confusing), but generating a single is a bit useless
         'OE': 'ei', # regular flip
         'AO': 'oi', # redundant . easy to type, should drop something useful in here
         'OEu': 'io', # redundant
         'AOu': 'oo', # redundant
-        'Ou': 'uo', # redundant
-        'AOEu': 'ao', # redundant
 
-        'Ou': 'uo',
+        'AOEu': 'ao', # redundant and painful (and never used anyway)
+
+        'Ou': 'ui', # Experimental WAIT these overlap
+        # Would normally flip to uo but that's never used
 
         'A': 'ua',
         'O': 'uo',
         'E': 'ue',
         'u': 'ui',
         # want: oe (basically only for shoe?)
+        # Can generate 3-letter sets too, might be more useful. eau, in particular?
+        # Want: iu (medium) but it's pretty low frequency
+        # eo? (people... anything else?)
         }
-
-#rules = {x: list() for x in jd_keycodes}
-#for rule in rules_dict.items():
-#    rules[rule[0][0]].append(rule)
-
-#for rule in rules:
-#    rules[rule] = sorted(rules[rule], key = lambda x: -len(x[0]))
 
 # Pre-generated out of jackdaw_map.rb to save memory
 from jackdaw_rules import rules
@@ -365,6 +375,20 @@ from jackdaw_rules import rules
 # Extended rules that I don't want in the generator. Must be sorted by length.
 rules['x'] = [('xCOMMA', ','), ('xQUOTE', '\''), ('xDOT', '.'), ('x', '')]
 punctuation = [',', '\'', '.'] # Special space treatment. These stick to the word before
+# ===================
+# Really need to set up attachment rules so these can be merged with specials
+# Plover-style {^}?
+# Also want key-emitting stuff to I can lose the special cases
+# Should also smooth out the processing flow - generate keys, set flags, return keystrokes
+
+# Numbers... making it shiftable gives me symbols too, which is nice
+# Is there any advantage to putting in here rather than switching to Cykey?
+# Spacing rules is about the only thing
+# breaks my flow too but ehhh
+# Oh hey I need stuff like hash too
+
+# Cykey numbers with a number modifier somewhere?
+# And then a number+shift modifier somewhere
 
 rules_vowels = {x: list() for x in center_keycodes}
 for rule in rules_vowels_raw.items():
@@ -377,6 +401,51 @@ for rule in rules_vowels_shifted_raw.items():
 for v in center_keycodes:
     rules_vowels[v] = sorted(rules_vowels[v], key = lambda x: -len(x[0]))
     rules_vowels_shifted[v] = sorted(rules_vowels_shifted[v], key = lambda x: -len(x[0]))
+
+# No reason to do the leader breakdown like the main generator
+# Actually that's maybe a bit pointless too...
+specials = {
+    'Es': 'es',
+    'Eung': 'ing',
+    'Enlg': 'ed',
+    'Es': 'es',
+    'xQUOTEOU': '"', # sub-optimal, probably
+    'F': '',
+
+    'FN': KC.N1, # Cykey style
+    'FNO': KC.N2, # Cykey style
+    'FWNO': KC.N3, # Cykey style
+    'FCWNO': KC.N4, # Cykey style
+    'F4CWNO': KC.N5, # Cykey style
+    'F4': KC.N6, # Cykey style
+    'F4C': KC.N7, # Cykey style
+    'F4CW': KC.N8, # Cykey style
+    'F4CWN': KC.N9, # Cykey style
+    'FW': KC.N0, # Cykey style
+
+    'FNUO': KC.LSFT(KC.N1),
+    'FNUOO': KC.LSFT(KC.N2),
+    'FWNUOO': KC.LSFT(KC.N3),
+    'FCWNUOO': KC.LSFT(KC.N4),
+    'F4CWNUOO': KC.LSFT(KC.N5),
+    'F4UO': KC.LSFT(KC.N6),
+    'F4CUO': KC.LSFT(KC.N7),
+    'F4CWUO': KC.LSFT(KC.N8),
+    'F4CWNUO': KC.LSFT(KC.N9),
+    'FWUO': KC.LSFT(KC.N0),
+ 
+    
+    'F4CNO': DVP['COLN'],
+    'FCWNO': DVP['SCLN'],
+    'F4WO': DVP['EQL'],
+    'F4W': KC.LEFT_PAREN,
+    'FWO': KC.RIGHT_PAREN,
+    'F4O': KC.QUOT, # DVp['MINUS'], # Don't know why this doesn't work via DV
+    'FCW': KC.LSFT(KC.Q), # DOUBLE_QUOTE
+
+    'FCO': DVP['BSLS'],
+    'F4N': DVP['SLSH'],
+        }
 
 class Chord():
     def __init__(self, compact):
@@ -391,10 +460,13 @@ class Chord():
         self.last_stroke = 1 # for backspacing
 
     def reset(self):
+        # TODO: is this faster than assigning?
         self.chord = {x: False for x in jd_keycodes}
 
     def add(self, key):
         self.chord[key] = True
+    def discard(self, key):
+        self.chord[key] = False
 
     def result(self):
         blocks = ["".join([c for c in keys if self.chord[c]]) for keys in (center_keycodes, lh_keycodes, rh_keycodes, special_keycodes)]
@@ -402,9 +474,6 @@ class Chord():
 
         if len(combined) == 0:
             return ""
-        # if combined == .... do something special (commands and whatever)
-        # #. disable auto-space
-        # #. something
 
         print("Chord: ", blocks)
 
@@ -414,17 +483,40 @@ class Chord():
             self.suppress_space = True
             return result
 
-        if combined == "rnghts":
+        if combined == "rnghts": # -RNGHTS: Enter (-> no space)
             self.last_stroke = 1
             self.suppress_space = True
             return [KC.ENTER]
-        elif combined == "STHR":
+        elif combined == "STHR": # STHR-: Shift next char
             self.next_shift = not self.next_shift
             return []
-        elif combined == "WHNRrnlg":
+        elif combined == "WHNRrnlg": # WHNR-rnlg (inner 2x2s): Auto space toggle
             self.auto_space = not self.auto_space
             self.suppress_space = True
             return []
+        elif combined == "SCTWHN": #SCTWHN: escape
+            self.suppress_space = True
+            return [KC.ESCAPE]
+        elif combined == "SCTWHR": #SCTWHR: tab (the SB combos - SBN, SBR are useless)
+            self.suppress_space = True
+            return [KC.ESCAPE]
+        elif combined in specials:
+            # HRM this will require a rework later.
+            # For now it's only endings that attach, but there will be full words later
+            # should release suppress-space, I guess...?
+            # So these should probably generate {^}es and whatever instead
+
+            # If a generated block starts with {^}, do not write out the space even if it's buffered
+            # ... ends with {^}, force suppress-space off (wait this makes no sense)
+            # What I actually want is... single quote, stick to the trailing part
+            # full stop and into the next word is not something I want to do, so the suppression doesn't have to work like that
+            # Now that the space is pushed to the next word.... 'attach' is the only thing needed?
+            self.suppress_space = not self.auto_space
+            if isinstance(specials[combined], Key):
+                return [specials[combined]]
+            else:
+                return [c if isinstance(c, Key) else DVP[c] for c in specials[combined]]
+            # TODO: Needs to follow spacing rules!
        
         output_v = []
         vowel_shift = blocks[0].startswith("UO")
@@ -527,7 +619,9 @@ class Chord():
                 else:
                     # Wonder if this will actually get used, punctuation + chars is pretty drastic
                     # maybe quote, but that's a bit special
-                    generated = [keys[0], KC.SPC] + keys[1:]
+                    #generated = [keys[0], KC.SPC] + keys[1:]
+                    generated = keys
+                    # TODO merge this later if the logic works
             else:
                 generated = [KC.SPC] + keys
         else:
@@ -540,11 +634,13 @@ class Chord():
 ## Compact mode: left S tapped alone is backspace
 # Also the IE -> O, OU -> E chords are enabled (because the board has no space for UO and EI buttons)
 class Jackdaw(Module):
+    CHAINABLE = set(('X', 'Z', 'z', 'F'))
     def __init__(self, compact = False):
         self.chord = Chord(compact)
         self.compact = compact
 
         self.held = set()
+        self.pressing = True # press/release edge
 
         # Stream the output
         self.send_next = []
@@ -560,15 +656,21 @@ class Jackdaw(Module):
         if is_pressed:
             self.held.add(code) # currently unused, but will be handy for non-spacing mode
             self.chord.add(code)
+            self.pressing = True
         else:
             self.held.discard(code)
             # keys_pressed is the USB report; coordkeys is real keys (kmk internal)
-            if len(keyboard._coordkeys_pressed) == 0:
-
+            #if len(keyboard._coordkeys_pressed) == 0:
+            if self.held - self.CHAINABLE == set() and self.pressing:
                 # OH HEY this isn't just JD keys
                 output = self.chord.result()
                 self.handle_chord(output)
                 self.chord.reset()
+                for key in self.held:
+                    self.chord.add(key)
+                self.pressing = False
+            elif not self.pressing and code in self.CHAINABLE:
+                self.chord.discard(code)
 
     # Not really chord, this is the output string
     def handle_chord(self, chord):
@@ -608,3 +710,10 @@ class Jackdaw(Module):
         pass
 
 # In the end this is a lot closer to the original Shelton patent than the Jackdaw theory
+
+# TODO:
+# Rolling chords when auto space is disabled
+# LEDs to indicate auto space (and other stuf)
+# More punctuation
+# Numbers?
+# Matrix reset button
