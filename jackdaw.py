@@ -487,7 +487,8 @@ class Chord():
             keystrokes = [KC.SPC] + keystrokes
 
         self.last_stroke = len(keystrokes)
-        self.next_shift = False
+        # Ewwww shifty logic
+        self.next_shift = True if keystrokes[-1] == DVP['DOT'] else False
         self.suppress_space = join_block == self.auto_space
 
         return keystrokes
@@ -537,7 +538,7 @@ class Jackdaw(Module):
         out = [c for c in list(chord)]
         out.reverse()
 
-        self.send_next = out
+        self.send_next += out
 
     def during_bootup(self, keyboard):
         pass
