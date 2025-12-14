@@ -98,9 +98,9 @@ keyboard.keymap = [
 # Jackdaw
 [
        KC.BSPACE, KC.JD_4, KC.JD_C, KC.JD_W, KC.JD_N, KC.JD_X,       KC.JD_z, KC.JD_r, KC.JD_l, KC.JD_c, KC.JD_t, KC.JD_dE, # y/TE
-   KC.JD_SHIFT,  KC.JD_S, KC.JD_T, KC.JD_H, KC.JD_R, KC.JD_UO,       KC.JD_UO, KC.JD_n, KC.JD_g, KC.JD_h, KC.JD_s, KC.JD_e, 
+   KC.JD_SHIFT,  KC.JD_S, KC.JD_T, KC.JD_H, KC.JD_R, KC.JD_UO,       KC.JD_F, KC.JD_n, KC.JD_g, KC.JD_h, KC.JD_s, KC.JD_e, 
 KC.NO, KC.JD_xQUOTE, KC.JD_xCOMMA, KC.JD_xDOT, KC.JD_UO, KC.JD_UO,      KC.JD_UO, KC.JD_UO, KC.NO, KC.E, KC.JD_SHIFT, KC.JD_y, 
-KC.TG(LAYER_JACKDAW), KC.NO, KC.NO, KC.TG(1), KC.JD_A, KC.JD_O,        KC.JD_E, KC.JD_u, KC.BSPACE, KC.NO, KC.NO, KC.NO, 
+KC.TG(LAYER_JACKDAW), KC.NO, KC.NO, KC.MO(4), KC.JD_A, KC.JD_O,        KC.JD_E, KC.JD_u, KC.MO(1), KC.NO, KC.NO, KC.NO, 
     ],
 
 # Taipo
@@ -108,7 +108,7 @@ KC.TG(LAYER_JACKDAW), KC.NO, KC.NO, KC.TG(1), KC.JD_A, KC.JD_O,        KC.JD_E, 
         KC.TG(1), KC.TP_TLP, KC.TP_TLR, KC.TP_TLM, KC.TP_TLI,  MWUP,          KC.TG(LAYER_GAME), KC.TP_TRI, KC.TP_TRM, KC.TP_TRR, KC.TP_TRP, KC.TG(1), 
         KC.NO, KC.TP_BLP, KC.TP_BLR, KC.TP_BLM, KC.TP_BLI, MWDOWN,         KC.NO, KC.TP_BRI, KC.TP_BRM, KC.TP_BRR, KC.TP_BRP, KC.TG(LAYER_GEMINI), 
         KC.NO, KC.TP_BLP, KC.TP_BLR, KC.LAYER2, KC.TP_LIT, KC.TP_LOT,      KC.TP_ROT, KC.TP_RIT, KC.TP_BRI, KC.TP_BRM, KC.TP_BRR, KC.TP_BRP, 
-        KC.NO, KC.NO, KC.NO, KC.SK(KC.MO(LAYER_BROWSER)), KC.TP_LOT, KC.TP_LIT,       KC.TP_RIT, KC.TP_ROT, KC.MO(1), KC.NO, KC.NO, KC.NO, 
+        KC.NO, KC.NO, KC.NO, KC.SK(KC.MO(LAYER_BROWSER)), KC.TP_LIT, KC.TP_LOT,       KC.TP_RIT, KC.TP_ROT, KC.MO(1), KC.NO, KC.NO, KC.NO, 
         ],
 
 # Most everything after this is unused

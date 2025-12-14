@@ -51,17 +51,15 @@ keyboard.modules.append(holdtap)
 MWUP = KC.RF(KC.MW_UP, interval = 800, timeout = 20)
 MWDOWN = KC.RF(KC.MW_DOWN, interval = 800, timeout = 20)
 
-LAYER_BROWSER = 3
-LAYER_GAME = 6
-
 keyboard.keymap = [
 # Jackdaw
 [
 KC.JD_4, KC.JD_C, KC.JD_W, KC.JD_N,      KC.JD_X,    KC.JD_r, KC.JD_l, KC.JD_c, KC.JD_t, KC.JD_dE,
 KC.JD_S, KC.JD_T, KC.JD_H, KC.JD_R,      KC.JD_z,    KC.JD_n, KC.JD_g, KC.JD_h, KC.JD_s, KC.JD_e, 
-KC.JD_xQUOTE, KC.JD_xCOMMA, KC.JD_xDOT, KC.JD_UO,     KC.JD_x,    KC.JD_UO,  KC.JD_u, KC.TG(4), KC.TG(3), KC.JD_y,
-                        KC.NO , KC.JD_A, KC.JD_O, KC.JD_E, KC.JD_u,    KC.ENTER # thumb row
+KC.JD_xQUOTE, KC.JD_xCOMMA, KC.JD_xDOT, KC.JD_UO,     KC.MO(3),    KC.JD_UO,  KC.JD_u, KC.TG(4), KC.TG(3), KC.JD_y,
+KC.NO,                  KC.JD_A, KC.JD_O, KC.JD_E, KC.JD_u,    KC.JD_F# thumb row
 ],
+# Terrible hack, center key to flip to taipo since symbols and stuff work
 
 # GeminiPR steno
 [
@@ -70,7 +68,7 @@ KC.G_S2, KC.G_LK, KC.G_LW, KC.G_LR, KC.G_ST2,   KC.G_RR, KC.G_RB, KC.G_RG, KC.G_
 KC.NO, KC.NO, KC.SPC, KC.G_LA, KC.G_LO,         KC.G_RE, KC.G_RU,   KC.ENTER, KC.NO, KC.NO,
 ],
 
-# Taipo
+# Taipo (unused)
 [
 KC.TP_TLP, KC.TP_TLR, KC.TP_TLM, KC.TP_TLI,  MWUP,          KC.TG(3), KC.TP_TRI, KC.TP_TRM, KC.TP_TRR, KC.TP_BRP,
 KC.TP_BLP, KC.TP_BLR, KC.TP_BLM, KC.TP_BLI, MWDOWN,         KC.NO, KC.TP_BRI, KC.TP_BRI, KC.TP_BRM, KC.TP_BRR,

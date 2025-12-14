@@ -1,0 +1,147 @@
+A C W N (XZ)    |    (zx) r l c t (tE)
+S T H R (UO)    |    (ei) n g h s (y)
+   (I) I E (A)     (A) o u (u)
+
+    AO-eu
+IE=OE  IO=AO  OA=AOEU
+
+AI=AEU AU=AU
+EA=AE EE=AOE
+I=EU   IE=OE  IO=AO
+OI=OEU OO=AOU OU=OU OA=AOEU
+Ux=
+
+G: SCT
+_ * _ _
+* * _ _
+J: TWN
+_ _ * *
+_ * _ _
+Q: TNR    QU: TWR
+_ _ _ *      _ _ * _
+_ * _ *      _ * _ *
+V: TN
+_ _ _ *
+_ * _ _
+X: STW
+_ _ * _
+* * _ _
+Z: CN
+_ * _ *
+_ _ _ _
+
+B: GC
+_ _ * _
+_ * _ _
+D: CHS or NLG
+_ _ * _   _ * _ _
+_ _ * *   * * _ _
+F: GCH
+_ _ * _
+_ * * _
+K: GT
+_ _ _ *
+_ * _ _
+M: NGH
+_ _ _ _
+* * * _
+P: LC (same as left hand)
+V: NH
+_ _ _ _
+* _ * _
+W: RH
+* _ _ _
+_ _ * _
+X: LGH
+_ * _ _
+_ * * _
+Z: LH
+_ * _ _
+_ _ * _
+LL: RNL
+CK: GCT
+ST: NLT
+SS: NLS
+
+T+TE -> TE
+TE alone -> Y
+(just for de-conflicting reasons)
+_ _ _ _
+_ _ _ _
+
+B=CTWH
+D=CT
+F=CTH
+G=SCT
+J=TWN
+K=TWH
+L=NR
+M=WN
+P=CW
+Q=TNR
+V=TN
+X=STW
+Y=HN
+Z=CN
+
+B=GC
+D=NLG or CHS
+F=GCH
+K=GT
+M=NGH
+P=LC
+S=NL or S
+V=NH
+W=RH
+X=LGH
+Z=LH
+
+RH: ST = NLT (alternate S)
+ 
+rules_vowels_raw = {
+        # E is right-hand, it's uppercased so it doesn't conflict with far-right e
+        # AO-eu
+        'AEu': 'ai',
+        'Au': 'au',
+        'AE': 'ea',
+        'AOE': 'ee',
+        'Eu': 'i',
+        'OE': 'ie',
+        'AO': 'io',
+        'OEu': 'oi',
+        'AOu': 'oo',
+        'Ou': 'ou',
+        'AOEu': 'oa',
+
+        'A': 'a',
+        'O': 'o',
+        'E': 'e',
+        'u': 'u',
+
+        }
+rules_vowels_shifted_raw = {
+        'AEu': 'ia',
+        'Au': 'ua', # redundant, but I dont' want to use this (outer + thumb modifier is a bad reach)
+        'AE': 'ae', # regular reverse
+        'AOE': 'ee', # redundant (in main layer)
+        'Eu': 'oe', # not great (confusing), but generating a single is a bit useless
+        'OE': 'ei', # regular flip
+        'AO': 'oi', # redundant . easy to type, should drop something useful in here
+        'OEu': 'io', # redundant
+        'AOu': 'oo', # redundant
+
+        'AOEu': 'ao', # redundant and painful (and never used anyway)
+
+        'Ou': 'ui', # Experimental WAIT these overlap
+        # Would normally flip to uo but that's never used
+
+        'A': 'ua',
+        'O': 'uo',
+        'E': 'ue',
+        'u': 'ui',
+        # Can generate 3-letter sets too, might be more useful. eau, in particular?
+        # Want: iu (medium) but it's pretty low frequency
+        # eo? (people... anything else?)
+        }
+
+

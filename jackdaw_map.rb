@@ -1,5 +1,5 @@
 #!/usr/bin/env ruby
-require 'pry'
+# require 'pry'
 
 # Things to try:
 # leading E...
@@ -8,6 +8,10 @@ require 'pry'
 # ex pect
 
 # Data out of the patent. Verified that this is comprehensive (but not necessarily correct)
+
+# Generation rules: This will output the minimum set to guarantee these can all be generated
+
+# TODO: Split this into patent versions and my version
 lh = [
 ['A', 'A'],
 ['CHR', 'CHR'],
@@ -691,6 +695,7 @@ $base_rules= [		# left hand obvious
         ['ey', 'dEe'],
         ['er', 'ey'], # maybe useful?
         ['y', 'dE'],
+
         # Only from the wiki, but crucial
         ['qu', 'TWR'],
         ['squ', 'STWR'],
@@ -741,6 +746,7 @@ rh_sorted = rh.map {|k, v| [k.downcase, v.downcase]}.sort_by { |k, v|
 }
 
 if ARGV.size == 0
+  # No arguments: Generate ruleset for jackdaw.py
   changed = true
   while changed == true
     changed = false
@@ -843,9 +849,9 @@ elsif false
   end
 
 else
-
   # More useful stuff: 
   # For each position in a word, display the available chords to generate the next block
+  # Useful for figuring out optimal stroke
   word = ARGV[0]
   print("#{word}\n")
   word.size.times do |i|

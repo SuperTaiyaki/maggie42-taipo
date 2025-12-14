@@ -506,9 +506,8 @@ class Cykey(Module):
             a | o | t | e: DV['N9'],
             t: DV['N0'],
 
-            
-            ot | a | o | e: DV['COLN'],
-            ot | o | e: DV['SCLN'],
+            ot | a | t | e: DV['COLN'],
+            ot | t | e: DV['SCLN'],
             ot | o | a: DV['EQL'], # "J"ust the same
             a | t: KC.LEFT_PAREN,
             t | ot: KC.RIGHT_PAREN,
