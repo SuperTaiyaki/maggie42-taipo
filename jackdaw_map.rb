@@ -410,7 +410,7 @@ rh = [
 ['NCS', 'NCES'],
 ['RGTS', 'RKS'],
 ['RNGHS', 'RMS'],
-['RNLCHS', 'LD'],
+['RNLCHS', 'PHS'],
 
 ['NL', 'S'],
 ['NHT', 'NTH'],
@@ -600,7 +600,7 @@ rh = [
 
 ['RLS', 'RLS'],
 ['RNGS', 'GNS'],
-['LCHS', 'PHS'],
+['LCHS', 'LD'],
 ['NGCHS', 'MBS'],
 ['LGY', 'LOGY'],
 
@@ -636,6 +636,11 @@ rh = [
 ['RLGC', '-'],
 ['CHTS', 'DS'],
 ]
+
+# Changes memo:
+# LCHS -> I typed this expecting LD
+# it's only used for PHS, which is used for ~graphs - uncommon
+# so exchange the two
 $base_rules= [		# left hand obvious
 		['a', 'A'],
 		['s', 'S'],
