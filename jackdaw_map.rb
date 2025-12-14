@@ -337,7 +337,7 @@ rh = [
 ['L', 'L'],
 ['RTS', 'RTS'],
 ['RLGS', '-'],
-['RNLGT', 'LK'],
+['RNLGT', 'KL'],
 ['LGCHS', '-'],
 
 ['G', 'G'],
@@ -443,7 +443,7 @@ rh = [
 ['RNGCTS', '-'],
 
 ['NS', 'NS'],
-['LGT', 'KL'],
+['LGT', 'LK'],
 ['NLGH', 'SM'],
 ['RLGCH', '-'],
 ['RNGHTS', '-'],
@@ -641,6 +641,9 @@ rh = [
 # LCHS -> I typed this expecting LD
 # it's only used for PHS, which is used for ~graphs - uncommon
 # so exchange the two
+# LGT -> I want LK
+# KL is basically unused (quickly, weekly - conjugated stuff)
+# so change with RNLGT
 $base_rules= [		# left hand obvious
 		['a', 'A'],
 		['s', 'S'],
