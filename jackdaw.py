@@ -240,7 +240,7 @@ from jackdaw_rules import rules
 
 # Extended rules that I don't want in the generator. Must be sorted by length.
 rules['x'] = [('xCOMMA', ','), ('xQUOTE', '\''), ('xDOT', '.'), ('x', '')]
-punctuation = [',', '\'', '.'] # Special space treatment. These stick to the word before
+punctuation = set([',', '\'', '.']) # Special space treatment. These stick to the word before
 # ===================
 # Really need to set up attachment rules so these can be merged with specials
 # Plover-style {^}?
@@ -252,9 +252,6 @@ punctuation = [',', '\'', '.'] # Special space treatment. These stick to the wor
 # Spacing rules is about the only thing
 # breaks my flow too but ehhh
 # Oh hey I need stuff like hash too
-
-# Cykey numbers with a number modifier somewhere?
-# And then a number+shift modifier somewhere
 
 rules_vowels = {x: list() for x in center_keycodes}
 for rule in rules_vowels_raw.items():
@@ -274,7 +271,6 @@ specials = {
     'Es': 'es',
     'Eung': 'ing',
     'Enlg': 'ed',
-    'Es': 'es',
     'xQUOTEOU': '"', # sub-optimal, probably
     'F': '',
 
@@ -290,7 +286,7 @@ specials = {
     'FSCWN': KC.N9, # Cykey style
     'FW': KC.N0, # Cykey style
 
-    'FNUO': KC.LSFT(KC.N1),
+    'FNUO': KC.LSFT(KC.N1), # Number + vowel mod for shifter numbers (symbols)
     'FNUOO': KC.LSFT(KC.N2),
     'FWNUOO': KC.LSFT(KC.N3),
     'FCWNUOO': KC.LSFT(KC.N4),
@@ -302,7 +298,7 @@ specials = {
     'FWUO': KC.LSFT(KC.N0),
  
     
-    'FSCN': DVP['COMM'], # Wrong?
+    'FSCN': DVP['COMM'],
     'FCWN': DVP['DOT'],
     'FCWO': DVP['QUES'], # 
     'FSWN': DVP['EXLM'],
@@ -310,10 +306,9 @@ specials = {
     'FSCNO': DVP['COLN'],
     'FCNO': DVP['SCLN'],
     'FSWO': DVP['EQL'],
-    'FSW': KC.LEFT_PAREN, # TODO: bind right (suppress space)
+    'FSW': KC.LEFT_PAREN, # TODO: bind right (suppress space = set join flag)
     'FWO': KC.RIGHT_PAREN,
     'FSO': KC.QUOT, # DVp['MINUS'], # Don't know why this doesn't work via DV
-    # Where's single quote?
     'FCW': KC.LSFT(KC.Q), # DOUBLE_QUOTE # TODO: bind right (suppress space)
     'FSWNO': DVP['QUOT'], # TODO: bind right (suppress space)
 
@@ -351,6 +346,10 @@ class Chord():
             return ""
 
         print("Chord: ", blocks)
+
+        join_block = False
+        shifted = False
+        output = ""
 
         if combined == "S" and self.compact or combined == "BS" or combined == "SHIFT":
             result = [KC.BSPACE] * self.last_stroke
@@ -390,110 +389,108 @@ class Chord():
             # What I actually want is... single quote, stick to the trailing part
             # full stop and into the next word is not something I want to do, so the suppression doesn't have to work like that
             # Now that the space is pushed to the next word.... 'attach' is the only thing needed?
-            self.suppress_space = not self.auto_space
+            # Not quite. Left paren, right paren and single quote join differently
+            # Single quote and apostrophe also generate differently, do they need different rules?
+            # Even different strokes?
+            # Apostrophe in the main layer might work... but it's a bit complicated
+            self.suppress_space = True
+            # HEY WAIT suppress_space here is different to the above
+            # it doesn't link to the next cycle!
             if isinstance(specials[combined], Key):
-                self.last_stroke = 1
-                return [specials[combined]]
+                output = [specials[combined]]
             else:
-                self.last_stroke = len(specials[combined])
-                return [c if isinstance(c, Key) else DVP[c] for c in specials[combined]]
-            # TODO: Needs to follow spacing rules!
-       
-        output_v = []
-        vowel_shift = blocks[0].startswith("UO")
-        vrules = rules_vowels_shifted if vowel_shift else rules_vowels
-        idx = 2 if vowel_shift else 0
-        while idx < len(blocks[0]):
-            initial_idx = idx
-            if blocks[0][idx] not in vrules:
-                output_v += blocks[0][idx]
-                idx += 1
-                continue
-            candidates = vrules[blocks[0][idx]]
-            for c in candidates:
-                if blocks[0].startswith(c[0], idx):
-                    output_v += list(c[1])
-                    idx += len(c[0])
-                    break
+                output = specials[combined]
 
-            # TODO: just to stop the vowels from breaking
-            if idx == initial_idx:
-                output_v += blocks[0][idx]
-                idx += 1
-
-        join_block = False
-        shifted = False
-        generated = []
-        for block in range(1, 4):
-            output = []
-            idx = 0
-            while idx < len(blocks[block]):
-
-                # single x is used for things
-                if blocks[block].startswith(('X', 'z', 'Z'), idx):
-                    join_block = True
-                    idx += 1
-                    continue
-                if blocks[block].startswith('SHIFT', idx):
-                    idx += 5 # len('shift')
-                    shifted = True
-                    break # not continue because SHIFT is at the end
-
+        else:
+            # The regular chord generation rules
+            generated = []
+            output_v = []
+            vowel_shift = blocks[0].startswith("UO")
+            vrules = rules_vowels_shifted if vowel_shift else rules_vowels
+            idx = 2 if vowel_shift else 0
+            while idx < len(blocks[0]):
                 initial_idx = idx
-
-                if blocks[block][idx] not in rules:
-                    output += list(blocks[block][idx])
+                if blocks[0][idx] not in vrules:
+                    output_v += blocks[0][idx]
                     idx += 1
                     continue
-
-                candidates = rules[blocks[block][idx]]
+                candidates = vrules[blocks[0][idx]]
                 for c in candidates:
-                    if blocks[block].startswith(c[0], idx):
-                        output += list(c[1])
+                    if blocks[0].startswith(c[0], idx):
+                        output_v += list(c[1])
                         idx += len(c[0])
                         break
 
-                # Guarantees no infinite loop
+                # TODO: just to stop the vowels from breaking
                 if idx == initial_idx:
-                    output += list(blocks[block][idx])
+                    output_v += blocks[0][idx]
                     idx += 1
-            generated.append(output)
 
-        output = generated[0] + output_v + generated[1] + generated[2]
-        if len(output) == 0: # At current, only space and shift
-            if shifted:
-                # this should be unreachable
-                result = [KC.BSPACE] * self.last_stroke
-                self.last_stroke = 1
-                return result
-            elif join_block:
-                self.last_stroke = 1
-                self.suppress_space = True
-                return [KC.SPC]
-            else:
-                return ""
+            for block in range(1, 4):
+                block_output = []
+                idx = 0
+                while idx < len(blocks[block]):
 
-        keys = ([KC.LSFT(DVP[output[0]]) if (shifted or self.next_shift) else
-                 DVP[output[0]]] + [DVP[c] for c in output[1:]])
+                    # single x is used for things
+                    if blocks[block].startswith(('X', 'z', 'Z'), idx):
+                        join_block = True
+                        idx += 1
+                        continue
+                    if blocks[block].startswith('SHIFT', idx):
+                        idx += 5 # len('shift')
+                        shifted = True
+                        break # not continue because SHIFT is at the end
+
+                    initial_idx = idx
+
+                    if blocks[block][idx] not in rules:
+                        block_output += list(blocks[block][idx])
+                        idx += 1
+                        continue
+
+                    candidates = rules[blocks[block][idx]]
+                    for c in candidates:
+                        if blocks[block].startswith(c[0], idx):
+                            block_output += list(c[1])
+                            idx += len(c[0])
+                            break
+
+                    # Guarantees no infinite loop
+                    if idx == initial_idx:
+                        block_output += list(blocks[block][idx])
+                        idx += 1
+                generated.append(block_output)
+
+            output = generated[0] + output_v + generated[1] + generated[2]
+            if len(output) == 0: # At current, only space and shift
+                if shifted:
+                    # this should be unreachable
+                    result = [KC.BSPACE] * self.last_stroke
+                    self.last_stroke = 1
+                    return result
+                elif join_block:
+                    self.last_stroke = 1
+                    self.suppress_space = True
+                    return [KC.SPC]
+                else:
+                    return ""
+
+        keystrokes = [c if isinstance(c, Key) else DVP[c] for c in output]
+        #keys = ([KC.LSFT(DVP[output[0]]) if (shifted or self.next_shift) else
+        #         DVP[output[0]]] + [DVP[c] for c in output[1:]])
+        if shifted or self.next_shift:
+            keystrokes[0] = KC.LSFT(keystrokes[0])
         self.last_shift = self.next_shift
 
-
-        generated = ""
-        if not self.suppress_space:
+        if not self.suppress_space and output[0] not in punctuation:
             # ewww the way this crosses the arrays is fragile
-            if output[0] in punctuation:
-                if len(output) == 1:
-                    generated = keys
-            else:
-                generated = [KC.SPC] + keys
-        else:
-            generated = keys
+            keystrokes = [KC.SPC] + keystrokes
 
-        self.last_stroke = len(keys)
+        self.last_stroke = len(keystrokes)
         self.next_shift = False
         self.suppress_space = join_block == self.auto_space
 
-        return generated
+        return keystrokes
 
 ## Compact mode: left S tapped alone is backspace
 class Jackdaw(Module):
