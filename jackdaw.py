@@ -38,6 +38,14 @@ class JackdawKey(Key):
         self.block = block
         super().__init__()
 
+class OutputStroke():
+    def __init__(self, keycode, end_sentence = False, attach_left = False, attach_right = False, ignore_shift = True):
+        self.keycode = keycode
+        self.end_sentence = end_sentence
+        self.attach_left = attach_left
+        self.attach_right = attach_right
+        self.ignore_shift = ignore_shift
+
 # JD_4 is an A key
 # This is in steno order!
 
@@ -268,10 +276,11 @@ for v in center_keycodes:
 # No reason to do the leader breakdown like the main generator
 # Actually that's maybe a bit pointless too...
 specials = {
-    'Es': 'es',
-    'Eung': 'ing',
-    'Enlg': 'ed',
+    'Es': OutputStroke('es', attach_left = True), #ARGH these should left-attach too...
+    'Eung': OutputStroke('ing', attach_left = True),
+    'Enlg': OutputStroke('ed', attach_left = True),
     'xQUOTEOU': '"', # sub-optimal, probably
+
     'F': '',
 
     # Cykey layout uses the dropped pinkie just because I prefer it
@@ -279,41 +288,93 @@ specials = {
     'FNO': KC.N2, # Cykey style
     'FWNO': KC.N3, # Cykey style
     'FCWNO': KC.N4, # Cykey style
-    'FSCWNO': KC.N5, # Cykey style
-    'FS': KC.N6, # Cykey style
-    'FSC': KC.N7, # Cykey style
-    'FSCW': KC.N8, # Cykey style
-    'FSCWN': KC.N9, # Cykey style
+    'F4CWNO': KC.N5, # Cykey style
+    'F4': KC.N6, # Cykey style
+    'F4C': KC.N7, # Cykey style
+    'F4CW': KC.N8, # Cykey style
+    'F4CWN': KC.N9, # Cykey style
     'FW': KC.N0, # Cykey style
 
     'FNUO': KC.LSFT(KC.N1), # Number + vowel mod for shifter numbers (symbols)
     'FNUOO': KC.LSFT(KC.N2),
     'FWNUOO': KC.LSFT(KC.N3),
     'FCWNUOO': KC.LSFT(KC.N4),
-    'FSCWNUOO': KC.LSFT(KC.N5),
-    'FSUO': KC.LSFT(KC.N6),
-    'FSCUO': KC.LSFT(KC.N7),
-    'FSCWUO': KC.LSFT(KC.N8),
-    'FSCWNUO': KC.LSFT(KC.N9),
+    'F4CWNUOO': KC.LSFT(KC.N5),
+    'F4UO': KC.LSFT(KC.N6),
+    'F4CUO': KC.LSFT(KC.N7),
+    'F4CWUO': KC.LSFT(KC.N8),
+    'F4CWNUO': KC.LSFT(KC.N9),
     'FWUO': KC.LSFT(KC.N0),
  
     
-    'FSCN': DVP['COMM'],
+    # MAybe remove these later, the ardux-ish versions are better
+    'F4CN': DVP['COMM'],
     'FCWN': DVP['DOT'],
     'FCWO': DVP['QUES'], # 
-    'FSWN': DVP['EXLM'],
+    'F4WN': DVP['EXLM'],
 
-    'FSCNO': DVP['COLN'],
+    'F4CNO': DVP['COLN'],
     'FCNO': DVP['SCLN'],
-    'FSWO': DVP['EQL'],
-    'FSW': KC.LEFT_PAREN, # TODO: bind right (suppress space = set join flag)
+    'F4W': KC.LEFT_PAREN, # TODO: bind right (suppress space = set join flag)
     'FWO': KC.RIGHT_PAREN,
-    'FSO': KC.QUOT, # DVp['MINUS'], # Don't know why this doesn't work via DV
+    'F4O': KC.QUOT, # DVp['MINUS'], # Don't know why this doesn't work via DV
     'FCW': KC.LSFT(KC.Q), # DOUBLE_QUOTE # TODO: bind right (suppress space)
-    'FSWNO': DVP['QUOT'], # TODO: bind right (suppress space)
+    'F4WNO': DVP['QUOT'], # TODO: bind right (suppress space)
+    # so... 
 
+    'F4WO': DVP['EQL'],
     'FCO': DVP['BSLS'],
-    'FSN': DVP['SLSH'],
+    'F4N': DVP['SLSH'],
+
+    # Punctuation up to here should probably be top-layer
+    # If I want this for coding all braces and things too
+    # Right-hand modifier, left-hand symbol select?
+    # RLCT is open... (generates rpt but that's kind of useless)
+
+    # Stolen from Ardux
+
+    'CTrlct': OutputStroke(DVP['EXLM'], attach_left = True, end_sentence = True), # This is doubled up (CT or NR)
+    'TNrlct': OutputStroke(DVP['COMM'], attach_left = True, end_sentence = False),
+    'HNrlct': OutputStroke(DVP['DOT'], attach_left = True, end_sentence = True),
+    'THNrlct': OutputStroke(DVP['QUOT'], attach_left = True, attach_right = True), # Need DQT!
+    'SNrlct': DVP['SLSH'],
+
+    # R +
+    # ` ; \ 
+    # = - ? R
+    '4Rrlct': KC.GRV,
+    'CRrlct': OutputStroke(DVP['SCLN'], attach_left = True),
+    'WRrlct': DVP['BSLS'],
+    'NRrlct': OutputStroke(KC.LSFT(DVP['QUOT']), attach_left = True, attach_right = True, end_sentence = True), # TODO: left/right versions
+
+    'SRrlct': DVP['EQL'],
+    'TRrlct': KC.QUOT, # Still weird (-)
+    'HRrlct': OutputStroke(DVP['QUES'], attach_left = True, end_sentence = True),
+
+    # N + (same as above, with shift held
+    # ~ : | N
+    # = _ ? 
+    '4Nrlct': KC.LSFT(KC.GRV),
+    'CNrlct': OutputStroke(KC.LSFT(DVP['SCLN']), attach_left = True),
+    'WNrlct': KC.LSFT(DVP['BSLS']),
+    #'SNrlct': DVP['EQL'], # already shifted
+    #'TNrlct': KC.LSFT(KC.QUOT), # Still weird (-) underscore needs to be moved somewhere...
+    #'HNrlct': DVP['QUES'], # already shifted
+    # Or don't?
+    # TODO: hash and whatever?
+    # Need to summarize what I actually need...
+
+    # ARGH these are hold-taps, not just taps...
+    # NR +
+    # { ( ) N
+    # } [ ] R
+    '4NRrlct': DVP['SLSH'], # remainder NYI
+    'CNRrlct': OutputStroke(KC.LEFT_PAREN, attach_right = True),
+    'WNRrlct': OutputStroke(KC.RIGHT_PAREN, attach_left = True),
+    'SNRrlct': DVP['SLSH'],
+    'TNRrlct': DVP['SLSH'],
+    'HNRrlct': DVP['SLSH'],
+     # Need to put < > somewhere
         }
 
 class Chord():
@@ -349,15 +410,20 @@ class Chord():
 
         join_block = False
         shifted = False
+        end_sentence = False
+        attach_left = False
+        attach_right = False
+        end_sentence = False
+
         output = ""
+
 
         if combined == "S" and self.compact or combined == "BS" or combined == "SHIFT":
             result = [KC.BSPACE] * self.last_stroke
             self.last_stroke = 1
             self.suppress_space = True
 
-            if self.last_shift:
-                self.next_shift = True
+            self.next_shift = self.last_shift
             self.last_shift = False
             return result
 
@@ -366,7 +432,10 @@ class Chord():
             self.suppress_space = True
             return [KC.ENTER]
         elif combined == "STHR": # STHR-: Shift next char
-            self.next_shift = not self.next_shift
+            self.next_shift = True
+            return []
+        elif combined == "STHRrlct": # STHR-rlct: unshift next char
+            self.next_shift = False
             return []
         elif combined == "WHNRrnlg": # WHNR-rnlg (inner 2x2s): Auto space toggle
             self.auto_space = not self.auto_space
@@ -378,6 +447,11 @@ class Chord():
         elif combined == "SCTWHR": #SCTWHR: tab (the SB combos - SBN, SBR are useless)
             self.suppress_space = True
             return [KC.ESCAPE]
+        elif combined == 'rlgcht':  # -rlgcht: Force-suppress next space
+            # Normally generates rlft, useless
+            # Could also just double-flip space enable
+            self.suppress_space = True
+            return []
         elif combined in specials:
             # HRM this will require a rework later.
             # For now it's only endings that attach, but there will be full words later
@@ -393,14 +467,26 @@ class Chord():
             # Single quote and apostrophe also generate differently, do they need different rules?
             # Even different strokes?
             # Apostrophe in the main layer might work... but it's a bit complicated
-            self.suppress_space = True
+            #self.suppress_space = True
             # HEY WAIT suppress_space here is different to the above
             # it doesn't link to the next cycle!
-            if isinstance(specials[combined], Key):
-                output = [specials[combined]]
-            else:
-                output = specials[combined]
+            #self.next_shift = False
+            # Same as the above - forcefully unshift _this_ key
+            # TODO: Maybe this wil mess with backspace
+            special = specials[combined]
+            if isinstance(special, OutputStroke):
+                end_sentence = special.end_sentence
+                attach_left = special.attach_left
+                attach_right = special.attach_right
+                if special.ignore_shift:
+                    self.next_shift = False
 
+                special = specials[combined].keycode
+
+            if isinstance(special, Key):
+                output = [special]
+            else:
+                output = special
         else:
             # The regular chord generation rules
             generated = []
@@ -478,18 +564,17 @@ class Chord():
         keystrokes = [c if isinstance(c, Key) else DVP[c] for c in output]
         #keys = ([KC.LSFT(DVP[output[0]]) if (shifted or self.next_shift) else
         #         DVP[output[0]]] + [DVP[c] for c in output[1:]])
-        if shifted or self.next_shift:
+
+        if (shifted or self.next_shift) and not attach_left:
             keystrokes[0] = KC.LSFT(keystrokes[0])
         self.last_shift = self.next_shift
 
-        if not self.suppress_space and output[0] not in punctuation:
-            # ewww the way this crosses the arrays is fragile
+        if not self.suppress_space and not attach_left:
             keystrokes = [KC.SPC] + keystrokes
-
         self.last_stroke = len(keystrokes)
-        # Ewwww shifty logic
-        self.next_shift = True if keystrokes[-1] == DVP['DOT'] else False
-        self.suppress_space = join_block == self.auto_space
+
+        self.next_shift = end_sentence
+        self.suppress_space = join_block == self.auto_space or attach_right
 
         return keystrokes
 
