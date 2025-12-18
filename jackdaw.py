@@ -274,11 +274,11 @@ for v in center_keycodes:
     rules_vowels_shifted[v] = sorted(rules_vowels_shifted[v], key = lambda x: -len(x[0]))
 
 # No reason to do the leader breakdown like the main generator
-# Actually that's maybe a bit pointless too...
 specials = {
-    'Es': OutputStroke('es', attach_left = True), #ARGH these should left-attach too...
+    'Es': OutputStroke('es', attach_left = True),
     'Eung': OutputStroke('ing', attach_left = True),
     'Enlg': OutputStroke('ed', attach_left = True),
+    'Er': OutputStroke('er', attach_left = True), # Not sure about this one
     'xQUOTEOU': '"', # sub-optimal, probably
 
     'F': '',
@@ -306,8 +306,9 @@ specials = {
     'F4CWNUO': KC.LSFT(KC.N9),
     'FWUO': KC.LSFT(KC.N0),
  
+    # Better than the asterisk reach? But it's always in use anyway...
+    'Hg': OutputStroke(KC.SPC, attach_left = True, attach_right = True),
     
-    # MAybe remove these later, the ardux-ish versions are better
     'F4CN': DVP['COMM'],
     'FCWN': DVP['DOT'],
     'FCWO': DVP['QUES'], # 
@@ -333,11 +334,15 @@ specials = {
 
     # Stolen from Ardux
 
-    'CTrlct': OutputStroke(DVP['EXLM'], attach_left = True, end_sentence = True), # This is doubled up (CT or NR)
+    'CTrlct': OutputStroke(DVP['EXLM'], attach_left = True, end_sentence = True),
     'TNrlct': OutputStroke(DVP['COMM'], attach_left = True, end_sentence = False),
     'HNrlct': OutputStroke(DVP['DOT'], attach_left = True, end_sentence = True),
-    'THNrlct': OutputStroke(DVP['QUOT'], attach_left = True, attach_right = True), # Need DQT!
+    'THNrlct': OutputStroke(DVP['QUOT'], attach_left = True, attach_right = False), # Left single quote
+    '4THrlct': OutputStroke(DVP['QUOT'], attach_left = False, attach_right = True), # Right single quote
     'SNrlct': DVP['SLSH'],
+    'NRrlct': OutputStroke(KC.LSFT(DVP['QUOT']), attach_left = True, attach_right = False), # Left dquote
+    '4Srlct': OutputStroke(KC.LSFT(DVP['QUOT']), attach_left = False, attach_right = True), # Right dquote
+    # Apostrophe is STWN, without punctuation modifier (since it joins with other words)
 
     # R +
     # ` ; \ 
@@ -345,7 +350,6 @@ specials = {
     '4Rrlct': KC.GRV,
     'CRrlct': OutputStroke(DVP['SCLN'], attach_left = True),
     'WRrlct': DVP['BSLS'],
-    'NRrlct': OutputStroke(KC.LSFT(DVP['QUOT']), attach_left = True, attach_right = True, end_sentence = True), # TODO: left/right versions
 
     'SRrlct': DVP['EQL'],
     'TRrlct': KC.QUOT, # Still weird (-)
@@ -353,7 +357,7 @@ specials = {
 
     # N + (same as above, with shift held
     # ~ : | N
-    # = _ ? 
+    # X X X  <-- Xs are regular punctuation instead
     '4Nrlct': KC.LSFT(KC.GRV),
     'CNrlct': OutputStroke(KC.LSFT(DVP['SCLN']), attach_left = True),
     'WNrlct': KC.LSFT(DVP['BSLS']),
@@ -562,16 +566,15 @@ class Chord():
                     return ""
 
         keystrokes = [c if isinstance(c, Key) else DVP[c] for c in output]
-        #keys = ([KC.LSFT(DVP[output[0]]) if (shifted or self.next_shift) else
-        #         DVP[output[0]]] + [DVP[c] for c in output[1:]])
 
-        if (shifted or self.next_shift) and not attach_left:
+        # The shifted flag is deprecated
+        if self.next_shift:
             keystrokes[0] = KC.LSFT(keystrokes[0])
         self.last_shift = self.next_shift
 
+        self.last_stroke = len(keystrokes)
         if not self.suppress_space and not attach_left:
             keystrokes = [KC.SPC] + keystrokes
-        self.last_stroke = len(keystrokes)
 
         self.next_shift = end_sentence
         self.suppress_space = join_block == self.auto_space or attach_right

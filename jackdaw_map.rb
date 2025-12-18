@@ -152,7 +152,7 @@ lh = [
 ['ASCTWR', 'AGGR'],
 
 ['WH', 'WH'],
-['STWN', '-'],
+['STWN', '\\\''],
 ['SCTWHNR', '-'],
 ['ACHR', 'ACCR'],
 ['ASCTHN', 'AFT'],
@@ -644,6 +644,12 @@ rh = [
 # LGT -> I want LK
 # KL is basically unused (quickly, weekly - conjugated stuff)
 # so change with RNLGT
+# STWN -> apostrophe
+# Used to be XN (well, STW is X)
+
+# RLCT -> J?
+# it normally generates RPH, which is only used for 'morph' - safe to remove?
+# right hand J is kind of useless though
 $base_rules= [		# left hand obvious
 		['a', 'A'],
 		['s', 'S'],
