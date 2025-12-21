@@ -1,5 +1,4 @@
-'''Enables splitting keyboards wirelessly or wired'''
-
+''' replacement for KMK split that uses full matrices and hamming error detection'''
 # HORRIBLE SILLINESS: kmk_keyboard.py checks for kmk.modules.split by name, that will fail
 # if using this module that needs to be patched
 
@@ -45,7 +44,7 @@ class SplitSide:
     RIGHT = const(2)
 
 class ThickSplit(Module):
-    '''Enables splitting keyboards wirelessly, or wired'''
+    '''Enables splitting keyboards (wired only)'''
 
     def __init__(
         self,
@@ -75,11 +74,12 @@ class ThickSplit(Module):
         self.far_matrix = None
         self.events = []
         self.receive_buffer = []
-        self.refresh = 100
+        self.refresh = 100 # Interval to send a full matrix refresh
 
         if self._use_pio:
+            # In my experience the receiving end has a very high error rate
+            # Looks fine on a scope though
             from kmk.transports.pio_uart import PIO_UART
-
             self.PIO_UART = PIO_UART
 
     def during_bootup(self, keyboard):
@@ -152,10 +152,12 @@ class ThickSplit(Module):
                     cm.append(cols_to_calc * (rows_to_calc + ridx) + cidx)
 
             keyboard.coord_mapping = tuple(cm)
-        # ARGH silly offset stuff....
+
         self.matrix = [False] * (len(keyboard.row_pins) * len(keyboard.col_pins))
         self.far_matrix = [False] * (len(keyboard.row_pins) * len(keyboard.col_pins))
         self.report_size = math.ceil(len(self.matrix) / 8)
+
+        self.matrix_cells = bytearray(self.report_size) # For recycling
 
         if not keyboard.coord_mapping and debug.enabled:
             debug('Error: please provide coord_mapping for custom scanner')
@@ -172,13 +174,13 @@ class ThickSplit(Module):
         return
 
     def after_matrix_scan(self, keyboard):
-        # actually this does nothing, this will only ever get called with 1 update
         if not self._is_target:
             refresh = False
 
             if keyboard.matrix_update:
                 event = keyboard.matrix_update
-                self.matrix[event.key_number - self.split_offset] = event.pressed
+                offset = self.split_offset if self.split_side == SplitSide.RIGHT else 0
+                self.matrix[event.key_number - offset] = event.pressed
                 refresh = True
 
             # reduce the number of updates
@@ -198,12 +200,12 @@ class ThickSplit(Module):
         return
 
     def _encode_matrix(self):
-        # TODO: recycle this (instance variable it)
-        cells = bytearray(self.report_size)
+        for x in range(len(self.matrix_cells)):
+            self.matrix_cells[x] = 0
         for x in range(len(self.matrix)):
             if self.matrix[x]:
-                cells[x // 8] |= 1 << (x % 8)
-        return cells
+                self.matrix_cells[x // 8] |= 1 << (x % 8)
+        return self.matrix_cells
 
     def _decode_matrix(self, compressed):
         if compressed is None:
@@ -226,40 +228,22 @@ class ThickSplit(Module):
     def _check_all_connections(self, keyboard):
         pass
 
-    def _serialize_update(self, update):
-        buffer = bytearray(2)
-        buffer[0] = update.key_number
-        buffer[1] = update.pressed
-        return buffer
-
-    def _deserialize_update(self, update):
-        kevent = KeyEvent(key_number=update[0], pressed=update[1])
-        return kevent
-
-    # 4 bits in, 8 bits (7 bits) out
+    # 4 bits in, 8 bits (7 bits + parity) out
     def _hamming(self, word):
+        # Small table so precompute
         global hamming
         return hamming[word]
-
-    # Funkiness: B- is always corrected!
-    # It's sending some junk data...
-    # Now 178 is being received (consistently!) but it's not in the table
-    # And some others.... is the serial transmission really that flaky?
-    # Where's my white cable...
-    # WTF? 178 means the top bit got set
-    # LOL FUCK 178 is a desync (it's the marker). Should use something else, like 0xff
-    # 0xFE is probably better because of the parity error
-
-    # TODO next: 8,4 with a full parity bit
 
     # 7 bits in, 8 bits out
     def _dehamming(self, word):
         def isbit(b, i):
+            # TODO: Is there a faster way?
             return 0 if b & (1 << i) == 0 else 1
 
         parity_error = sum([isbit(word, i) for i in range(8)]) & 1
         if parity_error:
-            print("Parity error")
+            # Possible correctable but just discard it
+            debug("Parity error")
             return None
 
         error1 = isbit(word, 0) + isbit(word, 2) + isbit(word, 4) + isbit(word, 6)
@@ -268,9 +252,9 @@ class ThickSplit(Module):
         error = (error1 % 2) + (error2 % 2) << 1 + (error3 % 2) << 2
         if error != 0:
             if parity_error == 0:
-                print("Uncorrectable") # 2-bit error
+                debug("Uncorrectable") # 2-bit error
                 return None
-            print("Corrected: val ", word,"with error ", error)
+            debug("Corrected: val ", word,"with error ", error)
             word ^= 1 << (error - 1)
         result = isbit(word, 2) | isbit(word, 4) << 1 | isbit(word, 5) << 2 | isbit(word, 6) << 3
         return result
@@ -294,21 +278,18 @@ class ThickSplit(Module):
                 output[i // 2] = word
         return output
 
-
     def _send_uart(self, update):
         if self._uart is not None:
-            #update = self._serialize_update(update)
             self._uart.write(self.uart_header)
             self._uart.write(self._encode(update))
-            #self._uart.write(self._checksum(update))
 
     def _receive_uart(self, keyboard):
         if self._uart is not None and self._uart.in_waiting > 0:
+            # TODO: Change this to a ring buffer
             self.receive_buffer += self._uart.read(self._uart.in_waiting)
 
         # ARGH smells like the whole damn communication is desyncing
         while self.receive_buffer and self.receive_buffer[0] != self.uart_header[0]:
-            print("Walk")
             del self.receive_buffer[0]
 
         while len(self.receive_buffer) >= 1 + self.report_size * 2: # *2 for the error correction
@@ -319,15 +300,12 @@ class ThickSplit(Module):
                 #print(self.far_matrix)
                 if new_matrix != None:
                     for i in range(len(self.matrix)):
-                        # Kind of bad: debounce this?
                         if self.far_matrix[i] != new_matrix[i]:
                             # split_offset is only for right side!
                             key_number = i + self.split_offset if self.split_side == SplitSide.LEFT else i
                             self.events.append(KeyEvent(key_number = key_number, pressed = new_matrix[i]))
 
                     self.far_matrix = new_matrix
-                else:
-                    print("Discarded incoming matrix due to error")
 
         if self.events:
             keyboard.secondary_matrix_update = self.events.pop(0)
