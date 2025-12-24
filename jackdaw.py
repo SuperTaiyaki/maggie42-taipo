@@ -191,8 +191,6 @@ I don't recall whose dataset this is, extracted from an English bigram frequency
 
 # One thing to try: UO alone and the alternate to generate more vowel pairs
 # and both together?
-# IE is EI + flip
-# UE/UA are missing, 
 rules_vowels_raw = {
         # E is right-hand, it's uppercased so it doesn't conflict with far-right e
         # AO-eu
@@ -220,12 +218,12 @@ rules_vowels_raw = {
 # AU is quite annoying to reach
 rules_vowels_shifted_raw = {
         'A': 'ua',
-        'O': 'uo',
+        'O': 'uo', # Kind of useless, virtually no cases that aren't quo
         'E': 'ue',
-        'u': 'ui',
+        'u': 'ui', # uu makes no sense
         'Eu': 'oe', # not great (confusing), but generating a single is a bit useless
-        'AO': 'oi', # redundant . easy to type, should drop something useful in here
-        'Ou': 'ui', # Experimental (should be ou flipped but uo is never used)
+        'AO': 'eo',
+        'Ou': 'ui', # Redundant
 
         'OE': 'ei', # regular flip
         'AE': 'ae', # regular flip
@@ -233,12 +231,13 @@ rules_vowels_shifted_raw = {
         'AEu': 'ia', # regular flip
 
         'AOE': 'ee', # redundant (in main layer)
-        'OEu': 'io', # redundant
+        'OEu': 'iou',
         'AOu': 'oo', # redundant
 
         'AOEu': '', # painful
         'Au': '', # Even more painful
         # Can generate 3-letter sets too, might be more useful. eau, in particular?
+        # iou appears a little bit (curious). Actually more than eau!
         # Want: iu (medium) but it's pretty low frequency
         # eo? (people... anything else?)
         }
@@ -247,13 +246,10 @@ rules_vowels_shifted_raw = {
 from jackdaw_rules import rules
 
 # Extended rules that I don't want in the generator. Must be sorted by length.
+# Probably throw these away
 rules['x'] = [('xCOMMA', ','), ('xQUOTE', '\''), ('xDOT', '.'), ('x', '')]
-punctuation = set([',', '\'', '.']) # Special space treatment. These stick to the word before
 # ===================
-# Really need to set up attachment rules so these can be merged with specials
-# Plover-style {^}?
 # Also want key-emitting stuff to I can lose the special cases
-# Should also smooth out the processing flow - generate keys, set flags, return keystrokes
 
 # Numbers... making it shiftable gives me symbols too, which is nice
 # Is there any advantage to putting in here rather than switching to Cykey?
@@ -389,8 +385,9 @@ class Chord():
         self.auto_space = True
 
         # Things that flow into the next chord
-        self.next_shift = False # for full stops... or buffering shifts? NYI.
+        self.next_shift = False
         self.suppress_space = True
+        self.last_suppress_space = False
         self.last_stroke = 1 # for backspacing
         self.last_shift = False
 
@@ -425,7 +422,9 @@ class Chord():
         if combined == "S" and self.compact or combined == "BS" or combined == "SHIFT":
             result = [KC.BSPACE] * self.last_stroke
             self.last_stroke = 1
-            self.suppress_space = True
+            # ARGH need to carry this forward properly...
+            self.suppress_space = self.last_suppress_space
+            self.last_suppress_space = False
 
             self.next_shift = self.last_shift
             self.last_shift = False
@@ -565,19 +564,29 @@ class Chord():
                 else:
                     return ""
 
+            # Horrible hack: apostrophe force-attaches (don't want to put it in specials because there are too many RH combos)
+            # NOTE: check blocks rather than output for generated auto-spacing, since the null (WHR) generates nothing and then it's empty
+            if output[0] == "'" or len(blocks[1]) == 0: # or join_block:
+                attach_left = True
+                join_block = True
+
         keystrokes = [c if isinstance(c, Key) else DVP[c] for c in output]
 
         # The shifted flag is deprecated
         if self.next_shift:
             keystrokes[0] = KC.LSFT(keystrokes[0])
         self.last_shift = self.next_shift
+        self.last_suppress_space = self.suppress_space
 
-        self.last_stroke = len(keystrokes)
-        if not self.suppress_space and not attach_left:
+        if not self.suppress_space and not join_block and not attach_left and self.auto_space:
             keystrokes = [KC.SPC] + keystrokes
+        self.last_stroke = len(keystrokes)
 
         self.next_shift = end_sentence
-        self.suppress_space = join_block == self.auto_space or attach_right
+        self.suppress_space = attach_right
+        # Something is wrong here, suppress_space flows into the next block weirdly.
+        # Suppress next is bascially now never useful...?
+        # Apart from attach_right type punctuation
 
         return keystrokes
 
@@ -597,8 +606,12 @@ class Jackdaw(Module):
         self.now_pressed = None
 
     def process_key(self, keyboard, key, is_pressed, int_coord):
+
         if not isinstance(key, JackdawKey):
             return key
+
+        # TODO: Can we detect modifiers? Want to force a mode switch to non-spaced if they're held
+        # And then maybe a null modifier to unspace might be nice... (fingerspell key)
 
         code = key.code
 
@@ -609,15 +622,22 @@ class Jackdaw(Module):
         else:
             self.held.discard(code)
             # keys_pressed is the USB report; coordkeys is real keys (kmk internal)
-            if self.held - self.CHAINABLE == set() and self.pressing:
+            # Peeking inside chord is terrible
+            # TODO: If modifiers are held down, also trigger this
+            if self.pressing and (self.held - self.CHAINABLE == set() or self.chord.auto_space == False):
                 output = self.chord.result()
                 self.handle_output(output)
                 self.chord.reset()
                 for key in self.held:
-                    self.chord.add(key)
+                    if self.chord.auto_space == False or key in self.CHAINABLE:
+                        self.chord.add(key)
                 self.pressing = False
-            elif not self.pressing and code in self.CHAINABLE:
+            elif self.chord.auto_space == False:
                 self.chord.discard(code)
+            # CRAP this logic has gone all wonky
+            # If auto-space (rolling mode), execute
+            # Otherwise, wait for all keys to be gone
+            # was the original intent...
 
     # Not really chord, this is the output string
     def handle_output(self, chord):
@@ -665,4 +685,13 @@ class Jackdaw(Module):
 # Merge punctuation/number key into one word
 #   on press -> emit space
 #   at end of word -> re-enable auto space
-# Key to force-suppress space (for leading and brackets and whatever)
+# A second holdable key to attach the current stroke, rather than the next stroke?
+#   Not super useful but handy when there's too much going on to asterisk a stroke properly
+
+# Silliness that may work: anything starting with vowels or RH automatically attaches
+# And a null LH combo to start a new word from vowel/right
+# Unfortunately that leads to an advantage to overusing the right hand
+# Mabye WHNR?
+# How much extra asterisking does this save me?
+
+# TODO problem: When turning auto-space back on, the last chord gets spat out again
