@@ -18,12 +18,19 @@ debug = Debug(__name__)
 from jackdaw import Jackdaw
 from geminipr import Gemini
 
-keyboard = KMKKeyboard()
+from synchronousscanner import SynchronousScanner
 
+import digitalio
+led= digitalio.DigitalInOut(board.LED)
+led.switch_to_output()
+led.value = 1
+
+keyboard = KMKKeyboard()
 
 keyboard.col_pins = (board.GP2, board.GP3, board.GP4, board.GP5, board.GP6, board.GP7)
 keyboard.row_pins = (board.GP8, board.GP9, board.GP10, board.GP11, board.GP12, board.GP16)
 keyboard.diode_orientation = DiodeOrientation.COLUMNS
+keyboard.matrix = SynchronousScanner(keyboard.col_pins, keyboard.row_pins)
 
 keyboard.modules.append(StickyKeys(release_after = 3000))
 keyboard.modules.append(MouseKeys())
@@ -56,7 +63,7 @@ keyboard.keymap = [
 [
 KC.JD_4, KC.JD_C, KC.JD_W, KC.JD_N,      KC.JD_X,    KC.JD_r, KC.JD_l, KC.JD_c, KC.JD_t, KC.JD_dE,
 KC.JD_S, KC.JD_T, KC.JD_H, KC.JD_R,      KC.JD_z,    KC.JD_n, KC.JD_g, KC.JD_h, KC.JD_s, KC.JD_e, 
-KC.JD_xQUOTE, KC.JD_xCOMMA, KC.JD_xDOT, KC.JD_UO,     KC.MO(3),    KC.JD_UO,  KC.JD_u, KC.TG(4), KC.TG(3), KC.JD_y,
+KC.LCTL, KC.LGUI, KC.LALT, KC.JD_UO,     KC.MO(3),    KC.JD_UO,  KC.JD_u, KC.TG(4), KC.TG(3), KC.JD_y,
 KC.NO,                  KC.JD_A, KC.JD_O, KC.JD_E, KC.JD_u,    KC.JD_F# thumb row
 ],
 # Terrible hack, center key to flip to taipo since symbols and stuff work

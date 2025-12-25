@@ -23,11 +23,15 @@ debug = Debug(__name__)
 from jackdaw import Jackdaw
 from geminipr import Gemini
 
+from synchronousscanner import SynchronousScanner
+
 keyboard = KMKKeyboard()
 
 keyboard.col_pins = (board.GP10,board.GP9,board.GP8,board.GP7,board.GP6,board.GP5,)
 keyboard.row_pins = (board.GP27,board.GP26,board.GP15,board.GP14,)
 keyboard.diode_orientation = DiodeOrientation.COL2ROW
+
+keyboard.matrix = SynchronousScanner(keyboard.col_pins, keyboard.row_pins)
 
 split = ThickSplit(data_pin = board.GP0, use_pio = False, split_flip = False)
 keyboard.modules.append(split)
@@ -160,7 +164,7 @@ KC.TG(LAYER_JACKDAW), KC.NO, KC.NO, KC.MO(4), KC.JD_A, KC.JD_O,        KC.JD_E, 
     # empty spaces can be used for non-browser convenience stuff
     # mixing this with UI layer might be nice
     [
-        KC.RELOAD, KC.LGUI(KC.N1), KC.LGUI(KC.N2), KC.LGUI(KC.N3), KC.LGUI(KC.N4), KC.LGUI(KC.N5),  KC.LGUI(KC.N6), KC.LGUI(KC.N7), KC.LGUI(KC.N8), KC.LGUI(KC.N9), KC.LGUI(KC.N0), KC.NO, 
+        KC.RELOAD, KC.LGUI(KC.N1), KC.LGUI(KC.N2), KC.LGUI(KC.N3), KC.LGUI(KC.N4), KC.LGUI(KC.N5),  KC.LGUI(KC.N6), KC.LGUI(KC.N7), KC.LGUI(KC.N8), KC.LGUI(KC.N9), KC.LGUI(KC.N0), KC.TG(3), 
         KC.TRNS, KC.LCTRL(KC.LSFT(KC.TAB)), KC.LCTRL(KC.K) , KC.LCTRL(KC.TAB), KC.NO, KC.NO,     KC.NO, KC.NO, KC.NO, KC.LGUI(KC.P), KC.NO, KC.NO, 
         KC.RESET, KC.LCTRL(KC.P), KC.LCTRL(KC.COMMA) , KC.LGUI(KC.C), KC.LGUI(KC.V), KC.NO,      KC.NO, KC.LGUI(KC.J), KC.NO, KC.NO, KC.NO, KC.NO, 
         KC.NO, KC.NO, KC.NO, KC.NO, KC.NO, KC.NO,       KC.NO, KC.NO, KC.NO, KC.NO, KC.NO, KC.NO, 

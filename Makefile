@@ -15,17 +15,24 @@ else ifeq ($(BOARD), writer)
 else ifeq ($(BOARD), keyer)
 	echo "Building keyer"
 	make keyer
+else ifeq ($(BOARD), maggie-r)
+	echo "Building maggie right"
+	make maggie-r
 else
 	echo "Building maggie"
 	make maggie
 endif
 
 maggie:
-	cp thicksplit.py cykey.py jackdaw.py jackdaw_rules.py geminipr.py taipo.py dvp.py code.py /mnt/sda1/ && sync
+	cp thicksplit.py synchronousscanner.py cykey.py jackdaw.py jackdaw_rules.py geminipr.py taipo.py dvp.py code.py /mnt/sda1/ && sync
+
+maggie-r:
+	cp maggie-right.py /mnt/sda1/code.py
+	cp thicksplit.py synchronousscanner.py cykey.py /mnt/sda1/ && sync
 
 gherkin:
 	cp code_gherkin.py /mnt/sda1/code.py
-	cp cykey.py jackdaw.py jackdaw_rules.py geminipr.py taipo.py dvp.py /mnt/sda1/ && sync
+	cp cykey.py jackdaw.py jackdaw_rules.py synchronousscanner.py geminipr.py taipo.py dvp.py /mnt/sda1/ && sync
 
 handyman:
 	cp code-handyman.py /mnt/sda1/code.py
