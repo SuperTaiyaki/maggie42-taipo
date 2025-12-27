@@ -290,7 +290,7 @@ lh = [
 ['ASCWHNR', '-'],
 
 ['CTN', 'DEV'],
-['WHNR', '-'],
+['WHNR', ''],
 ['AWH', 'AWH'],
 ['ASTWN', '-'],
 ['ASTWHNR', '-'],
@@ -870,11 +870,13 @@ else
   print("#{word}\n")
   word.size.times do |i|
     lh_sorted.each do |c, g|
+      next if g == ""
       if word[i..].start_with?(g)
         print(" " * i + c.upcase +  " = " + g + "\n")
       end
     end
     rh_sorted.each do |c, g|
+      next if g == ""
       if word[i..].start_with?(g)
         print(" " * i + c + " = " + g + "\n")
       end

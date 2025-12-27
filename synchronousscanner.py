@@ -1,6 +1,7 @@
 import board
 import digitalio
 import keypad
+import time
 
 from kmk.scanners import Scanner
 
@@ -26,11 +27,16 @@ class SynchronousScanner(Scanner):
     def key_count(self):
         return len(self.cols) * len(self.rows)
 
+#    @property
+#    def matrix(self):
+#        return matrix
+
     def scan_for_changes(self):
         rowlength = len(self.cols)
         for c in range(len(self.cols)):
             self.cols[c].switch_to_output(value = True)
-            #time.sleep(0.000_01)
+            # May need a more serious debounce
+            time.sleep(0.000_01)
 
             for r in range(len(self.rows)):
                 # TODO: queue keydowns before keyups, for better chording
@@ -56,4 +62,8 @@ class SynchronousScanner(Scanner):
             return event
         else:
             return None
+
+# Just a memo about the circuitpython issue...
+# One input behind = number of entries in the queue has desynced from the queue contents
+# read and write are in separate threads, so the update of one gets stomped by the other...?
 

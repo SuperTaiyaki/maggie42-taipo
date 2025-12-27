@@ -27,7 +27,7 @@ keyboard.diode_orientation = DiodeOrientation.COL2ROW
 
 keyboard.matrix = SynchronousScanner(keyboard.col_pins, keyboard.row_pins)
 
-split = ThickSplit(data_pin = board.GP0, use_pio = False, split_flip = False)
+split = ThickSplit(data_pin = board.GP0, use_pio = False, split_flip = False, split_side = SplitSide.RIGHT)
 keyboard.modules.append(split)
 
 keyboard.modules.append(StickyKeys(release_after = 3000))
@@ -59,7 +59,7 @@ keyboard.modules.append(holdtap)
 keyboard.keymap = [
         # Normal layer
        [
-KC.ESCAPE,   KC.Q,KC.W,KC.E,KC.R,KC.T,         KC.Y, KC.U, KC.UP, KC.O, KC.P, KC.BACKSPACE,
+    KC.ESCAPE,   KC.Q,KC.W,KC.E,KC.R,KC.T,         KC.Y, KC.U, KC.UP, KC.O, KC.P, KC.BACKSPACE,
        KC.LCTRL, KC.A, KC.S, KC.D, KC.F, KC.G,     KC.H, KC.LEFT, KC.DOWN, KC.RIGHT, KC.SEMICOLON, KC.QUOTE,
        KC.LSHIFT, KC.Z, KC.X, KC.C, KC.V, KC.B,        KC.N, KC.M, KC.COMMA, KC.DOT, KC.SLASH, KC.RSHIFT,
        KC.NO, KC.NO, KC.NO, KC.LT(LAYER_BROWSER, KC.ESCAPE), KC.LT(LAYER_RAISED, KC.BSPACE), KC.SPACE,       KC.ENTER, KC.LT(LAYER_LOWERED, KC.SPACE), KC.HT(KC.ESCAPE, KC.LGUI), KC.NO, KC.NO, KC.NO

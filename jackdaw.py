@@ -271,10 +271,6 @@ for v in center_keycodes:
 
 # No reason to do the leader breakdown like the main generator
 specials = {
-    'Es': OutputStroke('es', attach_left = True),
-    'Eung': OutputStroke('ing', attach_left = True),
-    'Enlg': OutputStroke('ed', attach_left = True),
-    'Er': OutputStroke('er', attach_left = True), # Not sure about this one
     'xQUOTEOU': '"', # sub-optimal, probably
 
     'F': '',
@@ -333,12 +329,15 @@ specials = {
     'CTrlct': OutputStroke(DVP['EXLM'], attach_left = True, end_sentence = True),
     'TNrlct': OutputStroke(DVP['COMM'], attach_left = True, end_sentence = False),
     'HNrlct': OutputStroke(DVP['DOT'], attach_left = True, end_sentence = True),
+
+    # TH for quote, add N or 4 to set which way it binds
     'THNrlct': OutputStroke(DVP['QUOT'], attach_left = True, attach_right = False), # Left single quote
     '4THrlct': OutputStroke(DVP['QUOT'], attach_left = False, attach_right = True), # Right single quote
-    'SNrlct': DVP['SLSH'],
+    # Same for double quote (stacked NR/4S)
     'NRrlct': OutputStroke(KC.LSFT(DVP['QUOT']), attach_left = True, attach_right = False), # Left dquote
     '4Srlct': OutputStroke(KC.LSFT(DVP['QUOT']), attach_left = False, attach_right = True), # Right dquote
     # Apostrophe is STWN, without punctuation modifier (since it joins with other words)
+    'SNrlct': DVP['SLSH'],
 
     # R +
     # ` ; \ 
@@ -364,7 +363,6 @@ specials = {
     # TODO: hash and whatever?
     # Need to summarize what I actually need...
 
-    # ARGH these are hold-taps, not just taps...
     # NR +
     # { ( ) N
     # } [ ] R
@@ -375,10 +373,11 @@ specials = {
     'TNRrlct': DVP['SLSH'],
     'HNRrlct': DVP['SLSH'],
      # Need to put < > somewhere
-        }
+}
 
 class Chord():
-    def __init__(self, compact):
+    def __init__(self, compact, rgb):
+        self.rgb = rgb
         self.compact = compact
         self.chord = {x: False for x in jd_keycodes}
 
@@ -390,6 +389,19 @@ class Chord():
         self.last_suppress_space = False
         self.last_stroke = 1 # for backspacing
         self.last_shift = False
+
+        self.set_rgb(False)
+
+    def set_rgb(self, mode):
+        if not self.rgb:
+            return
+        if mode:
+            self.rgb.set_hsv_fill(176, 140, 90)
+        else:
+            self.rgb.set_hsv_fill(30, 200, 180)
+
+        self.rgb.show()
+
 
     def reset(self):
         for x in self.chord:
@@ -409,15 +421,12 @@ class Chord():
 
         print("Chord: ", blocks)
 
-        join_block = False
-        shifted = False
         end_sentence = False
         attach_left = False
         attach_right = False
         end_sentence = False
 
         output = ""
-
 
         if combined == "S" and self.compact or combined == "BS" or combined == "SHIFT":
             result = [KC.BSPACE] * self.last_stroke
@@ -429,11 +438,16 @@ class Chord():
             self.next_shift = self.last_shift
             self.last_shift = False
             return result
-
-        if combined == "rnghts": # -RNGHTS: Enter (-> no space)
+        elif combined in ('x', 'X', 'z', 'Z'):
+            self.last_stroke = 1
+            self.suppress_space = True
+            return [KC.SPC]
+        elif combined == "rnghts": # -RNGHTS: Enter (-> no space)
             self.last_stroke = 1
             self.suppress_space = True
             return [KC.ENTER]
+            # Maybe this could be marked as a special?
+            # attach left, attach right
         elif combined == "STHR": # STHR-: Shift next char
             self.next_shift = True
             return []
@@ -443,6 +457,7 @@ class Chord():
         elif combined == "WHNRrnlg": # WHNR-rnlg (inner 2x2s): Auto space toggle
             self.auto_space = not self.auto_space
             self.suppress_space = True
+            self.set_rgb(not self.auto_space)
             return []
         elif combined == "SCTWHN": #SCTWHN: escape
             self.suppress_space = True
@@ -452,30 +467,10 @@ class Chord():
             return [KC.ESCAPE]
         elif combined == 'rlgcht':  # -rlgcht: Force-suppress next space
             # Normally generates rlft, useless
-            # Could also just double-flip space enable
+            # Could also just double-flip auto space
             self.suppress_space = True
             return []
         elif combined in specials:
-            # HRM this will require a rework later.
-            # For now it's only endings that attach, but there will be full words later
-            # should release suppress-space, I guess...?
-            # So these should probably generate {^}es and whatever instead
-
-            # If a generated block starts with {^}, do not write out the space even if it's buffered
-            # ... ends with {^}, force suppress-space off (wait this makes no sense)
-            # What I actually want is... single quote, stick to the trailing part
-            # full stop and into the next word is not something I want to do, so the suppression doesn't have to work like that
-            # Now that the space is pushed to the next word.... 'attach' is the only thing needed?
-            # Not quite. Left paren, right paren and single quote join differently
-            # Single quote and apostrophe also generate differently, do they need different rules?
-            # Even different strokes?
-            # Apostrophe in the main layer might work... but it's a bit complicated
-            #self.suppress_space = True
-            # HEY WAIT suppress_space here is different to the above
-            # it doesn't link to the next cycle!
-            #self.next_shift = False
-            # Same as the above - forcefully unshift _this_ key
-            # TODO: Maybe this wil mess with backspace
             special = specials[combined]
             if isinstance(special, OutputStroke):
                 end_sentence = special.end_sentence
@@ -522,12 +517,14 @@ class Chord():
 
                     # single x is used for things
                     if blocks[block].startswith(('X', 'z', 'Z'), idx):
-                        join_block = True
+                        attach_left = True
                         idx += 1
                         continue
+                    # TODO: scrap this, this is not how shift works any more
+                    # But this is still backspace
                     if blocks[block].startswith('SHIFT', idx):
                         idx += 5 # len('shift')
-                        shifted = True
+                        # Now this does nothing, actually. Maybe it shuold generate an e?
                         break # not continue because SHIFT is at the end
 
                     initial_idx = idx
@@ -551,34 +548,22 @@ class Chord():
                 generated.append(block_output)
 
             output = generated[0] + output_v + generated[1] + generated[2]
-            if len(output) == 0: # At current, only space and shift
-                if shifted:
-                    # this should be unreachable
-                    result = [KC.BSPACE] * self.last_stroke
-                    self.last_stroke = 1
-                    return result
-                elif join_block:
-                    self.last_stroke = 1
-                    self.suppress_space = True
-                    return [KC.SPC]
-                else:
-                    return ""
+            if len(output) == 0:
+                return "" # There's a chord that generates nothing
 
             # Horrible hack: apostrophe force-attaches (don't want to put it in specials because there are too many RH combos)
             # NOTE: check blocks rather than output for generated auto-spacing, since the null (WHR) generates nothing and then it's empty
-            if output[0] == "'" or len(blocks[1]) == 0: # or join_block:
+            if output[0] == "'" or len(blocks[1]) == 0:
                 attach_left = True
-                join_block = True
 
         keystrokes = [c if isinstance(c, Key) else DVP[c] for c in output]
 
-        # The shifted flag is deprecated
+        self.last_shift = self.next_shift
         if self.next_shift:
             keystrokes[0] = KC.LSFT(keystrokes[0])
-        self.last_shift = self.next_shift
-        self.last_suppress_space = self.suppress_space
 
-        if not self.suppress_space and not join_block and not attach_left and self.auto_space:
+        self.last_suppress_space = self.suppress_space
+        if not self.suppress_space and not attach_left and self.auto_space:
             keystrokes = [KC.SPC] + keystrokes
         self.last_stroke = len(keystrokes)
 
@@ -593,8 +578,9 @@ class Chord():
 ## Compact mode: left S tapped alone is backspace
 class Jackdaw(Module):
     CHAINABLE = set(('X', 'Z', 'z', 'F'))
-    def __init__(self, compact = False):
-        self.chord = Chord(compact)
+    def __init__(self, compact = False, rgb = None):
+        self.rgb = rgb
+        self.chord = Chord(compact, rgb)
         self.compact = compact
 
         self.held = set()
@@ -634,10 +620,6 @@ class Jackdaw(Module):
                 self.pressing = False
             elif self.chord.auto_space == False:
                 self.chord.discard(code)
-            # CRAP this logic has gone all wonky
-            # If auto-space (rolling mode), execute
-            # Otherwise, wait for all keys to be gone
-            # was the original intent...
 
     # Not really chord, this is the output string
     def handle_output(self, chord):
@@ -679,19 +661,22 @@ class Jackdaw(Module):
 # In the end this is a lot closer to the original Shelton patent than the Jackdaw theory
 
 # TODO:
-# Rolling chords when auto space is disabled
 # LEDs to indicate auto space (and other stuf)
 # Matrix reset button
 # Merge punctuation/number key into one word
 #   on press -> emit space
 #   at end of word -> re-enable auto space
-# A second holdable key to attach the current stroke, rather than the next stroke?
-#   Not super useful but handy when there's too much going on to asterisk a stroke properly
 
-# Silliness that may work: anything starting with vowels or RH automatically attaches
-# And a null LH combo to start a new word from vowel/right
-# Unfortunately that leads to an advantage to overusing the right hand
-# Mabye WHNR?
-# How much extra asterisking does this save me?
+# GRRRRR the weird matrix desync:
+# keydown is sending keyup!
+# the pressed/released flag comes straight out of KMK
+# So... KMK is flipping the flags somehow?
+# But the source looked ok....
+# It happens on one side of the board so it's not a comunication problem
+# One-cycle delay makes me think the KMK event loop is not triggering properly, not running when idle...?
+# The scanner runs in the background, is there a synchronization bug...?
+# Maybe the default interval is better? Though 100hz is really the minimum here.... what happens at 0.001?
+# Let's just leave it and see... 
+# at 1khz it desyncs more!
+# there's a 1ms delay in each _row_ built into circuitpython, it won't go that fast anyway. Bugger.
 
-# TODO problem: When turning auto-space back on, the last chord gets spat out again

@@ -103,6 +103,7 @@ class ThickSplit(Module):
             elif name.endswith('R'):
                 self.split_side = SplitSide.RIGHT
 
+        self._is_target = runtime.usb_connected
         #self._is_target = False
         if not self._is_target:
             keyboard._hid_send_enabled = False
