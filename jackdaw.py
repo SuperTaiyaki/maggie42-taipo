@@ -395,6 +395,7 @@ class Chord():
     def set_rgb(self, mode):
         if not self.rgb:
             return
+        return
         if mode:
             self.rgb.set_hsv_fill(176, 140, 90)
         else:
@@ -431,7 +432,6 @@ class Chord():
         if combined == "S" and self.compact or combined == "BS" or combined == "SHIFT":
             result = [KC.BSPACE] * self.last_stroke
             self.last_stroke = 1
-            # ARGH need to carry this forward properly...
             self.suppress_space = self.last_suppress_space
             self.last_suppress_space = False
 
@@ -577,7 +577,8 @@ class Chord():
 
 ## Compact mode: left S tapped alone is backspace
 class Jackdaw(Module):
-    CHAINABLE = set(('X', 'Z', 'z', 'F'))
+    #CHAINABLE = set(('X', 'Z', 'z', 'F'))
+    CHAINABLE = set(('F',))
     def __init__(self, compact = False, rgb = None):
         self.rgb = rgb
         self.chord = Chord(compact, rgb)
@@ -615,11 +616,13 @@ class Jackdaw(Module):
                 self.handle_output(output)
                 self.chord.reset()
                 for key in self.held:
-                    if self.chord.auto_space == False or key in self.CHAINABLE:
+                    if self.chord.auto_space == False or code in self.CHAINABLE:
                         self.chord.add(key)
                 self.pressing = False
-            elif self.chord.auto_space == False:
+            elif not self.chord.auto_space or code in self.CHAINABLE:
                 self.chord.discard(code)
+        # The bug: roll off the chord but leave the asterisk until last
+        # -> the asterisk will join the next chord
 
     # Not really chord, this is the output string
     def handle_output(self, chord):

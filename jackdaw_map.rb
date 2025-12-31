@@ -385,7 +385,7 @@ rh = [
 ['RG', 'RG'],
 ['NGT', 'NK'],
 ['RGCT', '-'],
-['RNGCH', '-'],
+['RNGCH', 'FF'],
 ['RNLGHT', '-'],
 
 ['RC', 'RC'],
@@ -646,6 +646,7 @@ rh = [
 # so change with RNLGT
 # STWN -> apostrophe
 # Used to be XN (well, STW is X)
+# RNGCH -> FF (useful, combination doesn't do anything. F + disambiguate)
 
 # RLCT -> J?
 # it normally generates RPH, which is only used for 'morph' - safe to remove?
