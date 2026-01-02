@@ -22,7 +22,7 @@ except ImportError:
 from micropython import const
 
 import kmk.handlers.stock as handlers
-from kmk.keys import Key, KC, make_key
+from kmk.keys import Key, KC, make_key, ModifierKey
 from kmk.kmk_keyboard import KMKKeyboard
 from kmk.modules import Module
 from kmk.utils import Debug
@@ -388,7 +388,6 @@ class Chord():
         self.compact = compact
         self.chord = {x: False for x in jd_keycodes}
 
-        self.auto_space = True
         self.state = state
 
         # Things that flow into the next chord
@@ -420,7 +419,11 @@ class Chord():
     def discard(self, key):
         self.chord[key] = False
 
-    def result(self):
+    def result(self, auto_space_override = None):
+        auto_space = self.state.auto_space
+        if auto_space_override != None:
+            auto_space = auto_space_override
+
         blocks = ["".join([c for c in keys if self.chord[c]]) for keys in (center_keycodes, lh_keycodes, rh_keycodes, special_keycodes)]
         combined = blocks[1] + blocks[0] + blocks[2] + blocks[3]
 
@@ -462,9 +465,9 @@ class Chord():
             self.next_shift = False
             return []
         elif combined == "WHNRrnlg": # WHNR-rnlg (inner 2x2s): Auto space toggle
-            self.auto_space = not self.auto_space
+            self.state.auto_space = not self.state.auto_space
             self.suppress_space = True
-            self.set_rgb(not self.auto_space)
+            self.set_rgb(not self.state.auto_space)
             return []
         elif combined == "SCTWHN": #SCTWHN: escape
             self.suppress_space = True
@@ -570,7 +573,7 @@ class Chord():
             keystrokes[0] = KC.LSFT(keystrokes[0])
 
         self.last_suppress_space = self.suppress_space
-        if not self.suppress_space and not attach_left and self.auto_space:
+        if not self.suppress_space and not attach_left and auto_space:
             keystrokes = [KC.SPC] + keystrokes
         self.last_stroke = len(keystrokes)
 
@@ -587,8 +590,9 @@ class Jackdaw(Module):
     #CHAINABLE = set(('X', 'Z', 'z', 'F'))
     CHAINABLE = set(('F',))
     def __init__(self, compact = False, rgb = None):
+        self.state = ChordState()
         self.rgb = rgb
-        self.chord = Chord(compact, rgb)
+        self.chord = Chord(compact, rgb, self.state)
         self.compact = compact
 
         self.held = set()
@@ -616,36 +620,31 @@ class Jackdaw(Module):
         else:
             self.held.discard(code)
 
-            if self.chord.auto_space:
+            if self.state.auto_space:
                 if self.held - self.CHAINABLE == set():
-                    output = self.chord.result()
+                    # coordkeys is private but ehhhh
+                    modifiers_held = any([isinstance(key, ModifierKey) for key in keyboard._coordkeys_pressed.values()])
+
+                    # No modifiers goes to True, which is consistent with auto_space a few lines up
+                    output = self.chord.result(auto_space_override = not modifiers_held)
                     self.handle_output(output)
                     self.chord.reset()
                     for key in self.held:
                         if key in self.CHAINABLE:
                             self.chord.add(key)
+
+                self.pressing = False
+                # Nothing important to do on the transition to auto_space, probably
             else:
                 if self.pressing:
                     output = self.chord.result()
                     self.handle_output(output)
                 self.chord.discard(code)
+                if self.state.auto_space:
+                    # Transition happened in this frame
+                    self.chord.reset()
                 self.pressing = False
 
-            # keys_pressed is the USB report; coordkeys is real keys (kmk internal)
-            # Peeking inside chord is terrible
-            # TODO: If modifiers are held down, also trigger this
-            #if self.pressing and (self.held - self.CHAINABLE == set() or self.chord.auto_space == False):
-            #    output = self.chord.result()
-            #    self.handle_output(output)
-            #    self.chord.reset()
-            #    for key in self.held:
-            #        if self.chord.auto_space == False or code in self.CHAINABLE:
-            #            self.chord.add(key)
-            #    self.pressing = False
-            #elif not self.chord.auto_space or code in self.CHAINABLE:
-            #    self.chord.discard(code)
-        # The bug: roll off the chord but leave the asterisk until last
-        # -> the asterisk will join the next chord
 
     # Not really chord, this is the output string
     def handle_output(self, chord):
