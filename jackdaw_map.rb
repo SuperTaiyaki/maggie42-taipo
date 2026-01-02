@@ -17,12 +17,12 @@ lh = [
 ['CHR', 'CHR'],
 ['SCTNR', 'GL'],
 ['ASCT', 'AG'],
-['ASTNR', 'ASQ'],
+['ASTNR', 'ASQ'], # wut
 
 ['S', 'S'],
 ['CNR', 'CL'],
 ['SCWHN', 'SPY'],
-['ASCW', 'ASP'],
+['ASCW', 'ASP'], # wut
 ['ASWHN', '-'],
 
 ['C', 'C'],
@@ -40,19 +40,19 @@ lh = [
 ['W', 'W'],
 #['TWR', '-'], # this and STWR removed because I want more useful things for them
 ['SCHNR', '-'],
-['ASCR', 'ASCR'],
+['ASCR', 'ASCR'], # wut
 ['ASHNR', '-'],
 
 ['H', 'H'],
 ['THN', 'TY'],
-['STWHN', 'XY'],
+['STWHN', 'XY'], # wut
 ['ASTW', 'AX'],
 ['ACTWH', 'AB'],
 
 ['N', 'N'],
 ['THR', 'THR'],
 ['STWHR', '-'],
-['ASTH', 'ASTH'],
+['ASTH', 'ASTH'], # wut
 ['ACTWN', 'ADM'],
 
 ['R', 'R'],
@@ -65,19 +65,19 @@ lh = [
 ['WHN', 'MY'],
 ['STHNR', 'STRY'],
 ['ASTR', '-'],
-['ACTHN', 'AFF'],
+['ACTHN', 'AFF'], # useful
 
 ['ST', 'ST'],
 ['WHR', '-'],
 ['SWHNR', '-'],
 ['ASWH', '-'],
-['ACTHR', 'AFR'],
+['ACTHR', 'AFR'], # useful
 
 ['SW', 'SW'],
 ['WNR', 'MR'],
 ['CTWHN', 'BY'],
 ['ASWN', 'ASM'],
-['ACTNR', 'ACQ'],
+['ACTNR', 'ACQ'], # wut... maybe QU would be more useful
 
 ['SH', 'SH'],
 ['HNR', 'LY'],
@@ -173,12 +173,12 @@ lh = [
 ['STHR', '-'],
 ['AT', 'AT'],
 ['ATWN', 'AJ'],
-['ASCWHN', 'ASPHY'],
+['ASCWHN', 'ASPHY'], # wut
 
 ['HR', 'RH'],
 ['STNR', 'SQ'],
 ['AW', 'AW'],
-['ATWR', 'ATTR'],
+['ATWR', 'ATTR'], # useful
 ['ASCWHR', '-'],
 
 ['NR', 'L'],
@@ -214,11 +214,11 @@ lh = [
 ['SCR', 'SCR'],
 ['CTWN', 'DEM'],
 ['ASW', '-'],
-['AWNR', 'ALL'],
+['AWNR', 'ALL'], # useful
 ['ASTHNR', '-'],
 
 ['STW', 'X'],
-['CTWR', 'DER'],
+['CTWR', 'DER'], # useful
 ['ASH', 'ASH'],
 ['AHNR', '-'],
 ['ASWHNR', '-'],
@@ -227,7 +227,7 @@ lh = [
 ['CTHN', 'DY'],
 ['ASN', 'ANN'],
 ['ASCTW', 'AGG'],
-['ACTWHN', 'ABY'],
+['ACTWHN', 'ABY'], # wut
 
 ['STN', 'SV'],
 ['CTHR', 'FR'],
@@ -267,7 +267,7 @@ lh = [
 
 ['SHR', 'SHR'],
 ['TWHN', 'KN'],
-['ATW', 'ATT'],
+['ATW', 'ATT'], # useful
 ['ASCHN', '-'],
 ['ASCTWHR', 'ABBR'],
 
@@ -275,7 +275,7 @@ lh = [
 ['TWHR', 'KR'],
 ['ATH', 'ATH'],
 ['ASCHR', '-'],
-['ASCTWNR', 'AGGL'],
+['ASCTWNR', 'AGGL'], # wut
 
 ['CTW', 'DW'],
 ['TWNR', 'JER'],
@@ -367,7 +367,8 @@ rh = [
 ['S', 'S'],
 ['NLS', 'SS'],
 ['RLHS', 'WLS'],
-['RNLHT', '-'],
+['RNLHT', 'LAT'],
+['RNLHTY', 'LATE'], # Need to fix the logic to generaet this
 ['RNLGCH', '-'],
 
 ['RN', 'RN'],
@@ -379,13 +380,13 @@ rh = [
 ['RL', 'RL'],
 ['NGH', 'M'],
 ['RGCH', 'RF'],
-['RNLTS', 'RSTS'],
+['RNLTS', 'RSTS'], # useful
 ['RNLGCS', 'LBS'],
 
 ['RG', 'RG'],
 ['NGT', 'NK'],
 ['RGCT', '-'],
-['RNGCH', 'FF'],
+['RNGCH', 'FF'], # useful
 ['RNLGHT', '-'],
 
 ['RC', 'RC'],
@@ -401,13 +402,13 @@ rh = [
 ['RNLGTS', 'LKS'],
 
 ['RT', 'RT'],
-['NCT', 'TION'],
+['NCT', 'TION'], # useful, but maybe collision (-nct is in the list). RNCT is open. Don't forget the plurals
 ['RGHS', '-'],
 ['RNGHT', '-'],
 ['RNLCHT', '-'],
 
 ['RS', 'RS'],
-['NCS', 'NCES'],
+['NCS', 'NCES'], # useful
 ['RGTS', 'RKS'],
 ['RNGHS', 'RMS'],
 ['RNLCHS', 'PHS'],
@@ -486,13 +487,13 @@ rh = [
 
 ['GH', 'GH'],
 ['LTS', 'LTS'],
-['NLHS', 'SHES'],
+['NLHS', 'SHES'], # useful
 ['RLCHS', 'RLD'],
 ['RGCHTS', '-'],
 
 ['GT', 'K'],
 ['GCH', 'F'],
-['NLTS', 'STS'],
+['NLTS', 'STS'], # useful
 ['RLCTS', '-'],
 ['NLGCHT', 'MPT'],
 
@@ -538,7 +539,7 @@ rh = [
 ['NLGCH', 'MP'],
 ['RNLGCHT', '-'],
 
-['RNL', 'LL'],
+['RNL', 'LL'], # useful
 ['CTS', 'CTS'],
 ['NCHS', 'ND'],
 ['NLGCT', '-'],
@@ -647,6 +648,7 @@ rh = [
 # STWN -> apostrophe
 # Used to be XN (well, STW is X)
 # RNGCH -> FF (useful, combination doesn't do anything. F + disambiguate)
+# -RNLHT -> LAT (generally handy)
 
 # RLCT -> J?
 # it normally generates RPH, which is only used for 'morph' - safe to remove?
@@ -814,7 +816,7 @@ if ARGV.size == 0
     #print "'#{k.upcase.sub('A', '4')}': '#{v}',\n" if v.size > 1
     #end
     #print("#{v} = #{k}\n")
-    k2 = k.sub('A', '4')
+    k2 = k.sub('A', '4').sub('y', 'dE')
     if output_rules.has_key? k2[0]
       output_rules[k2[0]].push([k2, v])
     else
