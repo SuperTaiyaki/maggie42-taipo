@@ -54,10 +54,8 @@ keyboard.modules.append(Cykey(rgb))
 #from taipo import Taipo
 #keyboard.modules.append(Taipo())
 
-keyboard.modules.append(Jackdaw())
+keyboard.modules.append(Jackdaw(rgb = rgb))
 keyboard.modules.append(Gemini())
-
-
 
 LAYER_NORMAL = 2
 LAYER_BROWSER = 3
@@ -71,30 +69,6 @@ holdtap = HoldTap()
 holdtap.tap_time = 150
 keyboard.modules.append(holdtap)
 
-
-# Flip the LED depending on the layout. This only affects the USB-connected half.
-class RGBKey1(Key):
-    def __init__(self, mode):
-        # TODO: be less lazy and don't use 1/not-1
-        self.mode = mode
-
-    def on_press(self, keyboard, coord_int = None):
-        if self.mode == 1:
-            layers.activate_layer(keyboard, LAYER_NORMAL)
-            rgb.set_hsv_fill(30, 200, 128)
-            rgb.show()
-        else:
-            layers.deactivate_layer(keyboard, LAYER_NORMAL)
-            rgb.set_hsv_fill(176, 200, 128)
-            rgb.show()
-
-    def on_release(self, keyboard, coord_int = None):
-        pass
-
-NORMAL_ON = RGBKey1(1)
-NORMAL_OFF = RGBKey1(0)
-# oh right I was going to do separate left/right layouts instead of this
-
 MWUP = KC.RF(KC.MW_UP, interval = 800, timeout = 20)
 MWDOWN = KC.RF(KC.MW_DOWN, interval = 800, timeout = 20)
 
@@ -103,7 +77,7 @@ keyboard.keymap = [
 [
        KC.BSPACE, KC.JD_4, KC.JD_C, KC.JD_W, KC.JD_N, KC.JD_X,       KC.JD_z, KC.JD_r, KC.JD_l, KC.JD_c, KC.JD_t, KC.JD_dE, # y/TE
    KC.JD_SHIFT,  KC.JD_S, KC.JD_T, KC.JD_H, KC.JD_R, KC.JD_UO,       KC.JD_F, KC.JD_n, KC.JD_g, KC.JD_h, KC.JD_s, KC.JD_e, 
-KC.NO, KC.JD_xQUOTE, KC.JD_xCOMMA, KC.JD_xDOT, KC.JD_UO, KC.JD_UO,      KC.JD_UO, KC.JD_UO, KC.NO, KC.E, KC.JD_SHIFT, KC.JD_y, 
+KC.LSFT, KC.LCTL, KC.LGUI, KC.LALT, KC.JD_UO, KC.JD_UO,      KC.JD_UO, KC.JD_UO, KC.NO, KC.E, KC.JD_SHIFT, KC.JD_y, 
 KC.TG(LAYER_JACKDAW), KC.NO, KC.NO, KC.MO(4), KC.JD_A, KC.JD_O,        KC.JD_E, KC.JD_u, KC.MO(1), KC.NO, KC.NO, KC.NO, 
     ],
 
@@ -186,7 +160,7 @@ KC.TG(LAYER_JACKDAW), KC.NO, KC.NO, KC.MO(4), KC.JD_A, KC.JD_O,        KC.JD_E, 
     # Lowered layer
     # HHKB-based
     [
-        NORMAL_OFF, KC.LSFT(KC.N1), KC.LSFT(KC.N2), KC.LSFT(KC.N3), KC.LSFT(KC.N4), KC.LSFT(KC.N5),    KC.LSFT(KC.N6), KC.LSFT(KC.N7), KC.LSFT(KC.N8), KC.LSFT(KC.N9), KC.INSERT, KC.DELETE, 
+        KC.NO, KC.LSFT(KC.N1), KC.LSFT(KC.N2), KC.LSFT(KC.N3), KC.LSFT(KC.N4), KC.LSFT(KC.N5),    KC.LSFT(KC.N6), KC.LSFT(KC.N7), KC.LSFT(KC.N8), KC.LSFT(KC.N9), KC.INSERT, KC.DELETE, 
         KC.TRNS, KC.N1, KC.N2, KC.N3, KC.N4, KC.N5,          KC.HOME, KC.PGUP, KC.N8, KC.UP, KC.GRAVE, KC.BSLASH, 
         KC.TRNS, KC.NO, KC.NO, KC.NO, KC.END, KC.NO,       KC.END, KC.PGDN, KC.LEFT, KC.DOWN, KC.RIGHT, KC.TRNS, 
         KC.NO, KC.NO, KC.NO, KC.NO, KC.NO, KC.NO,       KC.NO, KC.NO, KC.NO, KC.NO, KC.NO, KC.NO, 
@@ -201,7 +175,7 @@ KC.TG(LAYER_JACKDAW), KC.NO, KC.NO, KC.MO(4), KC.JD_A, KC.JD_O,        KC.JD_E, 
 # Extra layer: Gaming layout
 # arrow keys, z, x, and the like hanging out nearby
     [
-        NORMAL_OFF, KC.LSFT(KC.N1), KC.LSFT(KC.N2), KC.LSFT(KC.N3), KC.LSFT(KC.N4), KC.LSFT(KC.N5),    KC.TG(LAYER_GAME), KC.NO, KC.UP, KC.NO, KC.INSERT, KC.DELETE, 
+        KC.NO, KC.LSFT(KC.N1), KC.LSFT(KC.N2), KC.LSFT(KC.N3), KC.LSFT(KC.N4), KC.LSFT(KC.N5),    KC.TG(LAYER_GAME), KC.NO, KC.UP, KC.NO, KC.INSERT, KC.DELETE, 
         KC.TRNS, KC.N1, KC.N2, KC.N3, KC.N4, KC.N5,          KC.NO, KC.LEFT, KC.DOWN, KC.RIGHT, KC.GRAVE, KC.BSLASH, 
         KC.TRNS, KC.NO, KC.NO, KC.NO, KC.END, KC.NO,       KC.END, KC.PGDN, KC.LEFT, KC.I, KC.B, KC.SLASH, 
         KC.NO, KC.NO, KC.NO, KC.NO, KC.NO, KC.NO,       KC.SLASH, KC.B, KC.I, KC.NO, KC.NO, KC.NO, 

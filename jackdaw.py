@@ -373,15 +373,23 @@ specials = {
     'TNRrlct': DVP['SLSH'],
     'HNRrlct': DVP['SLSH'],
      # Need to put < > somewhere
+
+     # Inversion - apostrophe + nt -> n't (otherwise it takes 2 strokes)
+     'STWNnt': OutputStroke((DVP['N'], DVP['QUOT'], DVP['T']), attach_left = True, attach_right = False)
 }
 
+class ChordState():
+    def __init__(self):
+        self.auto_space = True
+
 class Chord():
-    def __init__(self, compact, rgb):
+    def __init__(self, compact, rgb, state):
         self.rgb = rgb
         self.compact = compact
         self.chord = {x: False for x in jd_keycodes}
 
         self.auto_space = True
+        self.state = state
 
         # Things that flow into the next chord
         self.next_shift = False
@@ -390,15 +398,14 @@ class Chord():
         self.last_stroke = 1 # for backspacing
         self.last_shift = False
 
-        self.set_rgb(False)
-
     def set_rgb(self, mode):
         if not self.rgb:
             return
-        return
         if mode:
+            print("set ON")
             self.rgb.set_hsv_fill(176, 140, 90)
         else:
+            print("set OFF")
             self.rgb.set_hsv_fill(30, 200, 180)
 
         self.rgb.show()
@@ -608,19 +615,35 @@ class Jackdaw(Module):
             self.pressing = True
         else:
             self.held.discard(code)
+
+            if self.chord.auto_space:
+                if self.held - self.CHAINABLE == set():
+                    output = self.chord.result()
+                    self.handle_output(output)
+                    self.chord.reset()
+                    for key in self.held:
+                        if key in self.CHAINABLE:
+                            self.chord.add(key)
+            else:
+                if self.pressing:
+                    output = self.chord.result()
+                    self.handle_output(output)
+                self.chord.discard(code)
+                self.pressing = False
+
             # keys_pressed is the USB report; coordkeys is real keys (kmk internal)
             # Peeking inside chord is terrible
             # TODO: If modifiers are held down, also trigger this
-            if self.pressing and (self.held - self.CHAINABLE == set() or self.chord.auto_space == False):
-                output = self.chord.result()
-                self.handle_output(output)
-                self.chord.reset()
-                for key in self.held:
-                    if self.chord.auto_space == False or code in self.CHAINABLE:
-                        self.chord.add(key)
-                self.pressing = False
-            elif not self.chord.auto_space or code in self.CHAINABLE:
-                self.chord.discard(code)
+            #if self.pressing and (self.held - self.CHAINABLE == set() or self.chord.auto_space == False):
+            #    output = self.chord.result()
+            #    self.handle_output(output)
+            #    self.chord.reset()
+            #    for key in self.held:
+            #        if self.chord.auto_space == False or code in self.CHAINABLE:
+            #            self.chord.add(key)
+            #    self.pressing = False
+            #elif not self.chord.auto_space or code in self.CHAINABLE:
+            #    self.chord.discard(code)
         # The bug: roll off the chord but leave the asterisk until last
         # -> the asterisk will join the next chord
 
@@ -634,6 +657,8 @@ class Jackdaw(Module):
         self.send_next += out
 
     def during_bootup(self, keyboard):
+        # TODO: cleaner bootup chain
+        #self.chord.set_rgb(False)
         pass
 
     def before_matrix_scan(self, keyboard):
