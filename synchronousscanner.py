@@ -7,9 +7,13 @@ from kmk.scanners import Scanner
 
 """ Straight up python matrix scanner, that hopefully won't desync like
 the built-in keypad scanner. Only supports standard diode layouts.
+
+The debounce algorithm is lifted from CircuitPython
 """
 
 class SynchronousScanner(Scanner):
+    # I didn't want debounce, crappy Kailh switches keep flaking out on me
+    DEBOUNCE = 10 # TODO: verify the scan rate, this should be expressed in time rather than cycles
     def __init__(self, col_pins, row_pins):
         self.cols = [digitalio.DigitalInOut(x) for x in col_pins]
         self.rows = [digitalio.DigitalInOut(x) for x in row_pins]
@@ -17,7 +21,7 @@ class SynchronousScanner(Scanner):
             r.pull = digitalio.Pull.DOWN
 
         # Public-ish?
-        self.matrix = [False] * (len(self.cols) * len(self.rows))
+        self.matrix = [- self.DEBOUNCE] * (len(self.cols) * len(self.rows))
 
         self.event_queue = [(0, 0)] * 64
         self.queue_head = 0
@@ -29,7 +33,7 @@ class SynchronousScanner(Scanner):
 
 #    @property
 #    def matrix(self):
-#        return matrix
+#        return [k == DEBOUNCE for k in self.matrix]
 
     def scan_for_changes(self):
         rowlength = len(self.cols)
@@ -42,9 +46,22 @@ class SynchronousScanner(Scanner):
                 # TODO: queue keydowns before keyups, for better chording
                 address = c + r * rowlength
                 value = self.rows[r].value
-                if self.matrix[address] != value:
-                    self.matrix[address] = value
-                    self.add_event(address, value)
+                if value:
+                    if self.matrix[address] < self.DEBOUNCE:
+                        self.matrix[address] += 1
+                        if self.matrix[address] >= 0:
+                            self.matrix[address] = self.DEBOUNCE
+                            self.add_event(address, value)
+                else:
+                    if self.matrix[address] > - self.DEBOUNCE:
+                        self.matrix[address] -= 1
+                        if self.matrix[address] <= 0:
+                            self.matrix[address] = - self.DEBOUNCE
+                            self.add_event(address, value)
+
+                #if self.matrix[address] != value:
+                #    self.matrix[address] = value
+                #    self.add_event(address, value)
 
             self.cols[c].switch_to_input()
         return self.get_event()

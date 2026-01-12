@@ -523,11 +523,6 @@ class Chord():
             for block in range(1, 4):
                 block_output = []
                 idx = 0
-                # Special case, un-convert the nl->s if it's the entire block (right hand consonants)
-                #if blocks[block] in ("nl", "nle", "nly"):
-                #    generated.append(list(blocks[block]))
-                #    continue
-                # Maybe handled in the jackdaw mapping rules
 
                 while idx < len(blocks[block]):
 
