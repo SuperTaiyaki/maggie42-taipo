@@ -196,7 +196,7 @@ lh = [
 ['SCW', 'SP'],
 ['SWNR', '-'],
 ['AR', 'AR'],
-['ATNR', 'AQ'],
+['ATNR', 'AQ'], # wut
 ['ASTWHN', '-'],
 
 ['SCH', 'SCH'],
@@ -298,7 +298,7 @@ lh = [
 ['CTR', 'DR'],
 ['SCTWH', '-'],
 ['AWN', 'AM'],
-['ASTWR', '-'],
+['ASTWR', 'EQU'],
 ['ACTWHNR', 'ABL'],
 
 ['CWH', 'PH'],
@@ -413,7 +413,7 @@ rh = [
 ['RNGHS', 'RMS'],
 ['RNLCHS', 'PHS'],
 
-['NL', 'S'],
+['NL', 'NL'],
 ['NHT', 'NTH'],
 ['RCHT', '-'],
 ['RNGTS', '-'],
@@ -649,6 +649,13 @@ rh = [
 # Used to be XN (well, STW is X)
 # RNGCH -> FF (useful, combination doesn't do anything. F + disambiguate)
 # -RNLHT -> LAT (generally handy)
+# ASTWR -> EQU (AS + QU) - this is the only pattern with a character in front of a Q (well, SQ but that generates anyway)
+# NL -> NL, but only on its own - s generates s, 'nl' is useful
+
+# Under consideration:
+# swap PL and LP?
+# both disambig + P (since L is half of P)
+# PL is kind of useless
 
 # RLCT -> J?
 # it normally generates RPH, which is only used for 'morph' - safe to remove?
@@ -705,7 +712,7 @@ $base_rules= [		# left hand obvious
 		['x', 'lgh'],
         # Y is a hard key
 		['z', 'lh'],
-        ['s', 'nl'],  # in the patent
+        ['nl', 'nl'],  # in the patent, but I only want this for combinations
 
         # Not in the patent, just some silliness I use
         ['te', 'tdE'],
@@ -795,6 +802,7 @@ if ARGV.size == 0
         #print "Diff: #{k} generates #{generated} (not #{v})\n"
         #print "'#{k.upcase.sub('A', '4')}': '#{v}',\n" if v.size > 1
         $base_rules.push([v, k])
+        $base_rules.uniq!
         $base_rules.sort_by! { |k, v| v.size * -1 }
 
         changed = true

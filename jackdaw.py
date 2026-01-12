@@ -523,6 +523,12 @@ class Chord():
             for block in range(1, 4):
                 block_output = []
                 idx = 0
+                # Special case, un-convert the nl->s if it's the entire block (right hand consonants)
+                #if blocks[block] in ("nl", "nle", "nly"):
+                #    generated.append(list(blocks[block]))
+                #    continue
+                # Maybe handled in the jackdaw mapping rules
+
                 while idx < len(blocks[block]):
 
                     # single x is used for things
@@ -688,11 +694,13 @@ class Jackdaw(Module):
 # In the end this is a lot closer to the original Shelton patent than the Jackdaw theory
 
 # TODO:
-# LEDs to indicate auto space (and other stuf)
 # Matrix reset button
 # Merge punctuation/number key into one word
 #   on press -> emit space
 #   at end of word -> re-enable auto space
+# Matrix scanner debounce (to deal with crappy kailh switches)
+# Backspace count buffer
+#   single backspaces need to cleanly go through it, the word breaks should remain
 
 # GRRRRR the weird matrix desync:
 # keydown is sending keyup!
