@@ -402,7 +402,7 @@ rh = [
 ['RNLGTS', 'LKS'],
 
 ['RT', 'RT'],
-['NCT', 'TION'], # useful, but maybe collision (-nct is in the list). RNCT is open. Don't forget the plurals
+['NCT', 'TION'], # useful, but maybe collision (-nct is in the list). RNCT is open. Don't forget the plurals. Combines well! (r, s)
 ['RGHS', '-'],
 ['RNGHT', '-'],
 ['RNLCHT', '-'],
@@ -552,7 +552,7 @@ rh = [
 ['RNLGCTS', '-'],
 
 ['RNC', '-'],
-['RNLG', 'DL'],
+['RNLG', 'LD'],
 ['NHTS', 'NTHS'],
 ['NLGHT', 'DTH'],
 ['RNLGHTS', '-'],
@@ -601,7 +601,7 @@ rh = [
 
 ['RLS', 'RLS'],
 ['RNGS', 'GNS'],
-['LCHS', 'LD'],
+['LCHS', 'DL'],
 ['NGCHS', 'MBS'],
 ['LGY', 'LOGY'],
 
@@ -651,6 +651,8 @@ rh = [
 # -RNLHT -> LAT (generally handy)
 # ASTWR -> EQU (AS + QU) - this is the only pattern with a character in front of a Q (well, SQ but that generates anyway)
 # NL -> NL, but only on its own - s generates s, 'nl' is useful
+# Swap DL (RNLG) and LD (LCHS)
+#     combos aren't adjusted though, may require further work
 
 # Under consideration:
 # swap PL and LP?

@@ -382,6 +382,24 @@ class ChordState():
     def __init__(self):
         self.auto_space = True
 
+class RewindBuffer():
+    BUFFER_SIZE = 10
+    def __init__(self):
+        self.buffer = [(1, False, False)] * self.BUFFER_SIZE
+        self.buffer_write = 0
+        self.reversed = 0 # For tracking single-char removals
+    def add(self, chars, suppress_space, shift):
+        self.buffer_write += 1
+        self.buffer_write %= self.BUFFER_SIZE
+        self.buffer[self.buffer_write] = (chars, suppress_space, shift)
+    def backspace(self):
+        # Return the entire state
+        ret = self.buffer[self.buffer_write]
+        self.buffer[self.buffer_write] = (1, False, False)
+        self.buffer_write -= 1
+        self.buffer_write %= self.BUFFER_SIZE
+        return ret
+
 class Chord():
     def __init__(self, compact, rgb, state):
         self.rgb = rgb
@@ -389,13 +407,15 @@ class Chord():
         self.chord = {x: False for x in jd_keycodes}
 
         self.state = state
+        self.rewind = RewindBuffer()
 
         # Things that flow into the next chord
         self.next_shift = False
         self.suppress_space = True
-        self.last_suppress_space = False
-        self.last_stroke = 1 # for backspacing
-        self.last_shift = False
+
+        #self.last_suppress_space = False
+        #self.last_stroke = 1 # for backspacing
+        #self.last_shift = False
 
     def set_rgb(self, mode):
         if not self.rgb:
@@ -440,13 +460,10 @@ class Chord():
         output = ""
 
         if combined == "S" and self.compact or combined == "BS" or combined == "SHIFT":
-            result = [KC.BSPACE] * self.last_stroke
-            self.last_stroke = 1
-            self.suppress_space = self.last_suppress_space
-            self.last_suppress_space = False
-
-            self.next_shift = self.last_shift
-            self.last_shift = False
+            keys, space, shift = self.rewind.backspace()
+            result = [KC.BSPACE] * keys
+            self.suppress_space = space
+            self.next_shift = shift
             return result
         elif combined in ('x', 'X', 'z', 'Z'):
             self.last_stroke = 1
@@ -569,20 +586,16 @@ class Chord():
 
         keystrokes = [c if isinstance(c, Key) else DVP[c] for c in output]
 
-        self.last_shift = self.next_shift
         if self.next_shift:
             keystrokes[0] = KC.LSFT(keystrokes[0])
 
-        self.last_suppress_space = self.suppress_space
         if not self.suppress_space and not attach_left and auto_space:
             keystrokes = [KC.SPC] + keystrokes
-        self.last_stroke = len(keystrokes)
+
+        self.rewind.add(len(keystrokes), self.suppress_space, self.next_shift)
 
         self.next_shift = end_sentence
         self.suppress_space = attach_right
-        # Something is wrong here, suppress_space flows into the next block weirdly.
-        # Suppress next is bascially now never useful...?
-        # Apart from attach_right type punctuation
 
         return keystrokes
 
@@ -693,9 +706,9 @@ class Jackdaw(Module):
 # Merge punctuation/number key into one word
 #   on press -> emit space
 #   at end of word -> re-enable auto space
-# Matrix scanner debounce (to deal with crappy kailh switches)
 # Backspace count buffer
 #   single backspaces need to cleanly go through it, the word breaks should remain
+# Split auto-space on/off (avoid toggles)
 
 # GRRRRR the weird matrix desync:
 # keydown is sending keyup!
