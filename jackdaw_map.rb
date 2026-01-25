@@ -543,7 +543,7 @@ rh = [
 ['CTS', 'CTS'],
 ['NCHS', 'ND'],
 ['NLGCT', '-'],
-['RNLGCHS', '-'],
+['RNLGCHS', 'DD'],
 
 ['RNG', 'GN'],
 ['HTS', 'THS'],
@@ -594,7 +594,7 @@ rh = [
 #['E', 'E'],
 
 ['RLT', '-'],
-['RNGT', '-'],
+['RNGT', 'TT'],
 ['LCHT', 'PTH'],
 ['NGCHT', '-'],
 ['CTE', 'CATE'],
@@ -612,7 +612,7 @@ rh = [
 ['GTSE', 'KES'],
 
 ['RGH', 'RGH'],
-['RNCT', '-'],
+['RNCT', '-'], # R + NCT, generates RTION (useful!)
 ['LHTS', '-'],
 ['NGHTS', 'NGTHS'],
 ['TSY', 'YS'],
@@ -653,6 +653,8 @@ rh = [
 # NL -> NL, but only on its own - s generates s, 'nl' is useful
 # Swap DL (RNLG) and LD (LCHS)
 #     combos aren't adjusted though, may require further work
+# RNLGCHS -> DD (both RH Ds, + modifier)
+# RNGT -> TT (T + mod + 1 more)
 
 # Under consideration:
 # swap PL and LP?
@@ -661,7 +663,7 @@ rh = [
 
 # RLCT -> J?
 # it normally generates RPH, which is only used for 'morph' - safe to remove?
-# right hand J is kind of useless though
+# Right hand J is useful because of the spacing rules (want to end on a consonant if possible) and for vim
 $base_rules= [		# left hand obvious
 		['a', 'A'],
 		['s', 'S'],
