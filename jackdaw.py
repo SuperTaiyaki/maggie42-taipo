@@ -348,6 +348,8 @@ specials = {
 
     'SRrlct': DVP['EQL'],
     'TRrlct': KC.QUOT, # Still weird (-)
+    'TRXrlct': OutputStroke(KC.QUOT, attach_left = True, attach_right = True), # hyphen + star
+    'TRzrlct': OutputStroke(KC.QUOT, attach_left = True, attach_right = True), # hyphen + star (bit broken, there are 4...)
     'HRrlct': OutputStroke(DVP['QUES'], attach_left = True, end_sentence = True),
 
     # N + (same as above, with shift held
@@ -488,7 +490,7 @@ class Chord():
             self.set_rgb(not self.state.auto_space)
             return []
         elif combined == "WHNRchts": # WHNR-chts (right 2x2s): Auto space off
-            self.state.auto_space = True
+            self.state.auto_space = False
             self.suppress_space = True
             self.set_rgb(not self.state.auto_space)
             return []
