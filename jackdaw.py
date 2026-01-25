@@ -417,6 +417,7 @@ class Chord():
         #self.last_stroke = 1 # for backspacing
         #self.last_shift = False
 
+    # TODO: Push this outside, it shouldn't belong to chord!
     def set_rgb(self, mode):
         if not self.rgb:
             return
@@ -481,11 +482,21 @@ class Chord():
         elif combined == "STHRrlct": # STHR-rlct: unshift next char
             self.next_shift = False
             return []
-        elif combined == "WHNRrnlg": # WHNR-rnlg (inner 2x2s): Auto space toggle
-            self.state.auto_space = not self.state.auto_space
+        elif combined == "WHNRrnlg": # WHNR-rnlg (inner 2x2s): Auto space on
+            self.state.auto_space = True
             self.suppress_space = True
             self.set_rgb(not self.state.auto_space)
             return []
+        elif combined == "WHNRchts": # WHNR-chts (right 2x2s): Auto space off
+            self.state.auto_space = True
+            self.suppress_space = True
+            self.set_rgb(not self.state.auto_space)
+            return []
+        elif combined == "WHNRlgch": # WHNR-lgch: Auto space off + escape (for vim)
+            self.state.auto_space = False
+            self.suppress_space = True
+            self.set_rgb(not self.state.auto_space)
+            return [KC.ESCAPE]
         elif combined == "SCTWHN": #SCTWHN: escape
             self.suppress_space = True
             return [KC.ESCAPE]
@@ -495,8 +506,10 @@ class Chord():
         elif combined == 'rlgcht':  # -rlgcht: Force-suppress next space
             # Normally generates rlft, useless
             # Could also just double-flip auto space
+            # Could also just hold asterisk
             self.suppress_space = True
             return []
+        # Maybe want: "Open" chord (suppress space + capital)
         elif combined in specials:
             special = specials[combined]
             if isinstance(special, OutputStroke):
@@ -706,9 +719,6 @@ class Jackdaw(Module):
 # Merge punctuation/number key into one word
 #   on press -> emit space
 #   at end of word -> re-enable auto space
-# Backspace count buffer
-#   single backspaces need to cleanly go through it, the word breaks should remain
-# Split auto-space on/off (avoid toggles)
 
 # GRRRRR the weird matrix desync:
 # keydown is sending keyup!
