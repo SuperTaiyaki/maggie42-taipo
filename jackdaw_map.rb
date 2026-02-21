@@ -34,7 +34,7 @@ lh = [
 ['T', 'T'],
 ['TWN', 'J'],
 ['SCWNR', 'SPL'],
-['ASCN', 'ASS'],
+['ASCN', 'ASS'], # useful
 ['ASWNR', '-'],
 
 ['W', 'W'],
@@ -53,13 +53,13 @@ lh = [
 ['THR', 'THR'],
 ['STWHR', '-'],
 ['ASTH', 'ASTH'], # wut
-['ACTWN', 'ADM'],
+['ACTWN', 'ADM'], # useful
 
 ['R', 'R'],
 ['TNR', 'Q'],
-['STWNR', 'SERV'],
+['STWNR', 'SERV'], # useful
 ['ASTN', '-'],
-['ACTWR', 'ADDR'],
+['ACTWR', 'ADDR'], # useful
 
 ['SC', 'SC'],
 ['WHN', 'MY'],
@@ -106,7 +106,7 @@ lh = [
 ['CW', 'P'],
 ['SCTR', 'GR'],
 ['TWHNR', 'KL'],
-['ACTW', 'ADD'],
+['ACTW', 'ADD'], # useful
 ['ATWHN', 'ACKN'],
 
 ['CH', 'CH'],
@@ -118,14 +118,14 @@ lh = [
 ['CN', 'Z'],
 ['SCWN', '-'],
 ['SCTWHR', '-'],
-['ACTN', 'ADV'],
+['ACTN', 'ADV'], # useful
 ['ATWNR', '-'],
 
 ['CR', 'CR'],
 ['SCWR', 'SPR'],
 ['SCTWNR', '-'],
 ['ACTR', 'ADR'],
-['ATHNR', 'ATHL'],
+['ATHNR', 'ATHL'], # useful
 
 ['TW', 'TW'],
 ['SCHN', '-'],
@@ -137,7 +137,7 @@ lh = [
 ['SCHR', '-'],
 ['SCWHNR', '-'],
 ['ACWN', 'AMM'],
-['ASCTWH', 'ABB'],
+['ASCTWH', 'ABB'], # useful
 
 ['TN', 'V'],
 ['SCNR', '-'],
@@ -148,14 +148,14 @@ lh = [
 ['TR', 'TR'],
 ['STWH', 'SK'],
 ['CTWHNR', 'BL'],
-['ACHN', 'ACC'],
-['ASCTWR', 'AGGR'],
+['ACHN', 'ACC'], # useful
+['ASCTWR', 'AGGR'], # useful
 
 ['WH', 'WH'],
 ['STWN', '\\\''],
 ['SCTWHNR', '-'],
-['ACHR', 'ACCR'],
-['ASCTHN', 'AFT'],
+['ACHR', 'ACCR'], # useful
+['ASCTHN', 'AFT'], # useful (why as? disambiguates with AFF)
 
 ['WN', 'M'],
 #['STWR', 'XR'],
@@ -185,7 +185,7 @@ lh = [
 ['SWHN', '-'],
 ['AH', 'AH'],
 ['ATHN', '-'],
-['ASCWNR', 'APPL'],
+['ASCWNR', 'APPL'], # useful
 
 ['SCT', 'G'],
 ['SWHR', '-'],
@@ -205,14 +205,14 @@ lh = [
 ['AWHN', '-'],
 ['ASTWHR', '-'],
 
-['SCN', 'SS'],
+['SCN', 'SS'], # useful + wat
 ['CTWH', 'B'],
 ['AST', 'AST'],
 ['AWHR', '-'],
 ['ASTWNR', '-'],
 
 ['SCR', 'SCR'],
-['CTWN', 'DEM'],
+['CTWN', 'DEM'], # useful
 ['ASW', '-'],
 ['AWNR', 'ALL'], # useful
 ['ASTHNR', '-'],
@@ -225,18 +225,18 @@ lh = [
 
 ['STH', '-'],
 ['CTHN', 'DY'],
-['ASN', 'ANN'],
-['ASCTW', 'AGG'],
+['ASN', 'ANN'], # useful
+['ASCTW', 'AGG'], # useful
 ['ACTWHN', 'ABY'], # wut
 
 ['STN', 'SV'],
 ['CTHR', 'FR'],
-['ASR', 'ARR'],
+['ASR', 'ARR'], # useful
 ['ASCTH', 'AGH'],
 ['ACTWHR', 'ABR'],
 
 ['STR', 'STR'],
-['CTNR', 'DEL'],
+['CTNR', 'DEL'], # useful
 ['ACT', 'AD'],
 ['ASCTN', 'AGN'],
 ['ACTWNR', 'ADDL'],
@@ -256,7 +256,7 @@ lh = [
 ['SWR', '-'],
 ['CWNR', 'PL'],
 ['ACN', 'AZ'],
-['ASCWN', 'APP'],
+['ASCWN', 'APP'], # useful
 ['ATWHNR', '-'],
 
 ['SHN', 'SY'],
@@ -289,7 +289,7 @@ lh = [
 ['ASTWH', 'ASK'],
 ['ASCWHNR', '-'],
 
-['CTN', 'DEV'],
+['CTN', 'DEV'], # useful
 ['WHNR', ''],
 ['AWH', 'AWH'],
 ['ASTWN', '-'],
@@ -534,7 +534,7 @@ rh = [
 ['LGCHTS', '-'],
 
 ['TS', 'TS'],
-['CHS', 'D'],
+#['CHS', 'LD'], # base rule
 ['NCHT', '-'],
 ['NLGCH', 'MP'],
 ['RNLGCHT', '-'],
@@ -636,6 +636,28 @@ rh = [
 ['RCS', 'RCS'],
 ['RLGC', '-'],
 ['CHTS', 'DS'],
+
+# The doubled up stuff
+['RYE','RR'],
+['NYE','NN'],
+#['lye','ll'], # exists
+['GYE','GG'],
+['CYE','CC'],
+['HYE','HH'], # Never used?
+['TYE','TT'], # no idea how to stroke these
+# ['sye','ss'], # Already exists
+
+['GCYE','BB'],
+['NLGYE','DD'],
+['CHSYE','DD'], # hard to stroke
+#['gchye','ff'], # exists
+# ['gtye','kk'], # Never used? Also really hard to stroke
+['NGHYE','MM'],
+['LCYE','PP'],
+['NHYE','VV'], # Probably never used
+['RHYE','WW'], # Yeah, no
+['LGHYE','XX'],
+['LHYE','ZZ'],
 ]
 
 # Changes memo:
@@ -655,11 +677,10 @@ rh = [
 #     combos aren't adjusted though, may require further work
 # RNLGCHS -> DD (both RH Ds, + modifier)
 # RNGT -> TT (T + mod + 1 more)
+# -YE to double the last consonant
 
 # Under consideration:
-# swap PL and LP?
-# both disambig + P (since L is half of P)
-# PL is kind of useless
+# Put LD on right -D (CHS)? Combo as D as usual, regular D has other D (NLG), shouldn't conflict
 
 # RLCT -> J?
 # it normally generates RPH, which is only used for 'morph' - safe to remove?
@@ -706,7 +727,7 @@ $base_rules= [		# left hand obvious
 		# right hand required (to be fair, you can type this with the left hand anyway, but it takes another stroke)
 		['b', 'gc'],
 		['d', 'nlg'],
-		['d', 'chs'],
+		['ld', 'chs'],
 		['f', 'gch'],
 		['k', 'gt'],
 		['m', 'ngh'],

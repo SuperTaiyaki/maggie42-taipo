@@ -204,7 +204,7 @@ rules_vowels_raw = {
         'OEu': 'oi',
         'AOu': 'oo',
         'Ou': 'ou',
-        'AOEu': 'oa',
+        'AOEu': 'ia',
 
         'A': 'a',
         'O': 'o',
@@ -222,7 +222,7 @@ rules_vowels_shifted_raw = {
         'E': 'ue',
         'u': 'ui', # uu makes no sense
         'Eu': 'oe', # not great (confusing), but generating a single is a bit useless
-        'AO': 'eo',
+        'AO': 'oa', # Kind of natural?
         'Ou': 'ui', # Redundant
 
         'OE': 'ei', # regular flip
@@ -347,7 +347,7 @@ specials = {
     'WRrlct': DVP['BSLS'],
 
     'SRrlct': DVP['EQL'],
-    'TRrlct': KC.QUOT, # Still weird (-)
+    'TRrlct': OutputStroke(KC.QUOT, attach_left = True, attach_right = True), # Still weird (-)
     'TRXrlct': OutputStroke(KC.QUOT, attach_left = True, attach_right = True), # hyphen + star
     'TRzrlct': OutputStroke(KC.QUOT, attach_left = True, attach_right = True), # hyphen + star (bit broken, there are 4...)
     'HRrlct': OutputStroke(DVP['QUES'], attach_left = True, end_sentence = True),
