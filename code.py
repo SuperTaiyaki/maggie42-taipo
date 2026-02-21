@@ -21,7 +21,6 @@ from kmk.utils import Debug
 debug = Debug(__name__)
 
 from jackdaw import Jackdaw
-from geminipr import Gemini
 
 from synchronousscanner import SynchronousScanner
 
@@ -48,14 +47,9 @@ keyboard.modules.append(layers)
 rgb = RGB(pixel_pin = board.NEOPIXEL, num_pixels = 1, hue_default = 176, sat_default = 30, val_default = 128, val_limit = 128,)
 keyboard.extensions.append(rgb)
 
-from cykey import Cykey
-keyboard.modules.append(Cykey(rgb))
-
-#from taipo import Taipo
-#keyboard.modules.append(Taipo())
-
 keyboard.modules.append(Jackdaw(rgb = rgb))
-keyboard.modules.append(Gemini())
+#from geminipr import Gemini
+#keyboard.modules.append(Gemini())
 
 LAYER_NORMAL = 2
 LAYER_BROWSER = 3
@@ -80,59 +74,6 @@ keyboard.keymap = [
 KC.LSFT, KC.LCTL, KC.LGUI, KC.LALT, KC.JD_UO, KC.JD_UO,      KC.JD_UO, KC.JD_F, KC.RALT, KC.RGUI, KC.RCTL, KC.JD_y, 
 KC.TG(LAYER_JACKDAW), KC.NO, KC.NO, KC.MO(4), KC.JD_A, KC.JD_O,        KC.JD_E, KC.JD_u, KC.MO(1), KC.NO, KC.NO, KC.NO, 
     ],
-
-# Taipo
-        [
-        KC.TG(1), KC.TP_TLP, KC.TP_TLR, KC.TP_TLM, KC.TP_TLI,  MWUP,          KC.TG(LAYER_GAME), KC.TP_TRI, KC.TP_TRM, KC.TP_TRR, KC.TP_TRP, KC.TG(1), 
-        KC.NO, KC.TP_BLP, KC.TP_BLR, KC.TP_BLM, KC.TP_BLI, MWDOWN,         KC.NO, KC.TP_BRI, KC.TP_BRM, KC.TP_BRR, KC.TP_BRP, KC.TG(LAYER_GEMINI), 
-        KC.NO, KC.TP_BLP, KC.TP_BLR, KC.LAYER2, KC.TP_LIT, KC.TP_LOT,      KC.TP_ROT, KC.TP_RIT, KC.TP_BRI, KC.TP_BRM, KC.TP_BRR, KC.TP_BRP, 
-        KC.NO, KC.NO, KC.NO, KC.SK(KC.MO(LAYER_BROWSER)), KC.TP_LIT, KC.TP_LOT,       KC.TP_RIT, KC.TP_ROT, KC.MO(1), KC.NO, KC.NO, KC.NO, 
-        ],
-
-# Most everything after this is unused
-
-# TP but Cykey
-#       [
-#       KC.NO, KC.TP_TLP, KC.TP_TLR, KC.TP_TLM, KC.TP_TLI,  MWUP,          KC.TG(LAYER_GAME), KC.TP_TRI, KC.TP_TRM, KC.TP_TRR, KC.TP_BRP, KC.TG(LAYER_JACKDAW), 
-#       KC.NO, KC.TP_TLP, KC.TP_BLR, KC.TP_BLM, KC.TP_BLI, MWDOWN,         KC.NO, KC.TP_BRI, KC.TP_BRI, KC.TP_BRM, KC.TP_BRR, KC.TG(LAYER_GEMINI), 
-#       KC.NO, KC.TP_BLP, KC.TP_BLR, KC.LAYER2, KC.LAYER1, KC.TP_LUT,      KC.NO, KC.TP_BRI, KC.TP_BRI, KC.TP_BRM, KC.TP_BRR, KC.TP_BRP, 
-#       KC.NO, KC.NO, KC.NO, KC.SK(KC.MO(LAYER_BROWSER)), KC.TP_LOT, KC.TP_LIT,       KC.TP_RIT, KC.TP_ROT, KC.MO(1), KC.NO, KC.NO, KC.NO, 
-#       ],
-        # bottom-left should probably change to a oneshot since it's a pain to reach
-        # Taipo macro layer - useful browser stuff
-        # tab left/right
-        # spawn tab, kill tab
-       # scroll up, scroll down
-        # flip desktops
-        # ctrl+l to focus address bar would be handy (maybe)
-        [
-        KC.TRNS, KC.LGUI(KC.N1), KC.LGUI(KC.N2), KC.LGUI(KC.N3), KC.LGUI(KC.N4), KC.LGUI(KC.N5),  KC.LGUI(KC.N6), KC.LGUI(KC.N7), KC.LGUI(KC.N8), KC.LGUI(KC.N9), KC.LGUI(KC.N0), KC.NO, 
-        KC.NO, KC.TP_TLP, KC.TP_TLR, KC.TP_TLM, KC.TP_TLI, KC.NO,     KC.NO, KC.TP_TRI, KC.TP_TRM, KC.TP_TRR, KC.TP_TRP, KC.NO, 
-        KC.NO, KC.TP_BLP, KC.TP_BLR, KC.TP_BLM, KC.TP_BLI, KC.NO,      KC.NO, KC.TP_BRI, KC.TP_BRM, KC.TP_BRR, KC.TP_BRP, KC.NO, 
-        KC.NO, KC.NO, KC.NO, KC.TRIGGERL, KC.TP_LIT, KC.TP_LOT,       KC.TP_ROT, KC.TP_RIT, KC.TRIGGERR, KC.NO, KC.NO, KC.NO, 
-        ],
-
-
-        # Let's go with watchman, maybe
-        # https://www.keyboard-layout-editor.com/#/gists/246772cb72fa2de02354d5cb1add6b2b
-
-                   # for this layer:
-                   # corner is escape (tap), GUI (hold)
-                   # that can be done with holdtap, but I want to change the layer too
-                   # oh wait I like tab... tab/GUI?
-                   # then escape is a combo...
-                   # thumb outermost should be FN
-
-                   # what to do about shifted numbers, and escape, and the like?
-
-        # Normal layer
-       [KC.LT(LAYER_BROWSER, KC.TAB),   KC.Q,KC.W,KC.E,KC.R,KC.T,         KC.Y, KC.U, KC.I, KC.O, KC.P, KC.BACKSPACE,
-       KC.LCTRL, KC.A, KC.S, KC.D, KC.F, KC.G,     KC.H, KC.J, KC.K, KC.L, KC.SEMICOLON, KC.QUOTE,
-       KC.LSHIFT, KC.Z, KC.X, KC.C, KC.V, KC.B,        KC.N, KC.M, KC.COMMA, KC.DOT, KC.SLASH, KC.RSHIFT,
-       KC.NO, KC.NO, KC.NO, KC.LT(LAYER_BROWSER, KC.ESCAPE), KC.LT(LAYER_RAISED, KC.BSPACE), KC.SPACE,       KC.ENTER, KC.LT(LAYER_LOWERED, KC.SPACE), KC.HT(KC.ESCAPE, KC.LGUI), KC.NO, KC.NO, KC.NO
-       ],
-       # That top right backspace is maybe unnecessary
-       
 
     # Browser layer
     # empty spaces can be used for non-browser convenience stuff
@@ -185,14 +126,12 @@ KC.TG(LAYER_JACKDAW), KC.NO, KC.NO, KC.MO(4), KC.JD_A, KC.JD_O,        KC.JD_E, 
 # Numbers, symbols, etc. Same style as Cykey
 
 # Gemini steno
-[
-                   KC.BSPACE, KC.G_S1, KC.G_LT, KC.G_LP, KC.G_LH, KC.G_ST1,       KC.G_ST3, KC.G_RF, KC.G_RP, KC.G_RL, KC.G_RT, KC.G_RD,
-                   KC.BSPACE, KC.G_S2, KC.G_LK, KC.G_LW, KC.G_LR, KC.G_ST2,       KC.G_ST4, KC.G_RR, KC.G_RB, KC.G_RG, KC.G_RS, KC.G_RZ, 
-        KC.TG(LAYER_GEMINI), KC.JD_S, KC.JD_T, KC.JD_H, KC.JD_I, KC.G_LA,       KC.G_RU, KC.JD_u, KC.JD_g, KC.JD_h, KC.JD_s, KC.JD_y, 
-        KC.TG(LAYER_JACKDAW), KC.NO, KC.NO, KC.SPC, KC.G_LA, KC.G_LO,            KC.G_RE, KC.G_RU, KC.ENTER, KC.NO, KC.NO, KC.NO, 
-    ],
-
-
+#[
+#                   KC.BSPACE, KC.G_S1, KC.G_LT, KC.G_LP, KC.G_LH, KC.G_ST1,       KC.G_ST3, KC.G_RF, KC.G_RP, KC.G_RL, KC.G_RT, KC.G_RD,
+#                   KC.BSPACE, KC.G_S2, KC.G_LK, KC.G_LW, KC.G_LR, KC.G_ST2,       KC.G_ST4, KC.G_RR, KC.G_RB, KC.G_RG, KC.G_RS, KC.G_RZ, 
+#        KC.TG(LAYER_GEMINI), KC.JD_S, KC.JD_T, KC.JD_H, KC.JD_I, KC.G_LA,       KC.G_RU, KC.JD_u, KC.JD_g, KC.JD_h, KC.JD_s, KC.JD_y, 
+#        KC.TG(LAYER_JACKDAW), KC.NO, KC.NO, KC.SPC, KC.G_LA, KC.G_LO,            KC.G_RE, KC.G_RU, KC.ENTER, KC.NO, KC.NO, KC.NO, 
+#    ],
                    ]
 
 if __name__ == '__main__':
