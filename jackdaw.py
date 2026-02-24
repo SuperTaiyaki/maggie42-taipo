@@ -52,6 +52,7 @@ class OutputStroke():
 lh_keycodes = [
 # Not LH but needs to be up first
 'F', # Function?
+'M', # macro
 
 '4',
 'S',
@@ -276,27 +277,27 @@ specials = {
     'F': '',
 
     # Cykey layout uses the dropped pinkie just because I prefer it
-    'FN': KC.N1, # Cykey style
-    'FNO': KC.N2, # Cykey style
-    'FWNO': KC.N3, # Cykey style
-    'FCWNO': KC.N4, # Cykey style
-    'F4CWNO': KC.N5, # Cykey style
-    'F4': KC.N6, # Cykey style
-    'F4C': KC.N7, # Cykey style
-    'F4CW': KC.N8, # Cykey style
-    'F4CWN': KC.N9, # Cykey style
-    'FW': KC.N0, # Cykey style
+    'FN': OutputStroke(KC.N1, attach_left = True, attach_right = True), # Cykey style
+    'FNO': OutputStroke(KC.N2, attach_left = True, attach_right = True), # Cykey style
+    'FWNO': OutputStroke(KC.N3, attach_left = True, attach_right = True), # Cykey style
+    'FCWNO': OutputStroke(KC.N4, attach_left = True, attach_right = True), # Cykey style
+    'F4CWNO': OutputStroke(KC.N5, attach_left = True, attach_right = True), # Cykey style
+    'F4': OutputStroke(KC.N6, attach_left = True, attach_right = True), # Cykey style
+    'F4C': OutputStroke(KC.N7, attach_left = True, attach_right = True), # Cykey style
+    'F4CW': OutputStroke(KC.N8, attach_left = True, attach_right = True), # Cykey style
+    'F4CWN': OutputStroke(KC.N9, attach_left = True, attach_right = True), # Cykey style
+    'FW': OutputStroke(KC.N0, attach_left = True, attach_right = True), # Cykey style
 
-    'FNUO': KC.LSFT(KC.N1), # Number + vowel mod for shifter numbers (symbols)
-    'FNUOO': KC.LSFT(KC.N2),
-    'FWNUOO': KC.LSFT(KC.N3),
-    'FCWNUOO': KC.LSFT(KC.N4),
-    'F4CWNUOO': KC.LSFT(KC.N5),
-    'F4UO': KC.LSFT(KC.N6),
-    'F4CUO': KC.LSFT(KC.N7),
-    'F4CWUO': KC.LSFT(KC.N8),
-    'F4CWNUO': KC.LSFT(KC.N9),
-    'FWUO': KC.LSFT(KC.N0),
+    'FNUO': OutputStroke(KC.LSFT(KC.N1), attach_left = True, attach_right = True), # Number + vowel mod for shifter numbers (symbols)
+    'FNUOO': OutputStroke(KC.LSFT(KC.N2), attach_left = True, attach_right = True),
+    'FWNUOO': OutputStroke(KC.LSFT(KC.N3), attach_left = True, attach_right = True),
+    'FCWNUOO': OutputStroke(KC.LSFT(KC.N4), attach_left = True, attach_right = True),
+    'F4CWNUOO': OutputStroke(KC.LSFT(KC.N5), attach_left = True, attach_right = True),
+    'F4UO': OutputStroke(KC.LSFT(KC.N6), attach_left = True, attach_right = True),
+    'F4CUO': OutputStroke(KC.LSFT(KC.N7), attach_left = True, attach_right = True),
+    'F4CWUO': OutputStroke(KC.LSFT(KC.N8), attach_left = True, attach_right = True),
+    'F4CWNUO': OutputStroke(KC.LSFT(KC.N9), attach_left = True, attach_right = True),
+    'FWUO': OutputStroke(KC.LSFT(KC.N0), attach_left = True, attach_right = True),
  
     # Better than the asterisk reach? But it's always in use anyway...
     'Hg': OutputStroke(KC.SPC, attach_left = True, attach_right = True),
@@ -377,7 +378,12 @@ specials = {
      # Need to put < > somewhere
 
      # Inversion - apostrophe + nt -> n't (otherwise it takes 2 strokes)
-     'STWNnt': OutputStroke((DVP['N'], DVP['QUOT'], DVP['T']), attach_left = True, attach_right = False)
+     'STWNnt': OutputStroke((DVP['N'], DVP['QUOT'], DVP['T']), attach_left = True, attach_right = False),
+
+    # Word generator shortcuts
+     'M': [],
+     'MEu': KC.LSFT(DVP['I']),
+     'Mls': OutputStroke((DVP['A'], DVP['L'], DVP['S'], DVP['O'])),
 }
 
 class ChordState():
@@ -509,6 +515,7 @@ class Chord():
             # Normally generates rlft, useless
             # Could also just double-flip auto space
             # Could also just hold asterisk
+            # Could also re-enable auto space (that kills the space)
             self.suppress_space = True
             return []
         # Maybe want: "Open" chord (suppress space + capital)

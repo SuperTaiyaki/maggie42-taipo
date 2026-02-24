@@ -1,3 +1,34 @@
+Getting started:
+    Non-spacing mode might be useful, but don't stick with it too much
+    Dunno what order is best for memorizing, need everything in the end
+    settings for monkey/typey: ?
+    lock in that home position!
+    In the end, need to memorize syllables. It's all muscle memory and there's a lot to memorize
+
+Annoying things:
+    RN- and -NR are flipped. Gets a bit confusing.
+    Vowels suck, no way around it
+    Some things simply don't generate and need to span both hands, i.e. middle -> DLE- doesn't work (also TLE-)
+
+Overall rules:
+    Steno order - strokes generate based on the layout
+        Mostly. There are exceptions - see the chart. Especially -HT and -GHT
+    A left consonant will add a space, unless suppressed with an asterisk
+    A left WHNR will space the next word (due to the previous rule - used for opening consonants)
+    If you need more consonants in the middle, you'll need to break up the chord
+
+Chord-generating rules:
+    Not a rule, but most everything just works for English
+    -RN switches to alternate outputs
+        -NG = NG, -RNG = GN
+        (and the LD thing)
+        - I don't think there's a left hand version
+    -Be aware of the second S - it gets used a lot (-F in steno)
+    -If there's a chord you want the map has plenty of empty spaces
+        rules.rb for syllables that get combined, jackdaw.py for entire chords (can't be combined)
+    -left quote, right quote and apostrophe are different (due to word binding)
+
+
 A C W N (XZ)    |    (zx) r l c t (tE)
 S T H R (UO)    |    (ei) n g h s (y)
    (I) I E (A)     (A) o u (u)
@@ -120,28 +151,33 @@ rules_vowels_raw = {
 
         }
 rules_vowels_shifted_raw = {
-        'AEu': 'ia',
-        'Au': 'ua', # redundant, but I dont' want to use this (outer + thumb modifier is a bad reach)
-        'AE': 'ae', # regular reverse
-        'AOE': 'ee', # redundant (in main layer)
+        'A': 'ua',
+        'O': 'uo', # Kind of useless, virtually no cases that aren't quo
+        'E': 'ue',
+        'u': 'ui', # uu makes no sense
         'Eu': 'oe', # not great (confusing), but generating a single is a bit useless
+        'AO': 'eo',
+        'Ou': 'ui', # Redundant
+
         'OE': 'ei', # regular flip
-        'AO': 'oi', # redundant . easy to type, should drop something useful in here
-        'OEu': 'io', # redundant
+        'AE': 'ae', # regular flip
+
+        'AEu': 'ia', # regular flip
+
+        'AOE': 'ee', # redundant (in main layer)
+        'OEu': 'iou',
         'AOu': 'oo', # redundant
 
-        'AOEu': 'ao', # redundant and painful (and never used anyway)
-
-        'Ou': 'ui', # Experimental WAIT these overlap
-        # Would normally flip to uo but that's never used
-
-        'A': 'ua',
-        'O': 'uo',
-        'E': 'ue',
-        'u': 'ui',
-        # Can generate 3-letter sets too, might be more useful. eau, in particular?
-        # Want: iu (medium) but it's pretty low frequency
-        # eo? (people... anything else?)
+        'AOEu': '', # painful
+        'Au': '', # Even more painful
         }
 
+Extra useful LH:
+['ASCN', 'ASS'],
+['ACTW', 'ADD'],
+['ASCTWH', 'ABB'],
+['AWNR', 'ALL']
+['ASCTW', 'AGG']
+['ASCWN', 'APP']
+['ATW', 'ATT']
 

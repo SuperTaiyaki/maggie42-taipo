@@ -71,7 +71,7 @@ keyboard.keymap = [
 [
        KC.BSPACE, KC.JD_4, KC.JD_C, KC.JD_W, KC.JD_N, KC.JD_X,       KC.JD_z, KC.JD_r, KC.JD_l, KC.JD_c, KC.JD_t, KC.JD_dE, # y/TE
    KC.JD_SHIFT,  KC.JD_S, KC.JD_T, KC.JD_H, KC.JD_R, KC.JD_UO,       KC.JD_F, KC.JD_n, KC.JD_g, KC.JD_h, KC.JD_s, KC.JD_e, 
-KC.LSFT, KC.LCTL, KC.LGUI, KC.LALT, KC.JD_UO, KC.JD_UO,      KC.JD_UO, KC.JD_F, KC.RALT, KC.RGUI, KC.RCTL, KC.JD_y, 
+KC.LSFT, KC.LCTL, KC.LGUI, KC.LALT, KC.JD_M, KC.JD_UO,      KC.JD_UO, KC.JD_F, KC.RALT, KC.RGUI, KC.RCTL, KC.JD_y, 
 KC.TG(LAYER_JACKDAW), KC.NO, KC.NO, KC.MO(4), KC.JD_A, KC.JD_O,        KC.JD_E, KC.JD_u, KC.MO(1), KC.NO, KC.NO, KC.NO, 
     ],
 
