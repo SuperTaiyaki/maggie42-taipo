@@ -319,6 +319,8 @@ lh = [
 ['CHN', 'CY'],
 ['SCTHR', '-'],
 ['ANR', 'AL'],
+
+['ETW', 'EX'], # this isn't generating as 3.
 ]
 
 rh = [
@@ -463,7 +465,7 @@ rh = [
 
 ['LH', 'Z'],
 ['LCT', 'PT'],
-['NLCH', '-'],
+['NLCH', 'SC'],
 ['RLGHT', '-'],
 ['RLGCHS', '-'],
 
@@ -678,14 +680,18 @@ rh = [
 # RNLGCHS -> DD (both RH Ds, + modifier)
 # RNGT -> TT (T + mod + 1 more)
 # -YE to double the last consonant
+# Put LD on right -D (CHS)? Combo as D as usual, regular D has other D (NLG), shouldn't conflict
+# -NLCH to generate sc (previously SPH)
+# E on the left hand (on the board with enough space), left of S.
+# merge with X (STW) -> ETW for EX
 
 # Under consideration:
-# Put LD on right -D (CHS)? Combo as D as usual, regular D has other D (NLG), shouldn't conflict
 
 # RLCT -> J?
 # it normally generates RPH, which is only used for 'morph' - safe to remove?
 # Right hand J is useful because of the spacing rules (want to end on a consonant if possible) and for vim
 $base_rules= [		# left hand obvious
+        ['e', 'E'],
 		['a', 'A'],
 		['s', 'S'],
 		['c', 'C'],
@@ -740,10 +746,10 @@ $base_rules= [		# left hand obvious
         ['nl', 'nl'],  # in the patent, but I only want this for combinations
 
         # Not in the patent, just some silliness I use
-        ['te', 'tdE'],
-        ['ey', 'dEe'],
+        ['te', 'td'],
+        ['ey', 'de'],
         ['er', 'ey'], # maybe useful?
-        ['y', 'dE'],
+        ['y', 'd'],
 
         # Only from the wiki, but crucial
         ['qu', 'TWR'],
@@ -773,7 +779,7 @@ def generate(chord)
   return output
 end
 
-left_sort = %w"A S C T W H N R"
+left_sort = %w"E A S C T W H N R"
 right_sort = %w"r n l g c h t s e y"
 
 lh_sorted = lh.map {|k, v| [k.upcase, v.downcase]}.sort_by { |k, v|
@@ -849,7 +855,13 @@ if ARGV.size == 0
     #print "'#{k.upcase.sub('A', '4')}': '#{v}',\n" if v.size > 1
     #end
     #print("#{v} = #{k}\n")
-    k2 = k.sub('A', '4').sub('y', 'dE')
+
+    # ARGH FUCK should just fix these stupid things to be single keys...
+    # need to lose the UO too
+    # unused keys:
+    # Abused keys: d (magic Y/E) F (numbers) M (macro) Q (vowel shift)
+    # B D J K P V
+    k2 = k == 'E' ? '3' : k.sub('A', '4')#.sub('y', 'd')
     if output_rules.has_key? k2[0]
       output_rules[k2[0]].push([k2, v])
     else

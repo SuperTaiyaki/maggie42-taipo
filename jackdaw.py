@@ -22,7 +22,7 @@ except ImportError:
 from micropython import const
 
 import kmk.handlers.stock as handlers
-from kmk.keys import Key, KC, make_key, ModifierKey
+from kmk.keys import Key, KC, make_key, ModifierKey, ModifiedKey
 from kmk.kmk_keyboard import KMKKeyboard
 from kmk.modules import Module
 from kmk.utils import Debug
@@ -54,6 +54,7 @@ lh_keycodes = [
 'F', # Function?
 'M', # macro
 
+'3', # leading E
 '4',
 'S',
 'C',
@@ -67,7 +68,7 @@ lh_keycodes = [
 ]
 
 center_keycodes = [
-'UO', # Because this is a modifier
+'Q', # Because this is a modifier
 'A',
 'O',
 'E',
@@ -78,8 +79,6 @@ rh_keycodes =  [
 'x', # These are maybe special
 'z',
 
-'xQUOTE',
-
 'r',
 'n',
 'l',
@@ -89,17 +88,13 @@ rh_keycodes =  [
 't',
 's',
 
-'dE', # Call this something else, the t breaks shit (generates Y or TE)
+'d', # magic TE
 'e',
 'y',
-
-'xDOT',
-'xCOMMA',
 ]
 
 special_keycodes = [
 'BS',
-'SHIFT',
 ]
 
 jd_keycodes = lh_keycodes + center_keycodes + rh_keycodes + special_keycodes
@@ -107,59 +102,6 @@ for key in jd_keycodes:
     make_key(names = ("JD_" + key,), constructor = JackdawKey, code = key, block = 0)
 
 """ Vowel silliness
-AO - EU is reasonable...
-    That's the steno order
-    The patent order is ei-a-ou
-A
-O
-E
-U
-ao
-ae
-au
-oe
-ou
-eu
-
-aoe
-aou
-aeu
-oeu
-
-aoeu
-
-SO the existent 2-chars are:
-aa
-ae*
-ai*
-ao*
-au*
-
-ea**
-ee**
-ei**
-eo
-eu*
-
-ia* trial
-ie** field
-ii
-io** prior
-iu?
-
-oa* boar
-oe?
-oi* toil
-oo**
-ou**
-
-ua
-ue* fuel
-ui?
-uo 
-uu
-at least 16 combinations in use
-
 I don't recall whose dataset this is, extracted from an English bigram frequency chart
     "ou": 17457, <-- natural
     "ea": 13361, <-- natural (kind of, flip of ae)
@@ -224,17 +166,19 @@ rules_vowels_shifted_raw = {
         'u': 'ui', # uu makes no sense
         'Eu': 'oe', # not great (confusing), but generating a single is a bit useless
         'AO': 'oa', # Kind of natural?
+        'OE': 'ei', # regular flip
+        'AE': 'ae', # regular flip (but useless)
+
+        # These are doubled to allow for different thumb key locations
+        'OEu': 'iou',
+        'AEu': 'iou',
+
+        'AOE': 'eo',
+        'AOu': 'eo',
+
         'Ou': 'ui', # Redundant
 
-        'OE': 'ei', # regular flip
-        'AE': 'ae', # regular flip
-
-        'AEu': 'ia', # regular flip
-
-        'AOE': 'ee', # redundant (in main layer)
-        'OEu': 'iou',
-        'AOu': 'oo', # redundant
-
+        # Don't like to stroke these
         'AOEu': '', # painful
         'Au': '', # Even more painful
         # Can generate 3-letter sets too, might be more useful. eau, in particular?
@@ -246,10 +190,6 @@ rules_vowels_shifted_raw = {
 # Pre-generated out of jackdaw_map.rb to save memory
 from jackdaw_rules import rules
 
-# Extended rules that I don't want in the generator. Must be sorted by length.
-# Probably throw these away
-rules['x'] = [('xCOMMA', ','), ('xQUOTE', '\''), ('xDOT', '.'), ('x', '')]
-# ===================
 # Also want key-emitting stuff to I can lose the special cases
 
 # Numbers... making it shiftable gives me symbols too, which is nice
@@ -272,8 +212,6 @@ for v in center_keycodes:
 
 # No reason to do the leader breakdown like the main generator
 specials = {
-    'xQUOTEOU': '"', # sub-optimal, probably
-
     'F': '',
 
     # Cykey layout uses the dropped pinkie just because I prefer it
@@ -288,16 +226,16 @@ specials = {
     'F4CWN': OutputStroke(KC.N9, attach_left = True, attach_right = True), # Cykey style
     'FW': OutputStroke(KC.N0, attach_left = True, attach_right = True), # Cykey style
 
-    'FNUO': OutputStroke(KC.LSFT(KC.N1), attach_left = True, attach_right = True), # Number + vowel mod for shifter numbers (symbols)
-    'FNUOO': OutputStroke(KC.LSFT(KC.N2), attach_left = True, attach_right = True),
-    'FWNUOO': OutputStroke(KC.LSFT(KC.N3), attach_left = True, attach_right = True),
-    'FCWNUOO': OutputStroke(KC.LSFT(KC.N4), attach_left = True, attach_right = True),
-    'F4CWNUOO': OutputStroke(KC.LSFT(KC.N5), attach_left = True, attach_right = True),
-    'F4UO': OutputStroke(KC.LSFT(KC.N6), attach_left = True, attach_right = True),
-    'F4CUO': OutputStroke(KC.LSFT(KC.N7), attach_left = True, attach_right = True),
-    'F4CWUO': OutputStroke(KC.LSFT(KC.N8), attach_left = True, attach_right = True),
-    'F4CWNUO': OutputStroke(KC.LSFT(KC.N9), attach_left = True, attach_right = True),
-    'FWUO': OutputStroke(KC.LSFT(KC.N0), attach_left = True, attach_right = True),
+    'FNQ': OutputStroke(KC.LSFT(KC.N1), attach_left = True, attach_right = True), # Number + vowel mod for shifter numbers (symbols)
+    'FNQO': OutputStroke(KC.LSFT(KC.N2), attach_left = True, attach_right = True),
+    'FWNQO': OutputStroke(KC.LSFT(KC.N3), attach_left = True, attach_right = True),
+    'FCWNQO': OutputStroke(KC.LSFT(KC.N4), attach_left = True, attach_right = True),
+    'F4CWNQO': OutputStroke(KC.LSFT(KC.N5), attach_left = True, attach_right = True),
+    'F4Q': OutputStroke(KC.LSFT(KC.N6), attach_left = True, attach_right = True),
+    'F4CQ': OutputStroke(KC.LSFT(KC.N7), attach_left = True, attach_right = True),
+    'F4CWQ': OutputStroke(KC.LSFT(KC.N8), attach_left = True, attach_right = True),
+    'F4CWNQ': OutputStroke(KC.LSFT(KC.N9), attach_left = True, attach_right = True),
+    'FWQ': OutputStroke(KC.LSFT(KC.N0), attach_left = True, attach_right = True),
  
     # Better than the asterisk reach? But it's always in use anyway...
     'Hg': OutputStroke(KC.SPC, attach_left = True, attach_right = True),
@@ -382,8 +320,8 @@ specials = {
 
     # Word generator shortcuts
      'M': [],
-     'MEu': KC.LSFT(DVP['I']),
-     'Mls': OutputStroke((DVP['A'], DVP['L'], DVP['S'], DVP['O'])),
+     'MEu': KC.LSFT(DVP['I']), # M+I -> capital I
+     'Mls': OutputStroke((DVP['A'], DVP['L'], DVP['S'], DVP['O'])), # LS -> also
 }
 
 class ChordState():
@@ -420,10 +358,8 @@ class Chord():
         # Things that flow into the next chord
         self.next_shift = False
         self.suppress_space = True
-
-        #self.last_suppress_space = False
-        #self.last_stroke = 1 # for backspacing
-        #self.last_shift = False
+        self.word_caps = False
+        self.word_caps_tripped = False
 
     # TODO: Push this outside, it shouldn't belong to chord!
     def set_rgb(self, mode):
@@ -468,7 +404,7 @@ class Chord():
 
         output = ""
 
-        if combined == "S" and self.compact or combined == "BS" or combined == "SHIFT":
+        if combined in ("S", "3", "BS"):
             keys, space, shift = self.rewind.backspace()
             result = [KC.BSPACE] * keys
             self.suppress_space = space
@@ -487,8 +423,13 @@ class Chord():
         elif combined == "STHR": # STHR-: Shift next char
             self.next_shift = True
             return []
+        elif combined == "STHRnghs": # STHR-nghs: shift whole word
+            self.word_caps = True
+            self.word_caps_tripped = False
+            return []
         elif combined == "STHRrlct": # STHR-rlct: unshift next char
             self.next_shift = False
+            self.word_caps = False
             return []
         elif combined == "WHNRrnlg": # WHNR-rnlg (inner 2x2s): Auto space on
             self.state.auto_space = True
@@ -519,6 +460,7 @@ class Chord():
             self.suppress_space = True
             return []
         # Maybe want: "Open" chord (suppress space + capital)
+        # Also want: Capitalize until next word break
         elif combined in specials:
             special = specials[combined]
             if isinstance(special, OutputStroke):
@@ -538,9 +480,9 @@ class Chord():
             # The regular chord generation rules
             generated = []
             output_v = []
-            vowel_shift = blocks[0].startswith("UO")
+            vowel_shift = blocks[0].startswith("Q")
             vrules = rules_vowels_shifted if vowel_shift else rules_vowels
-            idx = 2 if vowel_shift else 0
+            idx = 1 if vowel_shift else 0
             while idx < len(blocks[0]):
                 initial_idx = idx
                 if blocks[0][idx] not in vrules:
@@ -570,13 +512,6 @@ class Chord():
                         attach_left = True
                         idx += 1
                         continue
-                    # TODO: scrap this, this is not how shift works any more
-                    # But this is still backspace
-                    if blocks[block].startswith('SHIFT', idx):
-                        idx += 5 # len('shift')
-                        # Now this does nothing, actually. Maybe it shuold generate an e?
-                        break # not continue because SHIFT is at the end
-
                     initial_idx = idx
 
                     if blocks[block][idx] not in rules:
@@ -602,7 +537,7 @@ class Chord():
                 return "" # There's a chord that generates nothing
 
             # Horrible hack: apostrophe force-attaches (don't want to put it in specials because there are too many RH combos)
-            # NOTE: check blocks rather than output for generated auto-spacing, since the null (WHR) generates nothing and then it's empty
+            # NOTE: check blocks rather than output for generated auto-spacing, since the null (WHRN) generates nothing and then it's empty
             if output[0] == "'" or len(blocks[1]) == 0:
                 attach_left = True
 
@@ -611,8 +546,23 @@ class Chord():
         if self.next_shift:
             keystrokes[0] = KC.LSFT(keystrokes[0])
 
+        word_break = False
         if not self.suppress_space and not attach_left and auto_space:
             keystrokes = [KC.SPC] + keystrokes
+            word_break = True
+
+        if word_break and self.word_caps_tripped:
+            self.word_caps = False
+            self.word_caps_tripped = False
+
+        if self.word_caps:
+            keystrokes = [KC.LSFT(k) if
+                        (k != KC.SPC and
+                        not isinstance(k, ModifiedKey) and
+                        not isinstance(k, ModifierKey))
+                        else k
+                        for k in keystrokes]
+            self.word_caps_tripped = True
 
         self.rewind.add(len(keystrokes), self.suppress_space, self.next_shift)
 
