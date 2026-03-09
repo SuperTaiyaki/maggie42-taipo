@@ -48,12 +48,20 @@ class OutputStroke():
 
 # JD_4 is an A key
 # This is in steno order!
+#
+# Which vowel is most common leading?
+# a: 17 - 226 = 209
+# e: 797-960 = 163 (NGSL only)
+# i: 1250 - 1365 = 115 (but it and in are here)
+# o: 1679 - 1746 = 77
+# u: 2639 - 2676 = 37
 
 lh_keycodes = [
 # Not LH but needs to be up first
 'F', # Function?
 'M', # macro
 
+'1', # leading I
 '3', # leading E
 '4',
 'S',

@@ -61,9 +61,9 @@ MWDOWN = KC.RF(KC.MW_DOWN, interval = 800, timeout = 20)
 keyboard.keymap = [
 # Jackdaw
 [
-KC.JD_4, KC.JD_C, KC.JD_W, KC.JD_N,      KC.JD_X,    KC.JD_r, KC.JD_l, KC.JD_c, KC.JD_t, KC.JD_dE,
+KC.JD_4, KC.JD_C, KC.JD_W, KC.JD_N,      KC.JD_X,    KC.JD_r, KC.JD_l, KC.JD_c, KC.JD_t, KC.JD_d,
 KC.JD_S, KC.JD_T, KC.JD_H, KC.JD_R,      KC.JD_z,    KC.JD_n, KC.JD_g, KC.JD_h, KC.JD_s, KC.JD_e, 
-KC.LCTL, KC.LGUI, KC.LALT, KC.JD_UO,     KC.MO(3),    KC.JD_UO,  KC.JD_u, KC.TG(4), KC.TG(3), KC.JD_y,
+KC.LCTL, KC.LGUI, KC.LALT, KC.JD_Q,     KC.JD_M,    KC.JD_Q,  KC.JD_u, KC.TG(4), KC.TG(3), KC.JD_y,
 KC.NO,                  KC.JD_A, KC.JD_O, KC.JD_E, KC.JD_u,    KC.JD_F# thumb row
 ],
 # Terrible hack, center key to flip to taipo since symbols and stuff work

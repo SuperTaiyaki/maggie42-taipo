@@ -320,7 +320,8 @@ lh = [
 ['SCTHR', '-'],
 ['ANR', 'AL'],
 
-['ETW', 'EX'], # this isn't generating as 3.
+['ETW', 'EX'],
+['ETWR', 'EQU'],
 ]
 
 rh = [
@@ -640,26 +641,26 @@ rh = [
 ['CHTS', 'DS'],
 
 # The doubled up stuff
-['RYE','RR'],
-['NYE','NN'],
+['RDE','RR'],
+['NDE','NN'],
 #['lye','ll'], # exists
-['GYE','GG'],
-['CYE','CC'],
-['HYE','HH'], # Never used?
-['TYE','TT'], # no idea how to stroke these
+['GDE','GG'],
+['CDE','CC'],
+['HDE','HH'], # Never used?
+['TDE','TT'], # no idea how to stroke these
 # ['sye','ss'], # Already exists
 
-['GCYE','BB'],
-['NLGYE','DD'],
-['CHSYE','DD'], # hard to stroke
+['GCDE','BB'],
+['NLGDE','DD'],
+['CHSDE','DD'], # hard to stroke
 #['gchye','ff'], # exists
 # ['gtye','kk'], # Never used? Also really hard to stroke
-['NGHYE','MM'],
-['LCYE','PP'],
-['NHYE','VV'], # Probably never used
-['RHYE','WW'], # Yeah, no
-['LGHYE','XX'],
-['LHYE','ZZ'],
+['NGHDE','MM'],
+['LCDE','PP'],
+['NHDE','VV'], # Probably never used
+['RHDE','WW'], # Yeah, no
+['LGHDE','XX'],
+['LHDE','ZZ'],
 ]
 
 # Changes memo:
@@ -690,8 +691,13 @@ rh = [
 # RLCT -> J?
 # it normally generates RPH, which is only used for 'morph' - safe to remove?
 # Right hand J is useful because of the spacing rules (want to end on a consonant if possible) and for vim
-$base_rules= [		# left hand obvious
+$base_rules= [		
+        ['i', 'I'], # non-standard, optional
         ['e', 'E'],
+        ['o', 'IE'],
+        ['u', 'IA'], # Why not
+
+        # left hand obvious
 		['a', 'A'],
 		['s', 'S'],
 		['c', 'C'],
@@ -779,8 +785,8 @@ def generate(chord)
   return output
 end
 
-left_sort = %w"E A S C T W H N R"
-right_sort = %w"r n l g c h t s e y"
+left_sort = %w"I E A S C T W H N R"
+right_sort = %w"r n l g c h t s e y d"
 
 lh_sorted = lh.map {|k, v| [k.upcase, v.downcase]}.sort_by { |k, v|
   val = 0
@@ -856,12 +862,10 @@ if ARGV.size == 0
     #end
     #print("#{v} = #{k}\n")
 
-    # ARGH FUCK should just fix these stupid things to be single keys...
-    # need to lose the UO too
-    # unused keys:
-    # Abused keys: d (magic Y/E) F (numbers) M (macro) Q (vowel shift)
+    # unused letters:
     # B D J K P V
-    k2 = k == 'E' ? '3' : k.sub('A', '4')#.sub('y', 'd')
+    # Abused keys: d (magic Y/E) F (numbers) M (macro) Q (vowel shift)
+    k2 = k.sub('I', '1').sub('E', '3').sub('A', '4')
     if output_rules.has_key? k2[0]
       output_rules[k2[0]].push([k2, v])
     else
