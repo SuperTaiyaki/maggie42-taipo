@@ -29,6 +29,7 @@ else
 	make maggie
 endif
 
+# mpy-cross: https://adafruit-circuit-python.s3.amazonaws.com/index.html?prefix=bin/mpy-cross/
 MPY=../mpy-cross-linux-amd64-10.1.4.static
 
 %.mpy: %.py
