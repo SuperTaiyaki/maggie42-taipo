@@ -6,6 +6,9 @@ switch:
 ifeq ($(BOARD), gherkin)
 	echo "Building Gherkin"
 	make gherkin
+else ifeq ($(BOARD), onthe17)
+	echo "Building OnThe17"
+	make onthe17
 else ifeq ($(BOARD), handyman)
 	echo "Building handyman"
 	make handyman
@@ -17,22 +20,37 @@ else ifeq ($(BOARD), keyer)
 	make keyer
 else ifeq ($(BOARD), maggie-r)
 	echo "Building maggie right"
+	echo "DISABLED"
+	exit 1
+	# REscue the files first
 	make maggie-r
 else
 	echo "Building maggie"
 	make maggie
 endif
 
-maggie:
+MPY=../mpy-cross-linux-amd64-10.1.4.static
+
+%.mpy: %.py
+	$(MPY) -o $@ $<
+
+clean:
+	rm *.mpy
+
+maggie: thicksplit.mpy 
 	cp thicksplit.py synchronousscanner.py cykey.py jackdaw.py jackdaw_rules.py geminipr.py taipo.py dvp.py code.py /mnt/sda1/ && sync
 
 maggie-r:
 	cp maggie-right.py /mnt/sda1/code.py
 	cp thicksplit.py synchronousscanner.py cykey.py /mnt/sda1/ && sync
 
-gherkin:
+gherkin: code_gherkin.py cykey.mpy jackdaw.mpy jackdaw_rules.mpy synchronousscanner.mpy dvp.mpy
 	cp code_gherkin.py /mnt/sda1/code.py
-	cp cykey.py jackdaw.py jackdaw_rules.py synchronousscanner.py geminipr.py taipo.py dvp.py /mnt/sda1/ && sync
+	cp $^ /mnt/sda1/ && sync
+
+onthe17:
+	cp code_seventeen.py /mnt/sda1/code.py
+	cp pwm3360.py cykey.py jackdaw.py jackdaw_rules.py synchronousscanner.py dvp.py /mnt/sda1/ && sync
 
 handyman:
 	cp code-handyman.py /mnt/sda1/code.py

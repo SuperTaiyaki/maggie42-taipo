@@ -5,18 +5,16 @@ from kmk.kmk_keyboard import KMKKeyboard
 from kmk.keys import KC, Key, make_key
 from kmk.scanners import DiodeOrientation
 from kmk.modules.layers import Layers
-from kmk.modules.split import Split, SplitSide
 from kmk.modules.sticky_keys import StickyKeys # requirement for Taipo (formerly oneshot, KC.OS)
 from kmk.modules.holdtap import HoldTap
 # Mouse stuff
-from kmk.modules.mouse_keys import MouseKeys
-from kmk.modules.rapidfire import RapidFire
+#from kmk.modules.mouse_keys import MouseKeys
+#from kmk.modules.rapidfire import RapidFire
 
 from kmk.utils import Debug
 debug = Debug(__name__)
 
 from jackdaw import Jackdaw
-from geminipr import Gemini
 
 from synchronousscanner import SynchronousScanner
 
@@ -33,60 +31,42 @@ keyboard.diode_orientation = DiodeOrientation.COLUMNS
 keyboard.matrix = SynchronousScanner(keyboard.col_pins, keyboard.row_pins)
 
 keyboard.modules.append(StickyKeys(release_after = 3000))
-keyboard.modules.append(MouseKeys())
-keyboard.modules.append(RapidFire())
 
 layers = Layers()
 layers.tap_time = 150
 keyboard.modules.append(layers)
 
-#from cykey import Cykey
-#keyboard.modules.append(Cykey())
-
-#from taipo import Taipo
-#keyboard.modules.append(Taipo())
 from cykey import Cykey
 keyboard.modules.append(Cykey())
 
 keyboard.modules.append(Jackdaw(compact = True))
-keyboard.modules.append(Gemini())
 
 holdtap = HoldTap()
 holdtap.tap_time = 150
 keyboard.modules.append(holdtap)
-
-MWUP = KC.RF(KC.MW_UP, interval = 800, timeout = 20)
-MWDOWN = KC.RF(KC.MW_DOWN, interval = 800, timeout = 20)
 
 keyboard.keymap = [
 # Jackdaw
 [
 KC.JD_4, KC.JD_C, KC.JD_W, KC.JD_N,      KC.JD_X,    KC.JD_r, KC.JD_l, KC.JD_c, KC.JD_t, KC.JD_d,
 KC.JD_S, KC.JD_T, KC.JD_H, KC.JD_R,      KC.JD_z,    KC.JD_n, KC.JD_g, KC.JD_h, KC.JD_s, KC.JD_e, 
-KC.LCTL, KC.LGUI, KC.LALT, KC.JD_Q,     KC.JD_M,    KC.JD_Q,  KC.JD_u, KC.TG(4), KC.TG(3), KC.JD_y,
+KC.JD_3, KC.LGUI, KC.LALT, KC.JD_Q,     KC.JD_M,    KC.JD_Q,  KC.JD_u, KC.TG(4), KC.TG(3), KC.JD_y,
 KC.NO,                  KC.JD_A, KC.JD_O, KC.JD_E, KC.JD_u,    KC.JD_F# thumb row
 ],
 # Terrible hack, center key to flip to taipo since symbols and stuff work
 
-# GeminiPR steno
-[
-KC.G_S1, KC.G_LT, KC.G_LP, KC.G_LH, KC.G_ST1,   KC.G_RF, KC.G_RP, KC.G_RL, KC.G_RT, KC.G_RD,
-KC.G_S2, KC.G_LK, KC.G_LW, KC.G_LR, KC.G_ST2,   KC.G_RR, KC.G_RB, KC.G_RG, KC.G_RS, KC.G_RZ, 
-KC.NO, KC.NO, KC.SPC, KC.G_LA, KC.G_LO,         KC.G_RE, KC.G_RU,   KC.ENTER, KC.NO, KC.NO,
-],
-
 # Taipo (unused)
 [
-KC.TP_TLP, KC.TP_TLR, KC.TP_TLM, KC.TP_TLI,  MWUP,          KC.TG(3), KC.TP_TRI, KC.TP_TRM, KC.TP_TRR, KC.TP_BRP,
-KC.TP_BLP, KC.TP_BLR, KC.TP_BLM, KC.TP_BLI, MWDOWN,         KC.NO, KC.TP_BRI, KC.TP_BRI, KC.TP_BRM, KC.TP_BRR,
+KC.TP_TLP, KC.TP_TLR, KC.TP_TLM, KC.TP_TLI,  KC.NO,          KC.TG(3), KC.TP_TRI, KC.TP_TRM, KC.TP_TRR, KC.TP_BRP,
+KC.TP_BLP, KC.TP_BLR, KC.TP_BLM, KC.TP_BLI, KC.NO,         KC.NO, KC.TP_BRI, KC.TP_BRI, KC.TP_BRM, KC.TP_BRR,
 KC.TP_BLP, KC.TP_BLR, KC.LAYER2, KC.TP_LIT, KC.TP_LOT,      KC.TP_LIT, KC.TP_BRI, KC.TP_BRI, KC.TP_BRM, KC.TP_BRR,
 KC.NO , KC.TP_LIT, KC.TP_LOT, KC.JD_E, KC.JD_u, KC.JD_C # thumb row
 ],
 
 # Cykey
 [
-KC.TP_TLP, KC.TP_TLR, KC.TP_TLM, KC.TP_TLI,     MWUP,          KC.TG(3), KC.TP_TRI, KC.TP_TRM, KC.TP_TRR,       KC.TP_BRP,
-KC.TP_BLP, KC.TP_BLR, KC.TP_BLM, KC.TP_BLI,     MWDOWN,         KC.NO, KC.TP_BRI, KC.TP_BRI, KC.TP_BRM, KC.     TP_BRR,
+KC.TP_TLP, KC.TP_TLR, KC.TP_TLM, KC.TP_TLI,     KC.NO,          KC.TG(3), KC.TP_TRI, KC.TP_TRM, KC.TP_TRR,       KC.TP_BRP,
+KC.TP_BLP, KC.TP_BLR, KC.TP_BLM, KC.TP_BLI,     KC.NO,         KC.NO, KC.TP_BRI, KC.TP_BRI, KC.TP_BRM, KC.     TP_BRR,
 KC.TP_BLP, KC.TP_BLR, KC.LAYER2, KC.TP_LIT,     KC.TP_LOT,      KC.TP_LIT, KC.TP_BRI, KC.TP_BRI, KC.TP_BRM,     KC.TP_BRR,
 KC.NO , KC.TP_LIT, KC.TP_LIT, KC.TP_LOT, KC.TP_LOT, KC.JD_C # thumb row
 ],
@@ -159,5 +139,4 @@ KC.NO,      KC.NO, KC.SPACE, KC.LCTRL, KC.ENTER, KC.LGUI
 if __name__ == '__main__':
     #debug.enabled = False
     keyboard.go()
-
 
