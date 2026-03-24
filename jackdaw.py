@@ -175,7 +175,7 @@ rules_vowels_shifted_raw = {
         'Eu': 'oe', # not great (confusing), but generating a single is a bit useless
         'AO': 'oa', # Kind of natural?
         'OE': 'ei', # regular flip
-        'AE': 'ae', # regular flip (but useless)
+        'Au': 'ei', # Copy of the same, might be more comfortable depending on layout
 
         # These are doubled to allow for different thumb key locations
         'OEu': 'iou',
@@ -184,11 +184,11 @@ rules_vowels_shifted_raw = {
         'AOE': 'eo',
         'AOu': 'eo',
 
+        'AE': 'ae', # regular flip (but useless)
         'Ou': 'ui', # Redundant
 
         # Don't like to stroke these
         'AOEu': '', # painful
-        'Au': '', # Even more painful
         # Can generate 3-letter sets too, might be more useful. eau, in particular?
         # iou appears a little bit (curious). Actually more than eau!
         # Want: iu (medium) but it's pretty low frequency
@@ -439,13 +439,13 @@ class Chord():
             self.next_shift = False
             self.word_caps = False
             return []
-        elif combined == "WHNRrnlg": # WHNR-rnlg (inner 2x2s): Auto space on
-            self.state.auto_space = True
+        elif combined == "WHNRrnlg": # WHNR-rnlg (inner 2x2s): Auto space off
+            self.state.auto_space = False
             self.suppress_space = True
             self.set_rgb(not self.state.auto_space)
             return []
-        elif combined == "WHNRchts": # WHNR-chts (right 2x2s): Auto space off
-            self.state.auto_space = False
+        elif combined == "WHNRchts": # WHNR-chts (right 2x2s): Auto space on (gap between blocks)
+            self.state.auto_space = True
             self.suppress_space = True
             self.set_rgb(not self.state.auto_space)
             return []
@@ -459,7 +459,7 @@ class Chord():
             return [KC.ESCAPE]
         elif combined == "SCTWHR": #SCTWHR: tab (the SB combos - SBN, SBR are useless)
             self.suppress_space = True
-            return [KC.ESCAPE]
+            return [KC.ESCAPE] # TODO: need a backspace too (for unindenting, reverse of tab)
         elif combined == 'rlgcht':  # -rlgcht: Force-suppress next space
             # Normally generates rlft, useless
             # Could also just double-flip auto space

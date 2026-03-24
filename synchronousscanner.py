@@ -13,7 +13,7 @@ The debounce algorithm is lifted from CircuitPython
 
 class SynchronousScanner(Scanner):
     # I didn't want debounce, crappy Kailh switches keep flaking out on me
-    DEBOUNCE = 10 # TODO: verify the scan rate, this should be expressed in time rather than cycles
+    DEBOUNCE = 2 # TODO: verify the scan rate, this should be expressed in time rather than cycles
     def __init__(self, col_pins, row_pins):
         self.cols = [digitalio.DigitalInOut(x) for x in col_pins]
         self.rows = [digitalio.DigitalInOut(x) for x in row_pins]
@@ -40,6 +40,7 @@ class SynchronousScanner(Scanner):
         for c in range(len(self.cols)):
             self.cols[c].switch_to_output(value = True)
             # May need a more serious debounce
+            # HRMMM maybe I should log the transitions on a test sled and see what happens
             time.sleep(0.000_01)
 
             for r in range(len(self.rows)):

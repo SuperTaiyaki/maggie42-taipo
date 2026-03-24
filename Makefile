@@ -38,8 +38,9 @@ MPY=../mpy-cross-linux-amd64-10.1.4.static
 clean:
 	rm *.mpy
 
-maggie: thicksplit.mpy 
-	cp thicksplit.py synchronousscanner.py cykey.py jackdaw.py jackdaw_rules.py geminipr.py taipo.py dvp.py code.py /mnt/sda1/ && sync
+maggie: thicksplit.mpy synchronousscanner.mpy cykey.mpy jackdaw.mpy jackdaw_rules.mpy geminipr.mpy taipo.mpy dvp.mpy
+	cp code.py /mnt/sda1/code.py
+	cp $^  /mnt/sda1/ && sync
 
 maggie-r:
 	cp maggie-right.py /mnt/sda1/code.py
@@ -49,13 +50,13 @@ gherkin: code_gherkin.py cykey.mpy jackdaw.mpy jackdaw_rules.mpy synchronousscan
 	cp code_gherkin.py /mnt/sda1/code.py
 	cp $^ /mnt/sda1/ && sync
 
-onthe17:
+onthe17: pwm3360.mpy cykey.mpy jackdaw.mpy jackdaw_rules.mpy synchronousscanner.mpy dvp.mpy
 	cp code_seventeen.py /mnt/sda1/code.py
-	cp pwm3360.py cykey.py jackdaw.py jackdaw_rules.py synchronousscanner.py dvp.py /mnt/sda1/ && sync
+	cp $^ /mnt/sda1/ && sync
 
-handyman:
+handyman: cykey.mpy jackdaw.mpy geminipr.mpy taipo.mpy dvp.mpy 
 	cp code-handyman.py /mnt/sda1/code.py
-	cp cykey.py jackdaw.py geminipr.py taipo.py dvp.py /mnt/sda1/ && sync
+	cp $^ /mnt/sda1/ && sync
 
 writer:
 	cp code-board.py /mnt/sda1/code.py
@@ -71,5 +72,9 @@ term:
 keymap:
 	./render_cykey
 # TODO: adafruit libraries as required
+
+kmk:
+	./mpy_tree.sh
+	rsync kmk_mpy /mnt/sda1/kmk
 
 all: switch

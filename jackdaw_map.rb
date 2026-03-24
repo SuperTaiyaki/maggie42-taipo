@@ -555,7 +555,7 @@ rh = [
 ['RNLGCTS', '-'],
 
 ['RNC', '-'],
-['RNLG', 'LD'],
+['RNLG', 'RD'],
 ['NHTS', 'NTHS'],
 ['NLGHT', 'DTH'],
 ['RNLGHTS', '-'],

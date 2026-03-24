@@ -50,7 +50,7 @@ keyboard.keymap = [
 [
 KC.JD_4, KC.JD_C, KC.JD_W, KC.JD_N,      KC.JD_X,    KC.JD_r, KC.JD_l, KC.JD_c, KC.JD_t, KC.JD_d,
 KC.JD_S, KC.JD_T, KC.JD_H, KC.JD_R,      KC.JD_z,    KC.JD_n, KC.JD_g, KC.JD_h, KC.JD_s, KC.JD_e, 
-KC.JD_3, KC.LGUI, KC.LALT, KC.JD_Q,     KC.JD_M,    KC.JD_Q,  KC.JD_u, KC.TG(4), KC.TG(3), KC.JD_y,
+KC.JD_3, KC.LGUI, KC.LALT, KC.JD_Q,     KC.JD_M,    KC.JD_Q,  KC.JD_u, KC.TG(4), KC.TG(2), KC.JD_y,
 KC.NO,                  KC.JD_A, KC.JD_O, KC.JD_E, KC.JD_u,    KC.JD_F# thumb row
 ],
 # Terrible hack, center key to flip to taipo since symbols and stuff work
@@ -65,7 +65,7 @@ KC.NO , KC.TP_LIT, KC.TP_LOT, KC.JD_E, KC.JD_u, KC.JD_C # thumb row
 
 # Cykey
 [
-KC.TP_TLP, KC.TP_TLR, KC.TP_TLM, KC.TP_TLI,     KC.NO,          KC.TG(3), KC.TP_TRI, KC.TP_TRM, KC.TP_TRR,       KC.TP_BRP,
+KC.TP_TLP, KC.TP_TLR, KC.TP_TLM, KC.TP_TLI,     KC.NO,          KC.TG(2), KC.TP_TRI, KC.TP_TRM, KC.TP_TRR,       KC.TP_BRP,
 KC.TP_BLP, KC.TP_BLR, KC.TP_BLM, KC.TP_BLI,     KC.NO,         KC.NO, KC.TP_BRI, KC.TP_BRI, KC.TP_BRM, KC.     TP_BRR,
 KC.TP_BLP, KC.TP_BLR, KC.LAYER2, KC.TP_LIT,     KC.TP_LOT,      KC.TP_LIT, KC.TP_BRI, KC.TP_BRI, KC.TP_BRM,     KC.TP_BRR,
 KC.NO , KC.TP_LIT, KC.TP_LIT, KC.TP_LOT, KC.TP_LOT, KC.JD_C # thumb row
