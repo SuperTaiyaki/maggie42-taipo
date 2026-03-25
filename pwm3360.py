@@ -7,11 +7,23 @@ import microcontroller
 
 import time
 
-from kmk.keys import AX
+from kmk.keys import AX, KC, Key, make_key
 from kmk.modules import Module
 from kmk.utils import Debug
 
 debug = Debug(__name__)
+class TrackballKey(Key):
+    def __init__(self, code):
+        self.code = code
+        super().__init__()
+
+for key in ('TB_LMB','TB_MMB', 'TB_RMB', 'TB_MOD', 'TB_SCROLL'):
+    make_key(names=(key,), constructor = TrackballKey, code = key)
+
+# the pimoroni trackball module does some interesting stuff with handler modes
+# I want the same for this
+# button to toggle between cursor and scroll
+# maybe button to slow down the cursor
 
 # HEEEEY this looks a lot like the PWM register list
 # It's also a PixArt
@@ -24,45 +36,14 @@ class REG:
     DELTA_X_H = 0x4
     DELTA_Y_L = 0x5
     DELTA_Y_H = 0x6
-    SQUAL = 0x7
-    PIXEL_SUM = 0x8
-    Maximum_Pixel = 0x9
-    Minimum_Pixel = 0xA
-    Shutter_Lower = 0xB
-    Shutter_Upper = 0xC
-    Frame_Period_Lower = 0xD
-    Frame_Period_Upper = 0xE
     Configuration_I = 0xF
     Configuration_II = 0x10
-    Frame_Capture = 0x12
-    SROM_Enable = 0x13
-    Run_Downshift = 0x14
-    Rest1_Rate = 0x15
-    Rest1_Downshift = 0x16
-    Rest2_Rate = 0x17
-    Rest2_Downshift = 0x18
-    Rest3_Rate = 0x19
-    Frame_Period_Max_Bound_Lower = 0x1A
-    Frame_Period_Max_Bound_Upper = 0x1B
-    Frame_Period_Min_Bound_Lower = 0x1C
-    Frame_Period_Min_Bound_Upper = 0x1D
-    Shutter_Max_Bound_Lower = 0x1E
-    Shutter_Max_Bound_Upper = 0x1F
-    LASER_CTRL0 = 0x20 # Doesn't exist on the 3360
     Observation = 0x24
-    Data_Out_Lower = 0x25
-    Data_Out_Upper = 0x26
     SROM_ID = 0x2A
-    Lift_Detection_Thr = 0x2E
-    Configuration_V = 0x2F
-    Configuration_IV = 0x39
     Power_Up_Reset = 0x3A
     Shutdown = 0x3B
-    Inverse_Product_ID = 0x3F
     Snap_Angle = 0x42
     Motion_Burst = 0x50
-    SROM_Load_Burst = 0x62
-    Pixel_Burst = 0x64
 
 
 class PWM3360(Module):
@@ -82,6 +63,13 @@ class PWM3360(Module):
         self.spi = busio.SPI(clock=sclk, MOSI=mosi, MISO=miso)
         self.invert_x = invert_x
         self.invert_y = invert_y
+        self.scroll_mode = False
+        self.slow_mode = False
+        self.mod_pressed = False
+        self.scroll_pressed = False
+
+        self.delta_x = 0
+        self.delta_y = 0
 
     def adns_start(self):
         self.cs.value = False
@@ -116,19 +104,6 @@ class PWM3360(Module):
             self.adns_stop()
 
         return result[0]
-
-    def adns_upload_srom(self):
-        while not self.spi.try_lock():
-            pass
-        try:
-            self.spi.configure(baudrate=self.baud, polarity=self.cpol, phase=self.cpha)
-            self.adns_start()
-            self.spi.write(bytes([REG.SROM_Load_Burst | self.DIR_WRITE]))
-            for b in firmware:
-                self.spi.write(bytes([b]))
-        finally:
-            self.spi.unlock()
-            self.adns_stop()
 
     def delta_to_int(self, high, low):
         comp = (high << 8) | low
@@ -168,17 +143,7 @@ class PWM3360(Module):
         self.adns_read(REG.DELTA_Y_H)
         microcontroller.delay_us(self.tsrw)
 
-        # Config IV is for firmware upload
-        #self.adns_write(REG.Configuration_IV, 0x2)
-        #microcontroller.delay_us(self.tsww)
-        #self.adns_write(REG.SROM_Enable, 0x1D)
-        #microcontroller.delay_us(1000)
-        #self.adns_write(REG.SROM_Enable, 0x18)
-        #microcontroller.delay_us(self.tsww)
-        #self.adns_upload_srom()
-        #microcontroller.delay_us(2000)
-
-        self.adns_write(REG.Configuration_I, 0x10) # DPI setting
+        self.adns_write(REG.Configuration_I, 0x04) # DPI setting
 
         microcontroller.delay_us(self.tsww)
 
@@ -199,22 +164,51 @@ class PWM3360(Module):
     def before_matrix_scan(self, keyboard):
         motion = self.adns_read_motion()
         if motion[0] & 0x80:
-            delta_x = self.delta_to_int(motion[3], motion[2])
-            delta_y = self.delta_to_int(motion[5], motion[4])
+            delta_y = self.delta_to_int(motion[3], motion[2])
+            delta_x = self.delta_to_int(motion[5], motion[4])
 
             if self.invert_x:
                 delta_x *= -1
             if self.invert_y:
                 delta_y *= -1
 
-            if delta_x:
-                AX.X.move(keyboard, delta_x)
+            if self.scroll_mode or self.scroll_pressed:
+                self.delta_y += delta_y
+                if self.delta_y >= 40:
+                    AX.W.move(keyboard, -1)
+                    self.delta_y = 0
+                elif self.delta_y <= -40:
+                    AX.W.move(keyboard, 1)
+                    self.delta_y = 0
+            else:
+                if self.mod_pressed:
+                    delta_x >>= 2
+                    delta_y >>= 2
+                if delta_x:
+                    AX.X.move(keyboard, delta_x)
+                if delta_y:
+                    AX.Y.move(keyboard, delta_y)
 
-            if delta_y:
-                AX.Y.move(keyboard, delta_y)
+    def process_key(self, keyboard, key, is_pressed, int_coord):
+        if not isinstance(key, TrackballKey):
+            return key
+        if key.code == 'TB_MOD':
+            self.mod_pressed = is_pressed
+        if key.code == 'TB_SCROLL':
+            self.scroll_pressed = is_pressed
 
-            if debug.enabled:
-                debug('Delta: ', delta_x, ' ', delta_y)
+        if self.mod_pressed:
+            if key.code == 'TB_LMB' and is_pressed:
+                self.scroll_mode = not self.scroll_mode
+            elif key.code == 'TB_RMB':
+                keyboard.pre_process_key(KC.MB_MMB, is_pressed)
+        else:
+            if key.code == 'TB_LMB':
+                keyboard.pre_process_key(KC.MB_LMB, is_pressed)
+            elif key.code == 'TB_RMB':
+                keyboard.pre_process_key(KC.MB_RMB, is_pressed)
+            elif key.code == 'TB_MMB':
+                keyboard.pre_process_key(KC.MB_MMB, is_pressed)
 
     def after_matrix_scan(self, keyboard):
         return
@@ -230,9 +224,4 @@ class PWM3360(Module):
 
     def on_powersave_disable(self, keyboard):
         return
-
-# Stuff I want:
-# Keys for mouse buttons would be a good start (though KMK can do that easily enough)
-# Scroll button or toggle
-# slow move button...?
 

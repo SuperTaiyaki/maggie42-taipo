@@ -14,7 +14,7 @@ The debounce algorithm is lifted from CircuitPython
 class SynchronousScanner(Scanner):
     # I didn't want debounce, crappy Kailh switches keep flaking out on me
     DEBOUNCE = 2 # TODO: verify the scan rate, this should be expressed in time rather than cycles
-    def __init__(self, col_pins, row_pins):
+    def __init__(self, col_pins, row_pins, reverse_matrix = False):
         self.cols = [digitalio.DigitalInOut(x) for x in col_pins]
         self.rows = [digitalio.DigitalInOut(x) for x in row_pins]
         for r in self.rows:
@@ -23,6 +23,7 @@ class SynchronousScanner(Scanner):
         # Public-ish?
         self.matrix = [- self.DEBOUNCE] * (len(self.cols) * len(self.rows))
 
+        self.reverse_matrix = reverse_matrix
         self.event_queue = [(0, 0)] * 64
         self.queue_head = 0
         self.queue_tail = 0
@@ -46,6 +47,7 @@ class SynchronousScanner(Scanner):
             for r in range(len(self.rows)):
                 # TODO: queue keydowns before keyups, for better chording
                 address = c + r * rowlength
+                address = self.key_count - 1 - address if self.reverse_matrix else address
                 value = self.rows[r].value
                 if value:
                     if self.matrix[address] < self.DEBOUNCE:

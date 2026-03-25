@@ -675,6 +675,7 @@ rh = [
 # RNGCH -> FF (useful, combination doesn't do anything. F + disambiguate)
 # -RNLHT -> LAT (generally handy)
 # ASTWR -> EQU (AS + QU) - this is the only pattern with a character in front of a Q (well, SQ but that generates anyway)
+#   superceded by the leading E, but left in the chart
 # NL -> NL, but only on its own - s generates s, 'nl' is useful
 # Swap DL (RNLG) and LD (LCHS)
 #     combos aren't adjusted though, may require further work
@@ -685,6 +686,7 @@ rh = [
 # -NLCH to generate sc (previously SPH)
 # E on the left hand (on the board with enough space), left of S.
 # merge with X (STW) -> ETW for EX
+# RNLG -> RD orignially generated DL, which is... why? (in the patent text, too)
 
 # Under consideration:
 
