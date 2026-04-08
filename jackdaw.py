@@ -355,6 +355,7 @@ class RewindBuffer():
         return ret
 
 class Chord():
+    # RGB is a NeoPixel (not KMK RGB)
     def __init__(self, compact, rgb, state):
         self.rgb = rgb
         self.compact = compact
@@ -375,10 +376,10 @@ class Chord():
             return
         if mode:
             print("set ON")
-            self.rgb.set_hsv_fill(176, 140, 90)
+            self.rgb.fill((180, 60, 60))
         else:
             print("set OFF")
-            self.rgb.set_hsv_fill(30, 200, 180)
+            self.rgb.fill((60, 60, 180))
 
         self.rgb.show()
 

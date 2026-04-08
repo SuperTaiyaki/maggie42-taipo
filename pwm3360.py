@@ -143,7 +143,7 @@ class PWM3360(Module):
         self.adns_read(REG.DELTA_Y_H)
         microcontroller.delay_us(self.tsrw)
 
-        self.adns_write(REG.Configuration_I, 0x04) # DPI setting
+        self.adns_write(REG.Configuration_I, 0xA0) # DPI setting
 
         microcontroller.delay_us(self.tsww)
 
@@ -174,20 +174,24 @@ class PWM3360(Module):
 
             if self.scroll_mode or self.scroll_pressed:
                 self.delta_y += delta_y
-                if self.delta_y >= 40:
+                if self.delta_y >= 300:
                     AX.W.move(keyboard, -1)
-                    self.delta_y = 0
-                elif self.delta_y <= -40:
+                    self.delta_y -= 300
+                elif self.delta_y <= -300:
                     AX.W.move(keyboard, 1)
-                    self.delta_y = 0
+                    self.delta_y += 300
             else:
                 if self.mod_pressed:
                     delta_x >>= 2
                     delta_y >>= 2
-                if delta_x:
-                    AX.X.move(keyboard, delta_x)
-                if delta_y:
-                    AX.Y.move(keyboard, delta_y)
+                self.delta_x += delta_x
+                self.delta_y += delta_y
+                if self.delta_x >= 0x10 or self.delta_x <= -0x10:
+                    AX.X.move(keyboard, self.delta_x >> 4)
+                    self.delta_x &= 0xF
+                if self.delta_y >= 0x10 or self.delta_y <= -0x10:
+                    AX.Y.move(keyboard, self.delta_y >> 4)
+                    self.delta_y &= 0xF
 
     def process_key(self, keyboard, key, is_pressed, int_coord):
         if not isinstance(key, TrackballKey):

@@ -7,7 +7,6 @@ from kmk.kmk_keyboard import KMKKeyboard
 from kmk.keys import KC, Key, make_key
 from kmk.scanners import DiodeOrientation
 from kmk.modules.layers import Layers
-#from kmk.modules.split import Split, SplitSide
 from thicksplit import ThickSplit, SplitSide
 from kmk.modules.sticky_keys import StickyKeys # requirement for Taipo (formerly oneshot, KC.OS)
 from kmk.modules.holdtap import HoldTap
@@ -15,7 +14,8 @@ from kmk.modules.holdtap import HoldTap
 from kmk.modules.mouse_keys import MouseKeys
 from kmk.modules.rapidfire import RapidFire
 
-from kmk.extensions.rgb import RGB
+# Not using KMK RGB because it does a bunch of useless stuff (and wastes my memory)
+from neopixel import NeoPixel
 
 from kmk.utils import Debug
 debug = Debug(__name__)
@@ -44,12 +44,11 @@ layers.tap_time = 150
 keyboard.modules.append(layers)
 
 # The RP2040s have a neopixel-ish thing, light it up
-rgb = RGB(pixel_pin = board.NEOPIXEL, num_pixels = 1, hue_default = 176, sat_default = 30, val_default = 128, val_limit = 128,)
-keyboard.extensions.append(rgb)
+rgb = NeoPixel(board.NEOPIXEL, 1, brightness = 0.5, auto_write = False)
 
 keyboard.modules.append(Jackdaw(rgb = rgb))
-#from geminipr import Gemini
-#keyboard.modules.append(Gemini())
+from cykey import Cykey
+keyboard.modules.append(Cykey())
 
 LAYER_NORMAL = 2
 LAYER_BROWSER = 3
@@ -79,7 +78,7 @@ KC.TG(LAYER_JACKDAW), KC.NO, KC.NO, KC.MO(4), KC.JD_A, KC.JD_O,        KC.JD_E, 
     # empty spaces can be used for non-browser convenience stuff
     # mixing this with UI layer might be nice
     [
-        KC.RELOAD, KC.LGUI(KC.N1), KC.LGUI(KC.N2), KC.LGUI(KC.N3), KC.LGUI(KC.N4), KC.LGUI(KC.N5),  KC.LGUI(KC.N6), KC.LGUI(KC.N7), KC.LGUI(KC.N8), KC.LGUI(KC.N9), KC.LGUI(KC.N0), KC.TG(3), 
+        KC.RELOAD, KC.LGUI(KC.N1), KC.LGUI(KC.N2), KC.LGUI(KC.N3), KC.LGUI(KC.N4), KC.LGUI(KC.N5),  KC.LGUI(KC.N6), KC.LGUI(KC.N7), KC.LGUI(KC.N8), KC.LGUI(KC.N9), KC.LGUI(KC.N0), KC.TG(5), 
         KC.TRNS, KC.LCTRL(KC.LSFT(KC.TAB)), KC.LCTRL(KC.K) , KC.LCTRL(KC.TAB), KC.NO, KC.NO,     KC.NO, KC.NO, KC.NO, KC.LGUI(KC.P), KC.NO, KC.NO, 
         KC.RESET, KC.LCTRL(KC.P), KC.LCTRL(KC.COMMA) , KC.LGUI(KC.C), KC.LGUI(KC.V), KC.NO,      KC.NO, KC.LGUI(KC.J), KC.NO, KC.NO, KC.NO, KC.NO, 
         KC.NO, KC.NO, KC.NO, KC.NO, KC.NO, KC.NO,       KC.NO, KC.NO, KC.NO, KC.NO, KC.NO, KC.NO, 
@@ -125,13 +124,16 @@ KC.TG(LAYER_JACKDAW), KC.NO, KC.NO, KC.MO(4), KC.JD_A, KC.JD_O,        KC.JD_E, 
 # Maybe lower middle fingers should be shifts, that get applied to the far side...?
 # Numbers, symbols, etc. Same style as Cykey
 
-# Gemini steno
-#[
-#                   KC.BSPACE, KC.G_S1, KC.G_LT, KC.G_LP, KC.G_LH, KC.G_ST1,       KC.G_ST3, KC.G_RF, KC.G_RP, KC.G_RL, KC.G_RT, KC.G_RD,
-#                   KC.BSPACE, KC.G_S2, KC.G_LK, KC.G_LW, KC.G_LR, KC.G_ST2,       KC.G_ST4, KC.G_RR, KC.G_RB, KC.G_RG, KC.G_RS, KC.G_RZ, 
-#        KC.TG(LAYER_GEMINI), KC.JD_S, KC.JD_T, KC.JD_H, KC.JD_I, KC.G_LA,       KC.G_RU, KC.JD_u, KC.JD_g, KC.JD_h, KC.JD_s, KC.JD_y, 
-#        KC.TG(LAYER_JACKDAW), KC.NO, KC.NO, KC.SPC, KC.G_LA, KC.G_LO,            KC.G_RE, KC.G_RU, KC.ENTER, KC.NO, KC.NO, KC.NO, 
-#    ],
+    [
+
+KC.TRNS, KC.TP_TLP, KC.TP_TLR, KC.TP_TLM, KC.TP_TLI, KC.NO,    KC.NO, KC.TP_TRI, KC.TP_TRM, KC.TP_TRR, KC.TP_TRP, KC.TG(5),
+KC.TRNS, KC.TP_BLP, KC.TP_BLR, KC.TP_BLM, KC.TP_BLI, KC.NO,    KC.NO, KC.TP_BRI, KC.TP_BRM, KC.TP_BRR, KC.TP_BRP, KC.TRNS,
+KC.TRNS, KC.TP_BLP, KC.TP_BLR, KC.TP_BLM, KC.TP_BLI, KC.NO,    KC.NO, KC.TP_BRI, KC.TP_BRM, KC.TP_BRR, KC.TP_BRP, KC.TRNS,
+
+        KC.NO, KC.NO, KC.NO, KC.NO, KC.TP_LIT, KC.TP_LOT,       KC.TP_ROT, KC.TP_RIT, KC.NO, KC.NO, KC.NO, KC.NO, 
+    ],
+
+
                    ]
 
 if __name__ == '__main__':
@@ -141,4 +143,12 @@ if __name__ == '__main__':
 # Slightly annoying thing: HT causes a bit of lag. Layer switch doesn't (but that's a bit different....)
 # a HT-ish thing that triggers on release is maybe closer to what I want
 # Oh, there's a lot going on with HT so that's a bit hard
+
+
+# Ok, how to make this keyboard more useful generally?
+# full QWERTY layout is pretty much impossible
+# double cykey maybe gets close...
+# Add more supporting stuff around jackdaw so I can operate it like a normal keyboard?
+# What's the actual problem, anyway?
+# Mostly that if I want to type normally it's kind of annoying
 
