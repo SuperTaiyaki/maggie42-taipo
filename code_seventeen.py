@@ -125,9 +125,15 @@ KC.TRNS, KC.TRNS, KC.TRNS, KC.TRNS,   KC.TRNS, KC.TRNS, KC.TRNS, KC.TP_LIT, KC.T
 [ # NUM
 KC.TRNS, KC.TRNS, KC.TRNS, KC.ESCAPE, KC.LSFT(KC.N1), KC.LSFT(KC.N2), KC.LSFT(KC.N3), KC.LSFT(KC.N4), KC.LSFT(KC.N5),    KC.TRNS, KC.TRNS,    KC.LSFT(KC.N6), KC.LSFT(KC.N7), KC.LSFT(KC.N8), KC.LSFT(KC.N9), KC.LSFT(KC.N0), KC.BSPC, 
 KC.TRNS, KC.TRNS, KC.TRNS, KC.TRNS,   KC.N1, KC.N2, KC.N3 ,KC.N4, KC.N5,    KC.TRNS, KC.TRNS,     KC.N6, KC.N7, KC.N8, KC.N9, KC.N0, KC.ENTER,
-KC.NO, KC.NO, KC.TRNS, KC.TRNS,       KC.N0, KC.N9, KC.N8, KC.N7, KC.N6, KC.TRNS, KC.TRNS,   KC.N5, KC.N4, KC.N3, KC.N2, KC.N1, KC.TRNS,
-KC.NO, KC.NO, KC.TRNS, KC.TRNS, KC.TRNS, KC.N0, KC.TRNS, KC.TRNS, KC.LSFT,      KC.TRNS, KC.TRNS,    KC.LSFT,KC.TRNS, KC.TRNS, KC.TRNS, KC.TRNS, KC.TRNS, KC.TRNS,
+ # almost! but I want to have shifted middle chars in here too, the doubled grave is a bit in the way
+KC.NO, KC.NO, KC.TRNS, KC.TRNS,   KC.GRAVE, KC.LSFT(KC.GRAVE), KC.LSFT(KC.MINUS), KC.MINUS, KC.BSLS, KC.TRNS, KC.TRNS,   KC.LSFT(KC.BSLS), KC.EQUAL, KC.LSFT(KC.EQUAL), KC.LSFT(KC.RBRC), KC.RBRC, KC.TRNS,
+KC.NO, KC.NO, KC.TRNS, KC.TRNS,   KC.TRNS, KC.N0, KC.TRNS, KC.TRNS, KC.LSFT,      KC.TRNS, KC.TRNS,    KC.LSFT,KC.TRNS, KC.TRNS, KC.TRNS, KC.TRNS, KC.TRNS, KC.TRNS,
  ],
+# 5 keys in the middle - on a normal keyboard minus, equal, right brace, backslash, backtick
+# on this layout that's left brace, right brace, equal, backslash, grave
+# on a normal layout the grave is on the left, so put them there....
+# almost want backslash on the main layer, but there's no space
+# ` ~ { [ \ | ] } = +
 
 # for ardux based symbol layer...
 # braces paired off is nice
@@ -149,6 +155,5 @@ KC.NO, KC.NO, KC.TRNS, KC.TRNS,  KC.NO, KC.NO, KC.NO, KC.TRNS, KC.TRNS,   KC.TRN
 ]
 
 if __name__ == '__main__':
-    #debug.enabled = False
+    debug.enabled = False
     keyboard.go()
-

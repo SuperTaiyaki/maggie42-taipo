@@ -49,6 +49,8 @@ rgb = NeoPixel(board.NEOPIXEL, 1, brightness = 0.5, auto_write = False)
 keyboard.modules.append(Jackdaw(rgb = rgb))
 from cykey import Cykey
 keyboard.modules.append(Cykey())
+#from taipo import Taipo
+#keyboard.modules.append(Taipo())
 
 LAYER_NORMAL = 2
 LAYER_BROWSER = 3
@@ -71,14 +73,14 @@ keyboard.keymap = [
        KC.JD_1, KC.JD_4, KC.JD_C, KC.JD_W, KC.JD_N, KC.JD_X,       KC.JD_z, KC.JD_r, KC.JD_l, KC.JD_c, KC.JD_t, KC.JD_d, # y/TE
    KC.JD_3,  KC.JD_S, KC.JD_T, KC.JD_H, KC.JD_R, KC.NO,       KC.NO, KC.JD_n, KC.JD_g, KC.JD_h, KC.JD_s, KC.JD_e, 
 KC.LSFT, KC.LCTL, KC.LGUI, KC.LALT, KC.JD_M, KC.JD_Q,      KC.JD_Q, KC.JD_F, KC.RALT, KC.RGUI, KC.RCTL, KC.JD_y, 
-KC.TG(LAYER_JACKDAW), KC.NO, KC.NO, KC.MO(4), KC.JD_A, KC.JD_O,        KC.JD_E, KC.JD_u, KC.MO(1), KC.NO, KC.NO, KC.NO, 
+KC.NO, KC.NO, KC.NO, KC.MO(1), KC.JD_A, KC.JD_O,        KC.JD_E, KC.JD_u, KC.MO(1), KC.NO, KC.NO, KC.NO, 
     ],
 
     # Browser layer
     # empty spaces can be used for non-browser convenience stuff
     # mixing this with UI layer might be nice
     [
-        KC.RELOAD, KC.LGUI(KC.N1), KC.LGUI(KC.N2), KC.LGUI(KC.N3), KC.LGUI(KC.N4), KC.LGUI(KC.N5),  KC.LGUI(KC.N6), KC.LGUI(KC.N7), KC.LGUI(KC.N8), KC.LGUI(KC.N9), KC.LGUI(KC.N0), KC.TG(5), 
+        KC.TG(5), KC.LGUI(KC.N1), KC.LGUI(KC.N2), KC.LGUI(KC.N3), KC.LGUI(KC.N4), KC.LGUI(KC.N5),  KC.LGUI(KC.N6), KC.LGUI(KC.N7), KC.LGUI(KC.N8), KC.LGUI(KC.N9), KC.LGUI(KC.N0), KC.TG(5), 
         KC.TRNS, KC.LCTRL(KC.LSFT(KC.TAB)), KC.LCTRL(KC.K) , KC.LCTRL(KC.TAB), KC.NO, KC.NO,     KC.NO, KC.NO, KC.NO, KC.LGUI(KC.P), KC.NO, KC.NO, 
         KC.RESET, KC.LCTRL(KC.P), KC.LCTRL(KC.COMMA) , KC.LGUI(KC.C), KC.LGUI(KC.V), KC.NO,      KC.NO, KC.LGUI(KC.J), KC.NO, KC.NO, KC.NO, KC.NO, 
         KC.NO, KC.NO, KC.NO, KC.NO, KC.NO, KC.NO,       KC.NO, KC.NO, KC.NO, KC.NO, KC.NO, KC.NO, 
