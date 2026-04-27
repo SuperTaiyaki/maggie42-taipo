@@ -7,7 +7,7 @@ d: SCP          l: RI
 f: F            w/h: XI (h after pwrg)
 g: ZP           m: RU
 h: FC (zcf)     n: XU
-j: ZNI          b: IU
+j: ZNI          h: IU
 k: SZ           t: RIU
 l: SCN          c: XIU
 m: SZP          e: RX
@@ -17,24 +17,25 @@ QU: CPXIU       (mirr vowels)
 r: Z            o: ie
 s: S            au: Uu
 t: C            ai: Ii
-v: SC
+v: SC           ua: Uuia
 w: CN
 x: SZN
 y: ZN
 z: FCN
 
+th: zf
 sh: CP
 ch: SP
-gh: FZP
+gh: FZP (g+tail)
 (i)nd: FN
-inc: SN
-ng: ns
 (i)nt: FZN
-ck: zc
-th: zf
-st: cf
+inc: SN (pair V)
+ng: ns  (pair ^)
+ck: zc (RH only)
+st: cf (RH only)
 ll: ncfs
 dd: pcfs
+ss: fs
 
 str: FSCR (fcr = hr?)
 spl: FCRI (hl)

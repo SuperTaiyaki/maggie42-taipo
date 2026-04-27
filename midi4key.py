@@ -1,137 +1,6 @@
 # https://github.com/Sillabix/MIDI4TEXT-sistema-ortosillabico-per-tastiera-midi--MIDI4TEXT-orthosllabic-system-for-midi-keyboard/tree/main/ENG
 
 """
-problems:
-felt
--lt
-should that merge?
-not in the dictionary!
-    there are no ~lt in the entire damn dictionary
-    ... maybe it just doesn't generate?
-        yep, just need to split
-
-two
-    T = FP
-    W = CN
-    FCNP
-    Officially, FPXIuie
-    AHHHH so the characters don't merge in each slot...?
-    not true. FCPRIuianzf = blunt
-    b-l-u$-n... zf? 
-    ahhh nzf is nt (tail) (or int at the head)
-    [t][w][o$] (CXIuo)
-
-seem
-s-e-e-m...
-se would be s-xr, but sx is sci
-SRX is apparently the better way?
-    uhhh 
-    so I was basically right
-    seem and the like are basically the only problems...
-    e in the second slot
-    SRXue[m]
-
-hand
-    dictionary uses nf
-        defined in the list!
-            can I swap that with R or something?
-        alias it or something if necessary
-
-only
-    nothing?
-        brief it, I guess
-        3 strokes, needs a brief
-
-want
--nzf
-    oh, just ned to remember FZN
-
-earth
-    how to terminate this?
-    FCnzf is supposed to be terminal, not sure about the logic
-    ear/th (RXa/c) is fine
-
-have
-    Dictionary says FCRcs. So, this just can't be briefed out...
-        or requires some ever more annoying logic to block those if group 3 is dropped...?
-    works now
-
-tain (certain)
-    Oh, use the Ii
-        and no way to force a word break so split it into 3...?
-
-join
-    J is shitty, the end
-        still, only 2 strokes
-
-shout
-    ARGH sh- and sw- are both feasible, the XI alone doesn't work...
-        OH I have an SH!
-
-board is a bit annoying
-    boa- is fine
-    rd$ is two strokes...
-        ea does nothing, allow it to drop in in place of the vowel and create a word break?
-            Given that I have no differentiation to deal with, that might be suitable
-            (this is implemented)
-            so [r][ea][d] should work
-
-usual:
-    no idea!
-        the second u is a pain to stroke....
-        any solo u is hard to stroke
-        ua is not available
-        so u/ doesn't work, us/u/ doesn't work... ????
-        us/Uapcs
-        oops delete was on the wrong side. Still sucks though!
-            3 strokes
-        the problem here is the -ual
-        Uaul should work, but it gets caught as UUa[l] -> usaual
-            but I want us[u][a$]l
-                I can force that... Uua -> $ua?
-                DONE
-        maybe this is just too weird a case
-
-build:
-    tricky...
-    bu/il/d works, but is that optimal?
-    would gets a brief, CNuiapcs
-    CN ->w
-    uia -> final u
-    pcs -> ???
-    d = p c s
-    l = n c s
-    so it's wu$d... might be the only way
-
-think
-    ~nk, can that be optimized?
-    drink is SCPRin/zs in the manual
-        thin/k... probably the way. bah.
-
-skill:
-    2nd slot has C that gets shared with k/g, but that doesn't auto switch...
-    just need to break, probably
-    ZXIUuincs = skil
-        from the 2nd group??
-    Z = Z
-    XIU = c (or alt)
-        hrm, why not sk? just based on the phonetic version?
-    honestly, the doubled L is annoying enough to be worth the double tap
-
-afraid
-    the -raid part is doable enough, but can I merge in a terminator?
-    -ai is Ii
-    dictionary: Iui
-    riid?
-    why not 
-
-nue (continue)
-    I want u + e$, but the Uu takes priority. Is that suitable?
-        It generates a useless ue, so probably not...
-        so those should be group 2/3 exact matches
-""" 
-
-"""
 # Somehow crams everything into 10 keys - no external consonants, no extra thumbs. How???
 # Nice and regular, for the most part... but maybe more magic required
     More magic because it's really hard to generate beyond one syllable in one stroke
@@ -246,6 +115,37 @@ Since I have the C/K problem in group 2, use one of the open slots to deal with 
 The dictionary has a bunch of useless shit, why?
     158k lines ughhh
     "boae"
+
+I installed EA as a null terminal but it's actually in use - when 2nd group is in use, it generates ea
+    ia for $ou as well
+    and iea for $ea
+    these will reduce the need for a null terminal...
+    can use the impossible ones though - UIEA, UEA
+    ea for $ with no 2nd group should be fine, it's just for forcing consonant blocks to terminate
+
+wtf is the B for in the second slot? I can see it being useful for the phonetic version...
+    I want a slot to split W/H, that's taking up space
+    the dictionary has lots of bp and the like, but that's also useless
+    SP-type stuff is about all of it... useless!
+        let's put the h there instead
+        P would be much better
+    C is also a bit iffy
+        again, SC... is about all
+        heck, the only consonant that chains into other consonants like that is S
+    This slot is mostly for the phonetic version anyway, can rethink it later
+        hopefully not confuse myself too much in the process
+
+    URGH some sort of inversion might be better - S on the second, something else in the first and they
+    swap. That solves most of the problems!
+        so like the trailing E, set up a leading S
+    actually H in 2nd is useful - TH, CH, WH so don't put the S on UI
+    X generates S, which is absolutely useless in second... flip that?
+
+pose: PXIs
+but the PH to generate 
+
+ZC on the right generates ck, left does nothing so ST (since it opens up group 2)
+
 """
 
 from kmk.keys import Key, KC, make_key, ModifierKey, ModifiedKey
@@ -308,6 +208,7 @@ dictionary = {
         'SN': 'inc', 'ns': 'ng', # blend? and sometimes ^ing?
         'FZN': 'int', 'nzf' :'nt',
         'zc': 'ck',
+        'ZC': 'st',
 
         # Not in the theory (white/black together) but useful
         # J
@@ -320,6 +221,7 @@ dictionary = {
         # Useful, not available on keyboard
         'pcfs': 'dd',
         'ncfs': 'll',
+        'fs': 'ss',
 
         # 2nd series
         'R': 'r',
@@ -330,7 +232,7 @@ dictionary = {
         'U': 'u', # and backspace
         'RU': 'm',
         'XU': 'n',
-        'IU': 'b', # and b
+        'IU': 'h', # Used to be p/b
         'RIU': 't',
         'XIU': 'c', # and k/g
         'XR': 'e',
@@ -346,7 +248,6 @@ dictionary = {
         'i': 'i',
         'ie': 'o',
         'u': 'u',
-        'ea': '$',
 
         # 3rd series terminators
         'ua': '$a',
@@ -369,21 +270,28 @@ dictionary = {
         'Uu': 'au',
         'Ii': 'ai',
         'Iui': '$ai',
+        'Iuie': '$io', # aie is not useful
         'Uua': '$ua', # Mostly for 'usual' - I don't need aual
         'Uui': '$ui',# for 'build'
         'Uue': '$ue', # for -ue (continue)
-        # TODO: Missing: ia/ea/iea specials
-        'apzc': 'ae',
-        'uapzc': 'ae', # TODO: terminator
+        'Uuia': '$au', # for 'laugh' - this is in the document. Not sure if it's meant to be terminating
+        #'apzc': 'ae',
+        #'uapzc': 'ae', # TODO: terminator
+        'ia': '$ou',
+        #'ea': 'ea', # This is implicit!
+        'iea': '$ea', # not uea? hrm. They both work!
+        # oh, uea is impossible on a proper Michela device
 
         # XI magic: after p,w,r,g it becomes H
-        'PXI': 'ph',
-        'CNXI': 'wh',
-        'FCNXI': 'rh',
-        'ZPXI': 'gh' ,# is this necessary...?
+        #'PXI': 'ph',
+        #'CNXI': 'wh',
+        #'FCNXI': 'rh',
+        #'ZPXI': 'gh' ,# is this necessary...?
+        # Removed since IU generates this anyway
 
         }
 
+# Applies when 3rd group is empmty
 dictionary_2nd = (
         # mirrored vowels for trailing-e
         ('R', 'a'),
@@ -391,6 +299,12 @@ dictionary_2nd = (
         ('X', 'e'),
         ('U', 'u'),
         ('I', 'i'),
+)
+# Applies when 2nd group is empty
+dictionary_3rd = (
+        ('ea', '$'),
+        ('iea', '\''), # Should this be terminating? Maybe it shouldn't count as 3rd group
+        # ia not used right now
 )
 
 # special markers: $ for terminators
@@ -453,29 +367,48 @@ class Chord():
         add_e = False
 
         blocks = ["".join([c for c in keys if self.chord[c]]) for keys in groups]
+ 
+        # Alternate 2nd and 3rd blocks get enabled when the other block is empty
+        alt_2nd = len(blocks[2]) == 0
+        alt_3rd = len(blocks[1]) == 0
+
+        if blocks[1] == 'X':
+            # leading S
+            blocks[1] = blocks[0]
+            blocks[0] = 'X'
+
         pressed = "".join(blocks)
 
         if pressed == "":
             return ""
-
-        if pressed == "U":
+        elif pressed == "U":
             # backspace
             keys, _, _ = self.rewind.backspace()
             return [KC.BSPC] * keys
         elif pressed == "ea":
             # space
             return [KC.SPC]
-        # zcs for shift - can be current word, or trigger next word
+        elif pressed == "nsf":
+            # TODO: rewird
+            return [KC.ENTER] # TODO: set up a dictionary for this instead.
+            # HRMMMM this is a bit annoying with end-space (would like to un-space it)
+        elif pressed == "zcs":
+            # Push the space forward, etc.
+            # zcs for shift - can be current word, or trigger next word
+            return ""
+        elif pressed == "NX":
+            # TODO: Push the shift forward
+            # TODO: rewird
+            return ". "
+        # TODO: full dictionary
 
         print(blocks)
+        print(pressed)
 
         # This part of the documentation is unclear. What's the actual trigger to end the word?
         # Maybe this logic is correct and the correct way is just to make sure the final stroke is [4] only?
         if len(blocks[0]) == 0 and len(blocks[1]) == 0 and len(blocks[2]) == 0 and len(blocks[3]) > 0:
             space = True
-        
-        # Enable the alternate vowel block only if block 3 is empty (for terminating Es)
-        alt_2nd = len(blocks[2]) == 0
 
         while idx < len(pressed):
             initial_idx = idx
@@ -487,6 +420,19 @@ class Chord():
                     if pressed.startswith(stroke, idx):
                         add_e = True
                         space = True
+                        generated = True
+                        block_output += list(out)
+                        idx += len(stroke)
+                        break
+                if generated:
+                    continue
+            if alt_3rd:
+                generated = False
+                for stroke, out in dictionary_3rd:
+                    if pressed.startswith(stroke, idx):
+                        if out[0] == '$':
+                            out = out[1:]
+                            space = True
                         generated = True
                         block_output += list(out)
                         idx += len(stroke)
@@ -514,13 +460,11 @@ class Chord():
                     #        add_e = True
                     #    target = target[1:]
 
-                    print("gen: ", target)
                     block_output += list(target)
                     idx += len(c[0])
                     break
 
             # Guarantees no infinite loop
-            # .... does this still do something?
             if idx == initial_idx:
                 block_output += list(pressed[idx])
                 idx += 1
