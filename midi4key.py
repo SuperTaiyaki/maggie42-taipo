@@ -140,6 +140,8 @@ wtf is the B for in the second slot? I can see it being useful for the phonetic 
         so like the trailing E, set up a leading S
     actually H in 2nd is useful - TH, CH, WH so don't put the S on UI
     X generates S, which is absolutely useless in second... flip that?
+        DONE works pretty well.
+        Now, do I want to replace another useless character and generate a leading A?
 
 pose: PXIs
 but the PH to generate 
@@ -197,8 +199,8 @@ dictionary = {
         'SZ': 'k', 'zs': 'k',
 
         'FC': 'h', # head
-        'cf': 'st',
         'zcf': 'h', # tail
+        'cf': 'st',
 
         'FCN': 'z', 'ncf': 'z',
         'SC': 'v', 'cs': 'v',
@@ -270,6 +272,7 @@ dictionary = {
         'Uu': 'au',
         'Ii': 'ai',
         'Iui': '$ai',
+        'Iie': 'io',
         'Iuie': '$io', # aie is not useful
         'Uua': '$ua', # Mostly for 'usual' - I don't need aual
         'Uui': '$ui',# for 'build'
@@ -306,6 +309,46 @@ dictionary_3rd = (
         ('iea', '\''), # Should this be terminating? Maybe it shouldn't count as 3rd group
         # ia not used right now
 )
+# TODO: attach may not be useful any more
+class OutputStroke():
+    def __init__(self, keycode, end_sentence = False, attach_left = False, attach_right = False, ignore_shift = True):
+        self.keycode = keycode
+        self.end_sentence = end_sentence
+        self.attach_left = attach_left
+        self.attach_right = attach_right
+        self.ignore_shift = ignore_shift
+specials = {
+        # For briefs and things
+
+    'IUep': OutputStroke(DVP['DOT'], attach_left = True, end_sentence = True),
+    'IUec': OutputStroke(DVP['COMM'], attach_left = True, end_sentence = False),
+    'IUzc': OutputStroke(DVP['EXLM'], attach_left = True, end_sentence = True),
+
+    'IUpcf': OutputStroke(DVP['QUOT'], attach_left = True, attach_right = False), # Left single quote
+    'IUepc': OutputStroke(DVP['QUOT'], attach_left = False, attach_right = True), # Right single quote
+
+    'IUfs': OutputStroke(KC.LSFT(DVP['QUOT']), attach_left = True, attach_right = False), # Left dquote
+    'IUea': OutputStroke(KC.LSFT(DVP['QUOT']), attach_left = False, attach_right = True), # Right dquote
+
+    # a +
+    #   \ ; `
+    # a ? - =
+    'IUaf': KC.GRV,
+    'IUaz': OutputStroke(DVP['SCLN'], attach_left = True),
+    'IUan': DVP['BSLS'],
+
+    'IUas': DVP['EQL'],
+    'IUac': OutputStroke(KC.QUOT, attach_left = True, attach_right = True), # Still weird (-)
+    'IUap': OutputStroke(DVP['QUES'], attach_left = True, end_sentence = True),
+
+    # e + (same as above, with shift held
+    # e | : ~
+    #   X X X  <-- Xs are regular punctuation instead
+    'IUef': KC.LSFT(KC.GRV),
+    'IUez': OutputStroke(KC.LSFT(DVP['SCLN']), attach_left = True),
+    'IUen': KC.LSFT(DVP['BSLS']),
+
+        }
 
 # special markers: $ for terminators
 # ! for terminator + ending E
@@ -326,10 +369,10 @@ class RewindBuffer():
         self.buffer = [(1, False, False)] * self.BUFFER_SIZE
         self.buffer_write = 0
         self.reversed = 0 # For tracking single-char removals
-    def add(self, chars, suppress_space, shift):
+    def add(self, chars, space, shift):
         self.buffer_write += 1
         self.buffer_write %= self.BUFFER_SIZE
-        self.buffer[self.buffer_write] = (chars, suppress_space, shift)
+        self.buffer[self.buffer_write] = (chars, space, shift)
     def backspace(self):
         # Return the entire state
         ret = self.buffer[self.buffer_write]
@@ -346,8 +389,8 @@ class Chord():
         self.rewind = RewindBuffer()
 
         # Things that flow into the next chord
+        self.space_buffered = False
         self.next_shift = False
-        self.suppress_space = True
         self.word_caps = False
         self.word_caps_tripped = False
 
@@ -366,115 +409,169 @@ class Chord():
         space = False
         add_e = False
 
+        attach_left = False
+        attach_right = True # maybe unused for now
+        end_sentence = False
+
         blocks = ["".join([c for c in keys if self.chord[c]]) for keys in groups]
  
         # Alternate 2nd and 3rd blocks get enabled when the other block is empty
         alt_2nd = len(blocks[2]) == 0
         alt_3rd = len(blocks[1]) == 0
 
-        if blocks[1] == 'X':
+        if blocks[1] == 'X' and not alt_2nd:
             # leading S
             blocks[1] = blocks[0]
             blocks[0] = 'X'
 
         pressed = "".join(blocks)
 
+        print(blocks)
+        print(pressed)
+
         if pressed == "":
             return ""
         elif pressed == "U":
             # backspace
-            keys, _, _ = self.rewind.backspace()
+            keys, self.space_buffered, self.next_shift = self.rewind.backspace()
             return [KC.BSPC] * keys
         elif pressed == "ea":
             # space
             return [KC.SPC]
+        elif pressed == "RXea":
+            # Cancel space
+            self.space_buffered = False
+            return []
         elif pressed == "nsf":
-            # TODO: rewird
+            # TODO: rewind
             return [KC.ENTER] # TODO: set up a dictionary for this instead.
             # HRMMMM this is a bit annoying with end-space (would like to un-space it)
         elif pressed == "zcs":
-            # Push the space forward, etc.
-            # zcs for shift - can be current word, or trigger next word
+            self.next_shift = True
             return ""
         elif pressed == "NX":
-            # TODO: Push the shift forward
-            # TODO: rewird
-            return ". "
-        # TODO: full dictionary
+            # TODO: rewind
+            self.next_shift = True
+            return [DVP['DOT'], DVP.SPACE]
+        elif pressed in specials:
+            special = specials[pressed]
+            if isinstance(special, OutputStroke):
+                end_sentence = special.end_sentence
+                attach_left = special.attach_left
+                attach_right = special.attach_right # maybe unused
+                space = not special.attach_right # Do this directly instead of attach_right
+                if special.ignore_shift:
+                    self.next_shift = False
 
-        print(blocks)
-        print(pressed)
+                special = specials[pressed].keycode
 
-        # This part of the documentation is unclear. What's the actual trigger to end the word?
-        # Maybe this logic is correct and the correct way is just to make sure the final stroke is [4] only?
-        if len(blocks[0]) == 0 and len(blocks[1]) == 0 and len(blocks[2]) == 0 and len(blocks[3]) > 0:
-            space = True
+            if isinstance(special, Key):
+                block_output = [special]
+            else:
+                block_output = special
+        else:
 
-        while idx < len(pressed):
-            initial_idx = idx
+        # The pdf has FZNX as indent, so it's available... but I'm not sure I want to flip my vowel block
+        # encs...? 
+        # nps/npf don't seem to be used, start there?
+        # still keyboard-able (but maybe a bit stretchy)
+        # I like nps better
+        # ARGH due to punctuation stuff the buffered space might be better ARGH.
 
-            if alt_2nd:
-                generated = False
-                # I wonder if linear search through the whole word list is too slow
-                for stroke, out in dictionary_2nd:
-                    if pressed.startswith(stroke, idx):
-                        add_e = True
-                        space = True
-                        generated = True
-                        block_output += list(out)
-                        idx += len(stroke)
-                        break
-                if generated:
-                    continue
-            if alt_3rd:
-                generated = False
-                for stroke, out in dictionary_3rd:
-                    if pressed.startswith(stroke, idx):
-                        if out[0] == '$':
-                            out = out[1:]
+
+            if pressed.endswith("zcs"):
+                # Actually not next, it's this round
+                self.next_shift = True
+                pressed = pressed[0:-3]
+
+            # This part of the documentation is unclear. What's the actual trigger to end the word?
+            # Maybe this logic is correct and the correct way is just to make sure the final stroke is [4] only?
+            if len(blocks[0]) == 0 and len(blocks[1]) == 0 and len(blocks[2]) == 0 and len(blocks[3]) > 0:
+                space = True
+
+            while idx < len(pressed):
+                initial_idx = idx
+
+                if alt_2nd:
+                    generated = False
+                    # I wonder if linear search through the whole word list is too slow
+                    for stroke, out in dictionary_2nd:
+                        if pressed.startswith(stroke, idx):
+                            add_e = True
                             space = True
-                        generated = True
-                        block_output += list(out)
-                        idx += len(stroke)
-                        break
-                if generated:
+                            generated = True
+                            block_output += list(out)
+                            idx += len(stroke)
+                            break
+                    if generated:
+                        continue
+                if alt_3rd:
+                    generated = False
+                    for stroke, out in dictionary_3rd:
+                        if pressed.startswith(stroke, idx):
+                            if out[0] == '$':
+                                out = out[1:]
+                                space = True
+                            generated = True
+                            block_output += list(out)
+                            idx += len(stroke)
+                            break
+                    if generated:
+                        continue
+
+                if pressed[idx] not in rules:
+                    block_output += list(pressed[idx])
+                    idx += 1
                     continue
 
-            if pressed[idx] not in rules:
-                block_output += list(pressed[idx])
-                idx += 1
-                continue
+                candidates = rules[pressed[idx]]
+                for c in candidates:
+                    if pressed.startswith(c[0], idx):
+                        target = c[1]
+                        if target[0] == '$':
+                            # buffer the space
+                            space = True
+                            target = target[1:]
+                        #elif target[0] == '!':
+                        #    # buffer the space
+                        #    if len(blocks[1]) == 0:
+                        #        space = True
+                        #        add_e = True
+                        #    target = target[1:]
 
-            candidates = rules[pressed[idx]]
-            for c in candidates:
-                if pressed.startswith(c[0], idx):
-                    target = c[1]
-                    if target[0] == '$':
-                        # buffer the space
-                        space = True
-                        target = target[1:]
-                    #elif target[0] == '!':
-                    #    # buffer the space
-                    #    if len(blocks[1]) == 0:
-                    #        space = True
-                    #        add_e = True
-                    #    target = target[1:]
+                        block_output += list(target)
+                        idx += len(c[0])
+                        break
 
-                    block_output += list(target)
-                    idx += len(c[0])
-                    break
-
-            # Guarantees no infinite loop
-            if idx == initial_idx:
-                block_output += list(pressed[idx])
-                idx += 1
+                # Guarantees no infinite loop
+                if idx == initial_idx:
+                    block_output += list(pressed[idx])
+                    idx += 1
 
         if add_e:
             block_output += 'e'
-        if space:
-            block_output += ' '
         keystrokes = [c if isinstance(c, Key) else DVP[c] for c in block_output]
-        self.rewind.add(len(keystrokes), False, False)
+
+        if self.next_shift:
+            keystrokes[0] = KC.LSFT(keystrokes[0])
+
+        if self.space_buffered and not attach_left:
+            keystrokes = [KC.SPC] + keystrokes
+        
+        self.rewind.add(len(keystrokes), self.space_buffered, self.next_shift)
+
+        self.space_buffered = end_sentence or space # (space and not attach_right)
+
+        if self.word_caps:
+            keystrokes = [KC.LSFT(k) if
+                        (k != KC.SPC and
+                        not isinstance(k, ModifiedKey) and
+                        not isinstance(k, ModifierKey))
+                        else k
+                        for k in keystrokes]
+            self.word_caps_tripped = True
+
+        self.next_shift = end_sentence
 
         return keystrokes
 
