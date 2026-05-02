@@ -20,11 +20,15 @@ from neopixel import NeoPixel
 from kmk.utils import Debug
 debug = Debug(__name__)
 
-from jackdaw import Jackdaw
+keyboard = KMKKeyboard()
+
+#from jackdaw import Jackdaw
+#keyboard.modules.append(Jackdaw(rgb = rgb))
+from midi4key import MidiKey
+keyboard.modules.append(MidiKey())
 
 from synchronousscanner import SynchronousScanner
 
-keyboard = KMKKeyboard()
 
 keyboard.col_pins = (board.GP10,board.GP9,board.GP8,board.GP7,board.GP6,board.GP5,)
 keyboard.row_pins = (board.GP27,board.GP26,board.GP15,board.GP14,)
@@ -45,8 +49,9 @@ keyboard.modules.append(layers)
 
 # The RP2040s have a neopixel-ish thing, light it up
 rgb = NeoPixel(board.NEOPIXEL, 1, brightness = 0.5, auto_write = False)
+rgb.fill((60, 60, 180))
+rgb.show()
 
-keyboard.modules.append(Jackdaw(rgb = rgb))
 from cykey import Cykey
 keyboard.modules.append(Cykey())
 #from taipo import Taipo
@@ -69,12 +74,19 @@ MWDOWN = KC.RF(KC.MW_DOWN, interval = 800, timeout = 20)
 
 keyboard.keymap = [
 # Jackdaw
+#[
+#       KC.JD_1, KC.JD_4, KC.JD_C, KC.JD_W, KC.JD_N, KC.JD_X,       KC.JD_z, KC.JD_r, KC.JD_l, KC.JD_c, KC.JD_t, KC.JD_d, # y/TE
+#   KC.JD_3,  KC.JD_S, KC.JD_T, KC.JD_H, KC.JD_R, KC.NO,       KC.NO, KC.JD_n, KC.JD_g, KC.JD_h, KC.JD_s, KC.JD_e, 
+#KC.LSFT, KC.LCTL, KC.LGUI, KC.LALT, KC.JD_M, KC.JD_Q,      KC.JD_Q, KC.JD_F, KC.RALT, KC.RGUI, KC.RCTL, KC.JD_y, 
+#KC.NO, KC.NO, KC.NO, KC.MO(1), KC.JD_A, KC.JD_O,        KC.JD_E, KC.JD_u, KC.MO(1), KC.NO, KC.NO, KC.NO, 
+#    ],
+
 [
-       KC.JD_1, KC.JD_4, KC.JD_C, KC.JD_W, KC.JD_N, KC.JD_X,       KC.JD_z, KC.JD_r, KC.JD_l, KC.JD_c, KC.JD_t, KC.JD_d, # y/TE
-   KC.JD_3,  KC.JD_S, KC.JD_T, KC.JD_H, KC.JD_R, KC.NO,       KC.NO, KC.JD_n, KC.JD_g, KC.JD_h, KC.JD_s, KC.JD_e, 
-KC.LSFT, KC.LCTL, KC.LGUI, KC.LALT, KC.JD_M, KC.JD_Q,      KC.JD_Q, KC.JD_F, KC.RALT, KC.RGUI, KC.RCTL, KC.JD_y, 
-KC.NO, KC.NO, KC.NO, KC.MO(1), KC.JD_A, KC.JD_O,        KC.JD_E, KC.JD_u, KC.MO(1), KC.NO, KC.NO, KC.NO, 
-    ],
+    KC.NO, KC.MT_F, KC.MT_Z, KC.MT_N, KC.MT_X, KC.NO, KC.NO, KC.MT_e, KC.MT_n, KC.MT_z, KC.MT_f, KC.NO,
+ KC.NO, KC.MT_S, KC.MT_C, KC.MT_P, KC.MT_R, KC.NO, KC.NO, KC.MT_a, KC.MT_p, KC.MT_c, KC.MT_s, KC.NO,
+ KC.NO, KC.NO, KC.NO, KC.NO, KC.NO, KC.NO,  KC.NO, KC.NO, KC.NO, KC.NO, KC.NO, KC.NO, 
+KC.NO, KC.NO, KC.NO,   KC.NO, KC.MT_I, KC.MT_U, KC.MT_u, KC.MT_i, KC.NO,
+ ],
 
     # Browser layer
     # empty spaces can be used for non-browser convenience stuff

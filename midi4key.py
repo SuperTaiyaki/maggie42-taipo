@@ -223,6 +223,7 @@ dictionary = {
         # Useful, not available on keyboard
         'pcfs': 'dd',
         'ncfs': 'll',
+        'npcfs': 'll', # easier to stroke
         'fs': 'ss',
 
         # 2nd series
@@ -292,6 +293,10 @@ dictionary = {
         #'ZPXI': 'gh' ,# is this necessary...?
         # Removed since IU generates this anyway
 
+        'eanz': '$y', # eay is never used, but terminal y is quite common
+        # This may conflict with -eanzf and -eanzs, dunno if they're useful
+
+
         }
 
 # Applies when 3rd group is empmty
@@ -307,6 +312,8 @@ dictionary_2nd = (
 dictionary_3rd = (
         ('ea', '$'),
         ('iea', '\''), # Should this be terminating? Maybe it shouldn't count as 3rd group
+        ('uiea', '$\''), # Should this be terminating? Maybe it shouldn't count as 3rd group
+        # Terminating and non-terminating versions would be nice...
         # ia not used right now
 )
 # TODO: attach may not be useful any more
@@ -437,6 +444,8 @@ class Chord():
             return [KC.BSPC] * keys
         elif pressed == "ea":
             # space
+            self.space_buffered = False
+            # TODO: rewind
             return [KC.SPC]
         elif pressed == "RXea":
             # Cancel space
@@ -444,13 +453,14 @@ class Chord():
             return []
         elif pressed == "nsf":
             # TODO: rewind
+            self.space_buffered = False
             return [KC.ENTER] # TODO: set up a dictionary for this instead.
-            # HRMMMM this is a bit annoying with end-space (would like to un-space it)
         elif pressed == "zcs":
             self.next_shift = True
             return ""
         elif pressed == "NX":
             # TODO: rewind
+            # TODO: not useful
             self.next_shift = True
             return [DVP['DOT'], DVP.SPACE]
         elif pressed in specials:
@@ -472,14 +482,8 @@ class Chord():
         else:
 
         # The pdf has FZNX as indent, so it's available... but I'm not sure I want to flip my vowel block
-        # encs...? 
-        # nps/npf don't seem to be used, start there?
-        # still keyboard-able (but maybe a bit stretchy)
-        # I like nps better
-        # ARGH due to punctuation stuff the buffered space might be better ARGH.
 
-
-            if pressed.endswith("zcs"):
+            if blocks[3] == "zcs":
                 # Actually not next, it's this round
                 self.next_shift = True
                 pressed = pressed[0:-3]

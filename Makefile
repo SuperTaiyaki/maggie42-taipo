@@ -38,7 +38,7 @@ MPY=../mpy-cross-linux-amd64-10.1.4.static
 clean:
 	rm *.mpy
 
-maggie: thicksplit.mpy synchronousscanner.mpy cykey.mpy jackdaw.mpy jackdaw_rules.mpy geminipr.mpy taipo.mpy dvp.mpy
+maggie: thicksplit.mpy synchronousscanner.mpy cykey.mpy jackdaw.mpy jackdaw_rules.mpy geminipr.mpy taipo.mpy dvp.mpy midi4key.mpy
 	cp code.py /mnt/sda1/code.py
 	cp $^  /mnt/sda1/ && sync
 
@@ -46,7 +46,7 @@ maggie-r:
 	cp maggie-right.py /mnt/sda1/code.py
 	cp thicksplit.py synchronousscanner.py cykey.py /mnt/sda1/ && sync
 
-gherkin: code_gherkin.py cykey.mpy jackdaw.mpy jackdaw_rules.mpy synchronousscanner.mpy dvp.mpy
+gherkin: code_gherkin.py cykey.mpy jackdaw.mpy jackdaw_rules.mpy synchronousscanner.mpy dvp.mpy midi4key.mpy
 	cp code_gherkin.py /mnt/sda1/code.py
 	cp $^ /mnt/sda1/ && sync
 

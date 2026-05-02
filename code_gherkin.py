@@ -14,7 +14,8 @@ from kmk.modules.holdtap import HoldTap
 from kmk.utils import Debug
 debug = Debug(__name__)
 
-from jackdaw import Jackdaw
+#from jackdaw import Jackdaw
+from midi4key import MidiKey
 
 from synchronousscanner import SynchronousScanner
 
@@ -39,7 +40,8 @@ keyboard.modules.append(layers)
 from cykey import Cykey
 keyboard.modules.append(Cykey())
 
-keyboard.modules.append(Jackdaw(compact = True))
+#keyboard.modules.append(Jackdaw(compact = True))
+keyboard.modules.append(MidiKey())
 
 holdtap = HoldTap()
 holdtap.tap_time = 150
@@ -47,12 +49,18 @@ keyboard.modules.append(holdtap)
 
 keyboard.keymap = [
 # Jackdaw
+#[
+#KC.JD_4, KC.JD_C, KC.JD_W, KC.JD_N,      KC.JD_X,    KC.JD_r, KC.JD_l, KC.JD_c, KC.JD_t, KC.JD_d,
+#KC.JD_S, KC.JD_T, KC.JD_H, KC.JD_R,      KC.JD_z,    KC.JD_n, KC.JD_g, KC.JD_h, KC.JD_s, KC.JD_e, 
+#KC.JD_3, KC.LGUI, KC.LALT, KC.JD_Q,     KC.JD_M,    KC.JD_Q,  KC.JD_u, KC.TG(4), KC.TG(2), KC.JD_y,
+#KC.NO,                  KC.JD_A, KC.JD_O, KC.JD_E, KC.JD_u,    KC.JD_F# thumb row
+#],
 [
-KC.JD_4, KC.JD_C, KC.JD_W, KC.JD_N,      KC.JD_X,    KC.JD_r, KC.JD_l, KC.JD_c, KC.JD_t, KC.JD_d,
-KC.JD_S, KC.JD_T, KC.JD_H, KC.JD_R,      KC.JD_z,    KC.JD_n, KC.JD_g, KC.JD_h, KC.JD_s, KC.JD_e, 
-KC.JD_3, KC.LGUI, KC.LALT, KC.JD_Q,     KC.JD_M,    KC.JD_Q,  KC.JD_u, KC.TG(4), KC.TG(2), KC.JD_y,
-KC.NO,                  KC.JD_A, KC.JD_O, KC.JD_E, KC.JD_u,    KC.JD_F# thumb row
-],
+KC.MT_F, KC.MT_Z, KC.MT_N, KC.MT_X, KC.NO, KC.MT_e, KC.MT_n, KC.MT_z, KC.MT_f, KC.NO,
+KC.MT_S, KC.MT_C, KC.MT_P, KC.MT_R, KC.NO, KC.MT_a, KC.MT_p, KC.MT_c, KC.MT_s, KC.NO,
+KC.NO, KC.NO, KC.NO, KC.NO, KC.NO, KC.NO, KC.NO, KC.NO, KC.NO, KC.NO, 
+KC.NO, KC.MT_I, KC.MT_U, KC.MT_u, KC.MT_i, KC.NO
+    ],
 # Terrible hack, center key to flip to taipo since symbols and stuff work
 
 # Taipo (unused)
