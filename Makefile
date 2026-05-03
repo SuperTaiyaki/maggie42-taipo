@@ -50,7 +50,7 @@ gherkin: code_gherkin.py cykey.mpy jackdaw.mpy jackdaw_rules.mpy synchronousscan
 	cp code_gherkin.py /mnt/sda1/code.py
 	cp $^ /mnt/sda1/ && sync
 
-onthe17: pwm3360.mpy cykey.mpy jackdaw.mpy jackdaw_rules.mpy synchronousscanner.mpy dvp.mpy rgb_seventeen.mpy
+onthe17: pwm3360.mpy cykey.mpy midi4key.mpy jackdaw_rules.mpy synchronousscanner.mpy dvp.mpy rgb_seventeen.mpy
 	cp code_seventeen.py /mnt/sda1/code.py
 	cp $^ /mnt/sda1/ && sync
 
@@ -73,8 +73,9 @@ keymap:
 	./render_cykey
 
 # TODO: adafruit libraries as required
+.PHONY: kmk
 kmk:
 	./mpy_tree.sh
-	rsync kmk_mpy /mnt/sda1/kmk
+	rsync -vr kmk_mpy/* /mnt/sda1/kmk
 
 all: switch

@@ -57,8 +57,10 @@ keyboard.modules.append(layers)
 
 from cykey import Cykey
 keyboard.modules.append(Cykey())
-from jackdaw import Jackdaw
-keyboard.modules.append(Jackdaw(compact = True))
+#from jackdaw import Jackdaw
+#keyboard.modules.append(Jackdaw(compact = True))
+from midi4key import MidiKey
+keyboard.modules.append(MidiKey())
 
 holdtap = HoldTap()
 holdtap.tap_time = 1000
@@ -105,10 +107,10 @@ KC.NO, KC.NO,
 
 # Jackdaw
 [ # JD
-KC.TRNS, KC.TRNS, KC.TRNS,   KC.JD_1, KC.JD_4, KC.JD_C, KC.JD_W, KC.JD_N, KC.JD_X,     KC.TRNS, KC.TRNS,    KC.JD_z, KC.JD_r, KC.JD_l, KC.JD_c, KC.JD_t, KC.JD_d,
-KC.TRNS, KC.TRNS, KC.TRNS,  KC.JD_3,  KC.JD_S, KC.JD_T, KC.JD_H, KC.JD_R, KC.JD_X,     KC.TRNS, KC.TRNS,    KC.JD_z, KC.JD_n, KC.JD_g, KC.JD_h, KC.JD_s, KC.JD_e,
-KC.TRNS, KC.TRNS, KC.TRNS,  KC.LSFT, KC.LCTL, KC.LGUI, KC.LALT, KC.JD_M, KC.JD_Q,      KC.TRNS, KC.TRNS,    KC.JD_Q, KC.JD_F, KC.RALT, KC.RGUI, KC.RCTL, KC.JD_y,
-KC.TRNS, KC.TRNS, KC.TRNS,  KC.TRNS, KC.TRNS, KC.TRNS, KC.MO(NUM), KC.JD_A, KC.JD_O,    KC.TRNS, KC.TRNS,    KC.JD_E, KC.JD_u, KC.MO(NUM), KC.TRNS, KC.TRNS, KC.TG(JD)
+KC.TRNS, KC.TRNS, KC.TRNS,   KC.TRNS, KC.MT_F, KC.MT_Z, KC.MT_N, KC.MT_X, KC.NO,     KC.TRNS, KC.TRNS,    KC.NO, KC.MT_e, KC.MT_n, KC.MT_z, KC.MT_f, KC.TRNS,
+KC.TRNS, KC.TRNS, KC.TRNS,  KC.TRNS,  KC.MT_S, KC.MT_C, KC.MT_P, KC.MT_R, KC.NO,     KC.TRNS, KC.TRNS,    KC.NO, KC.MT_a, KC.MT_p, KC.MT_c, KC.MT_s, KC.TRNS,
+KC.TRNS, KC.TRNS, KC.TRNS,  KC.LSFT, KC.LCTL, KC.LGUI, KC.LALT, KC.NO, KC.NO,      KC.TRNS, KC.TRNS,    KC.NO, KC.NO, KC.RALT, KC.RGUI, KC.RCTL, KC.TRNS,
+KC.TRNS, KC.TRNS, KC.TRNS,  KC.TRNS, KC.TRNS, KC.TRNS, KC.MO(NUM), KC.MT_I, KC.MT_U,    KC.TRNS, KC.TRNS,    KC.MT_u, KC.MT_i, KC.MO(NUM), KC.TRNS, KC.TRNS, KC.TG(JD)
 ],
 
 # Cykey!

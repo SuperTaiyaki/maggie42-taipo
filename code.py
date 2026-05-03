@@ -29,7 +29,6 @@ keyboard.modules.append(MidiKey())
 
 from synchronousscanner import SynchronousScanner
 
-
 keyboard.col_pins = (board.GP10,board.GP9,board.GP8,board.GP7,board.GP6,board.GP5,)
 keyboard.row_pins = (board.GP27,board.GP26,board.GP15,board.GP14,)
 keyboard.diode_orientation = DiodeOrientation.COL2ROW
@@ -82,7 +81,7 @@ keyboard.keymap = [
 #    ],
 
 [
-    KC.NO, KC.MT_F, KC.MT_Z, KC.MT_N, KC.MT_X, KC.NO, KC.NO, KC.MT_e, KC.MT_n, KC.MT_z, KC.MT_f, KC.NO,
+ KC.NO, KC.MT_F, KC.MT_Z, KC.MT_N, KC.MT_X, KC.NO, KC.NO, KC.MT_e, KC.MT_n, KC.MT_z, KC.MT_f, KC.NO,
  KC.NO, KC.MT_S, KC.MT_C, KC.MT_P, KC.MT_R, KC.NO, KC.NO, KC.MT_a, KC.MT_p, KC.MT_c, KC.MT_s, KC.NO,
  KC.NO, KC.NO, KC.NO, KC.NO, KC.NO, KC.NO,  KC.NO, KC.NO, KC.NO, KC.NO, KC.NO, KC.NO, 
 KC.NO, KC.NO, KC.NO,   KC.NO, KC.MT_I, KC.MT_U, KC.MT_u, KC.MT_i, KC.NO,

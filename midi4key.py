@@ -186,7 +186,7 @@ dictionary = {
         'SCN': 'l', 'ncs': 'l',
         'P': 'p', 'p': 'p',
         'SZP': 'm', 'pzs' :'m',
-        'n': 'n', 'n': 'n',
+        'N': 'n', 'n': 'n',
         'FCP': 'b', 'pcf': 'b',
         'SCP': 'd', 'pcs': 'd',
         'SZN': 'x', 'nzs': 'x',
@@ -388,7 +388,6 @@ class RewindBuffer():
         self.buffer_write %= self.BUFFER_SIZE
         return ret
 
-
 class Chord():
     def __init__(self):
         self.chord = {x: False for x in keycodes}
@@ -451,7 +450,7 @@ class Chord():
             # Cancel space
             self.space_buffered = False
             return []
-        elif pressed == "nsf":
+        elif pressed == "FZzf":
             # TODO: rewind
             self.space_buffered = False
             return [KC.ENTER] # TODO: set up a dictionary for this instead.
