@@ -499,7 +499,8 @@ class Chord():
                     generated = False
                     # I wonder if linear search through the whole word list is too slow
                     for stroke, out in dictionary_2nd:
-                        if pressed.startswith(stroke, idx):
+                        # This duplicated check is dumb
+                        if pressed.startswith(stroke, idx) and blocks[1] == stroke:
                             add_e = True
                             space = True
                             generated = True

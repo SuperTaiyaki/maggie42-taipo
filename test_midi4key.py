@@ -49,14 +49,16 @@ required = [
         ('F', 'f'),
         ('SCP', 'd'),
         ('SCPXIn', 'done'),
-        ('FCPUuie', 'buo'), # not buie
+        #('FCPUuie', 'buo'), # not buie
         # [FCP][U][uie][]
-        ('FCPUIua', 'biu'), # # not baia
+        #('FCPUIua', 'biu'), # # not baia
         # [FCP][U][uia][]
         # actually biu is weird too
+        # buie is better! (the e snuck in)
+        ('FCPUiu', 'bui'), # ACTUALLY this is better
+        ('FCPIiu', 'bai'), # The more sane option
         ('FCNXIUuiencs', 'zcol'), # Not xhuiel - not cross-group
         # [FCN][XIU][uie][ncs]
-        # 
         ('FCPRIzcs', 'Bl'), # not Baie. 2nd group doesn't generate so the flip-and-E doesn't apply
         # [FCP][RI][][zcs] - RI doesn't generate a vowel so it shouldn't add the trailing E (or generate the vowel side at all)
         ]
