@@ -225,6 +225,9 @@ dictionary = {
         'ncfs': 'll',
         'npcfs': 'll', # easier to stroke
         'fs': 'ss',
+        'nzc': 'rt', # zcs is shift, zcf is H, 
+        'nzcs': 'rl', 
+        # -ort and -ert are maybe more common than -urt and -art (easier to stroke)
 
         # 2nd series
         'R': 'r',
@@ -307,14 +310,18 @@ dictionary_2nd = (
         ('X', 'e'),
         ('U', 'u'),
         ('I', 'i'),
+        ('XR', 'ea'),
+        ('RI', 'ou'),
 )
 # Applies when 2nd group is empty
 dictionary_3rd = (
         ('ea', '$'),
-        ('iea', '\''), # Should this be terminating? Maybe it shouldn't count as 3rd group
         ('uiea', '$\''), # Should this be terminating? Maybe it shouldn't count as 3rd group
         # Terminating and non-terminating versions would be nice...
         # ia not used right now
+)
+dictionary_apostrophe = (
+        ('iea', '\''), # Should this be terminating? Maybe it shouldn't count as 3rd group
 )
 # TODO: attach may not be useful any more
 class OutputStroke():
@@ -424,6 +431,7 @@ class Chord():
         # Alternate 2nd and 3rd blocks get enabled when the other block is empty
         alt_2nd = len(blocks[2]) == 0
         alt_3rd = len(blocks[1]) == 0
+        alt_apostrophe= len(blocks[1]) + len(blocks[0]) == 0
 
         if blocks[1] == 'X' and not alt_2nd:
             # leading S
@@ -491,6 +499,12 @@ class Chord():
             # Maybe this logic is correct and the correct way is just to make sure the final stroke is [4] only?
             if len(blocks[0]) == 0 and len(blocks[1]) == 0 and len(blocks[2]) == 0 and len(blocks[3]) > 0:
                 space = True
+                # TODO: maybe continuous 4th-only blocks shouldn't trigger this (so -n/-n generates 'nn', not 'n n'
+                # The only English single-letter words are vowels
+                # Should  probably rework the auto spacing logic overall
+                # something like self.space_buffered = False
+                # More like, attach_right is true...?
+                attach_left = True
 
             while idx < len(pressed):
                 initial_idx = idx
@@ -519,6 +533,17 @@ class Chord():
                             generated = True
                             block_output += list(out)
                             idx += len(stroke)
+                            break
+                    if generated:
+                        continue
+                if alt_apostrophe:
+                    generated = False
+                    for stroke, out in dictionary_apostrophe:
+                        if pressed.startswith(stroke, idx):
+                            generated = True
+                            block_output += list(out)
+                            idx += len(stroke)
+                            attach_left = True # I think
                             break
                     if generated:
                         continue

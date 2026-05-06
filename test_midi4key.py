@@ -61,6 +61,10 @@ required = [
         # [FCN][XIU][uie][ncs]
         ('FCPRIzcs', 'Bl'), # not Baie. 2nd group doesn't generate so the flip-and-E doesn't apply
         # [FCP][RI][][zcs] - RI doesn't generate a vowel so it shouldn't add the trailing E (or generate the vowel side at all)
+
+        ('Nieas', 'neas'),
+        # ('Nieas', 'neas'), # test 2nd-only too?
+        ('ieas', '\'s'),
         ]
 
 class TestGeneration(unittest.TestCase):
