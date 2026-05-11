@@ -228,6 +228,7 @@ dictionary = {
         'nzc': 'rt', # zcs is shift, zcf is H, 
         'nzcs': 'rl', 
         # -ort and -ert are maybe more common than -urt and -art (easier to stroke)
+        'CNP': 'wh', # Extra
 
         # 2nd series
         'R': 'r',
@@ -243,7 +244,7 @@ dictionary = {
         'XIU': 'c', # and k/g
         'XR': 'e',
         'XRI': 'o',
-        # extra
+        # extra, but not useful any more
         'XRIU': 'k',
 
         # Alternate 2nd (mirrored vowels for terminating e) are in the other dictionary
@@ -278,7 +279,7 @@ dictionary = {
         'Iui': '$ai',
         'Iie': 'io',
         'Iuie': '$io', # aie is not useful
-        'Uua': '$ua', # Mostly for 'usual' - I don't need aual
+        'Uua': '$ua', # Mostly for 'usual' - I don't need aual. Come to think of it, do these even need special cases? U left, whatever right...
         'Uui': '$ui',# for 'build'
         'Uue': '$ue', # for -ue (continue)
         'Uuia': '$au', # for 'laugh' - this is in the document. Not sure if it's meant to be terminating
@@ -331,6 +332,7 @@ class OutputStroke():
         self.attach_left = attach_left
         self.attach_right = attach_right
         self.ignore_shift = ignore_shift
+
 specials = {
         # For briefs and things
 
@@ -362,6 +364,48 @@ specials = {
     'IUez': OutputStroke(KC.LSFT(DVP['SCLN']), attach_left = True),
     'IUen': KC.LSFT(DVP['BSLS']),
 
+    # Michela-style punctuation
+    'NX': OutputStroke(DVP['DOT'], end_sentence = True, attach_left = True),
+    'NXen': OutputStroke(DVP['COMM'], end_sentence = False, attach_left = True),
+
+    # Briefs list
+    'I': OutputStroke(KC.LSFT(DVP['I'])), # I = I
+    'IU': 'you', # you = IU
+    #'FN': OutputStroke((DVP['a'], DVP['n'], DVP['d'])), # and = FN
+    'FN': 'and',
+    'X': 'is',
+    # do I need 'the'?
+
+# Samples from the PDF:
+# for = FR
+# I = I*
+# new = NU
+# few = FU
+# did = SCPI
+# he = FCX
+# his = FCs
+# self = SRIuef
+# is = X*
+# its = Xuipf
+# can = CPR
+# inside = NXuipcs
+# session = SXuien
+# can't = CPuanzf
+# isn't = Xnzf
+# design = SCPXuinf
+# don't = SCPuienzf
+# doesn't
+# and = FN *
+# sign = SIuinf
+# have = FCcs
+# ? = PSsp
+# also = SCNXuie
+# why = CNnz
+# Auto^ = UApf
+# don't = RIUuienzf
+
+# Could add an extra thing that required that a space is buffered (or not) or the brief doesn't trigger
+# Mostly to avoid collisions with non-brief things and open up the space a bit
         }
 
 # special markers: $ for terminators
@@ -433,11 +477,6 @@ class Chord():
         alt_3rd = len(blocks[1]) == 0
         alt_apostrophe= len(blocks[1]) + len(blocks[0]) == 0
 
-        if blocks[1] == 'X' and not alt_2nd:
-            # leading S
-            blocks[1] = blocks[0]
-            blocks[0] = 'X'
-
         pressed = "".join(blocks)
 
         print(blocks)
@@ -454,7 +493,7 @@ class Chord():
             self.space_buffered = False
             # TODO: rewind
             return [KC.SPC]
-        elif pressed == "RXea":
+        elif pressed == "XRea":
             # Cancel space
             self.space_buffered = False
             return []
@@ -465,11 +504,15 @@ class Chord():
         elif pressed == "zcs":
             self.next_shift = True
             return ""
-        elif pressed == "NX":
+        elif pressed == "SZCzcs":
+            self.next_shift = False
+            return ""
+        #elif pressed == "NX":
             # TODO: rewind
             # TODO: not useful
-            self.next_shift = True
-            return [DVP['DOT'], DVP.SPACE]
+            # TODO: 
+        #    self.next_shift = True
+        #    return [DVP['DOT'], DVP['SPC']]
         elif pressed in specials:
             special = specials[pressed]
             if isinstance(special, OutputStroke):
@@ -481,12 +524,20 @@ class Chord():
                     self.next_shift = False
 
                 special = specials[pressed].keycode
+            else:
+                if isinstance(special, str):
+                    space = True
 
             if isinstance(special, Key):
                 block_output = [special]
             else:
                 block_output = special
         else:
+            if blocks[1] == 'X' and not alt_2nd:
+                # leading S
+                blocks[1] = blocks[0]
+                blocks[0] = 'X'
+                pressed = "".join(blocks)
 
         # The pdf has FZNX as indent, so it's available... but I'm not sure I want to flip my vowel block
 
@@ -581,7 +632,9 @@ class Chord():
             block_output += 'e'
         keystrokes = [c if isinstance(c, Key) else DVP[c] for c in block_output]
 
-        if self.next_shift:
+        if (self.next_shift and
+                not isinstance(k, ModifiedKey) and
+                not isinstance(k, ModifierKey)):
             keystrokes[0] = KC.LSFT(keystrokes[0])
 
         if self.space_buffered and not attach_left:
@@ -629,12 +682,13 @@ class MidiKey(Module):
             self.pressing = True
         else:
             # oops should wait until everything is up
-            output = self.chord.result()
-            print("Output: ", output)
-            self.handle_output(output)
-            self.chord.reset()
-            self.pressing = False
-            # Nothing important to do on the transition to auto_space, probably
+            if self.pressing:
+                output = self.chord.result()
+                #print("Output: ", output)
+                self.handle_output(output)
+                #self.chord.reset()
+                self.pressing = False
+            self.chord.discard(code)
 
 
     def handle_output(self, chars):
