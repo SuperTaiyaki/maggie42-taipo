@@ -81,9 +81,9 @@ keyboard.keymap = [
 #    ],
 
 [
+ KC.NO, KC.NO, KC.NO, KC.NO, KC.NO, KC.NO,  KC.NO, KC.NO, KC.NO, KC.NO, KC.NO, KC.NO, 
  KC.NO, KC.MT_F, KC.MT_Z, KC.MT_N, KC.MT_X, KC.NO, KC.NO, KC.MT_e, KC.MT_n, KC.MT_z, KC.MT_f, KC.NO,
  KC.NO, KC.MT_S, KC.MT_C, KC.MT_P, KC.MT_R, KC.NO, KC.NO, KC.MT_a, KC.MT_p, KC.MT_c, KC.MT_s, KC.NO,
- KC.NO, KC.NO, KC.NO, KC.NO, KC.NO, KC.NO,  KC.NO, KC.NO, KC.NO, KC.NO, KC.NO, KC.NO, 
 KC.NO, KC.NO, KC.NO,   KC.NO, KC.MT_I, KC.MT_U, KC.MT_u, KC.MT_i, KC.NO,
  ],
 
