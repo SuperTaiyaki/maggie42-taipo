@@ -178,18 +178,18 @@ for i, block in enumerate(groups):
 # FZNX       enzf
 # SCPR IU ui apcs
 dictionary = {
-        'FP': 'c', 'pf': 'c',
+        'FP': 'v', 'pf': 'v',
         'CP': 'sh', 'pc': 'sh',
         'S': 's', 's': 's',
         'F': 'f', 'f': 'f',
         'Z': 'r', 'z': 'r',
         'SCN': 'l', 'ncs': 'l',
         'P': 'p', 'p': 'p',
-        'SZP': 'm', 'pzs' :'m',
+        'SZP': 'x', 'pzs' :'x',
         'N': 'n', 'n': 'n',
         'FCP': 'b', 'pcf': 'b',
         'SCP': 'd', 'pcs': 'd',
-        'SZN': 'x', 'nzs': 'x',
+        'SZN': 'm', 'nzs': 'm',
         'ZP': 'g', 'pz' :'g',
         'ZN': 'y', 'nz': 'y',
         'CN': 'w', 'nc': 'w',
@@ -203,7 +203,7 @@ dictionary = {
         'cf': 'st',
 
         'FCN': 'z', 'ncf': 'z',
-        'SC': 'v', 'cs': 'v',
+        'SC': 'c', 'cs': 'c',
         'SP': 'ch', 'ps': 'ch',
         'FZP': 'gh', 'pzf' :'gh',
         'FN': 'ind', 'nf': 'nd', # and more in combos
@@ -235,12 +235,13 @@ dictionary = {
         'X': 's',
         'I': 'i',
         'RI': 'l',
-        'XI': 'w', # and magic
+        'XI': 'w',
         'U': 'u', # and backspace
-        'RU': 'm',
-        'XU': 'n',
+        #'RU': 'm', # Never used?
+        'RU': 'y',
+        'XU': 'n', # for 'know'
         'IU': 'h', # Used to be p/b
-        'RIU': 't',
+        'RIU': 't', # Kind of useless with the S flip
         'XIU': 'c', # and k/g
         'XR': 'e',
         'XRI': 'o',

@@ -2,24 +2,24 @@ FZNX       enzf
 SCPR IU ui apcs
 
 b: FCP          r: R
-c: FP           s: X
+c: SC           s: X
 d: SCP          l: RI
 f: F            w/h: XI (h after pwrg)
-g: ZP           m: RU
+g: ZP           y: RU
 h: FC (zcf)     n: XU
 j: ZNI          h: IU
 k: SZ           t: RIU
 l: SCN          c: XIU
-m: SZP          e: RX
+m: SZN          e: RX
 n: N            o: RXI
 p: P            k: RXIU
 QU: CPXIU       (mirr vowels)
 r: Z            o: ie
 s: S            au: Uu
 t: C            ai: Ii
-v: SC           ua: Uuia
-w: CN
-x: SZN
+v: FP           ua: Uuia
+w: CN           uo: ia
+x: SZP
 y: ZN
 z: FCN
 
@@ -36,6 +36,12 @@ st: cf (RH only)
 ll: ncfs
 dd: pcfs
 ss: fs
+rt: nzc
+rl: nzcs
+wh: CNP
+
+ind/inc/int
+(ing not useful)
 
 str: FSCR (fcr = hr?)
 spl: FCRI (hl)
@@ -45,3 +51,9 @@ sch: CXIU (cc)
 sk: ZXIU (zc)
 sci: FSX
 
+4th group only ends word (adds space)
+terminating vowels do the same
+2nd group X- (s) generates a leading s
+vowels mirrored into 2nd group and empty 3rd group generate the vowel, 4th group, then trailing E
+
+want: trailing ~lf (maybe)
