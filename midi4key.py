@@ -143,9 +143,6 @@ wtf is the B for in the second slot? I can see it being useful for the phonetic 
         DONE works pretty well.
         Now, do I want to replace another useless character and generate a leading A?
 
-pose: PXIs
-but the PH to generate 
-
 ZC on the right generates ck, left does nothing so ST (since it opens up group 2)
 
 """
@@ -269,8 +266,8 @@ dictionary = {
         'FCRI': 'spl',
         'FCIU': 'spr',
         'FCXIU': 'scr',
-        'CXIU': 'sch',
-        'ZXIU': 'sk',
+        'FCXIU': 'sch',
+        'FZXIU': 'sk',
         'FSX': 'sci', # SX conflicts with [s][e]
         'ZNI': 'j', # weird because it doesn't exist in the phonetic version?
         'CPXIU': 'qu', # no standalone q!
@@ -298,10 +295,8 @@ dictionary = {
         #'ZPXI': 'gh' ,# is this necessary...?
         # Removed since IU generates this anyway
 
-        'eanz': '$y', # eay is never used, but terminal y is quite common
-        # This may conflict with -eanzf and -eanzs, dunno if they're useful
-
-
+        #'uinz': '$y',
+        # Removed since this is special-cased (nzs/nsf conflict)
         }
 
 # Applies when 3rd group is empmty
@@ -323,7 +318,13 @@ dictionary_3rd = (
         # ia not used right now
 )
 dictionary_apostrophe = (
-        ('iea', '\''), # Should this be terminating? Maybe it shouldn't count as 3rd group
+        ('iea', '$\''), # Should this be terminating? Maybe it shouldn't count as 3rd group
+        # Terminating is better since other consonants can still be tacked on
+        # except for 're and 've and .....
+        # quote on its own -> not terminating?
+        # Another idea: Including this pushes to the front, other letters generate as usual. Then you can have one full stroke behind the apostrophe
+        # AND! it's just easier to stroke sometimes (can use left hand s and whatever)
+        # but then, how to terminate...
 )
 # TODO: attach may not be useful any more
 class OutputStroke():
@@ -375,7 +376,27 @@ specials = {
     #'FN': OutputStroke((DVP['a'], DVP['n'], DVP['d'])), # and = FN
     'FN': 'and',
     'X': 'is',
+    'SZX': 'the',
     # do I need 'the'?
+
+    'ieapf': OutputStroke((DVP['QUOT'], DVP['V'], DVP['E']), end_sentence = False, attach_left = True),
+    'Iieapf': OutputStroke((KC.LSFT(DVP['I']), DVP['QUOT'], DVP['V'], DVP['E'])),
+    'IUieapf': 'you\'ve',
+    'ieaz': OutputStroke((DVP['QUOT'], DVP['R'], DVP['E']), end_sentence = False, attach_left = True), # 're
+    'ieancs': OutputStroke((DVP['QUOT'], DVP['L'], DVP['L']), end_sentence = False, attach_left = True), #'ll
+
+    # Maybe I want a connected -ed here
+    # so type 'roll' and still be able to extend it
+    # 's' works fine because it's group 4 consonant only
+    # -er as well?
+    # -en
+    # but not -end
+    # The terminating version or non-terminating...?
+    # Terminating might be better. '^ed$' and '^er$' are not so useful...
+    # well, I use er. crap.
+    # and if I want 'error' I need the er starter (non-terminating)
+    # Use the mirrored 'e' instead...?
+    # since ere and ede and ene aren't useful
 
 # Samples from the PDF:
 # for = FR
@@ -539,6 +560,12 @@ class Chord():
                 blocks[1] = blocks[0]
                 blocks[0] = 'X'
                 pressed = "".join(blocks)
+            if blocks[2] == 'ui' and blocks[3] == 'nz':
+                # terminating y
+                blocks[2] = ''
+                space = True
+                pressed = "".join(blocks)
+
 
         # The pdf has FZNX as indent, so it's available... but I'm not sure I want to flip my vowel block
 
@@ -592,6 +619,9 @@ class Chord():
                     generated = False
                     for stroke, out in dictionary_apostrophe:
                         if pressed.startswith(stroke, idx):
+                            if out[0] == '$':
+                                out = out[1:]
+                                space = True
                             generated = True
                             block_output += list(out)
                             idx += len(stroke)
@@ -634,8 +664,8 @@ class Chord():
         keystrokes = [c if isinstance(c, Key) else DVP[c] for c in block_output]
 
         if (self.next_shift and
-                not isinstance(k, ModifiedKey) and
-                not isinstance(k, ModifierKey)):
+                not isinstance(keystrokes[0], ModifiedKey) and
+                not isinstance(keystrokes[0], ModifierKey)):
             keystrokes[0] = KC.LSFT(keystrokes[0])
 
         if self.space_buffered and not attach_left:
@@ -645,6 +675,7 @@ class Chord():
 
         self.space_buffered = end_sentence or space # (space and not attach_right)
 
+        # wtf is k
         if self.word_caps:
             keystrokes = [KC.LSFT(k) if
                         (k != KC.SPC and
