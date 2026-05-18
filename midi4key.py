@@ -164,7 +164,8 @@ class MTKey(Key):
 groups = (('F', 'S', 'Z', 'C', 'N', 'P'),
           ('X', 'R', 'I', 'U'),
           ('u', 'i', 'e', 'a'),
-          ('n', 'p', 'z', 'c', 'f', 's')
+          ('n', 'p', 'z', 'c', 'f', 's'),
+          () # Empty group to cause a trailing !
           )
 keycodes = [x for xs in groups for x in xs]
 
@@ -175,117 +176,117 @@ for i, block in enumerate(groups):
 # FZNX       enzf
 # SCPR IU ui apcs
 dictionary = {
-        'FP': 'v', 'pf': 'v',
-        'CP': 'sh', 'pc': 'sh',
-        'S': 's', 's': 's',
-        'F': 'f', 'f': 'f',
-        'Z': 'r', 'z': 'r',
-        'SCN': 'l', 'ncs': 'l',
-        'P': 'p', 'p': 'p',
-        'SZP': 'x', 'pzs' :'x',
-        'N': 'n', 'n': 'n',
-        'FCP': 'b', 'pcf': 'b',
-        'SCP': 'd', 'pcs': 'd',
-        'SZN': 'm', 'nzs': 'm',
-        'ZP': 'g', 'pz' :'g',
-        'ZN': 'y', 'nz': 'y',
-        'CN': 'w', 'nc': 'w',
+        'FP!': 'v', 'pf': 'v',
+        'CP!': 'sh', 'pc': 'sh',
+        'S!': 's', 's': 's',
+        'F!': 'f', 'f': 'f',
+        'Z!': 'r', 'z': 'r',
+        'SCN!': 'l', 'ncs': 'l',
+        'P!': 'p', 'p': 'p',
+        'SZP!': 'x', 'pzs' :'x',
+        'N!': 'n', 'n': 'n',
+        'FCP!': 'b', 'pcf': 'b',
+        'SCP!': 'd', 'pcs': 'd',
+        'SZN!': 'm', 'nzs': 'm',
+        'ZP!': 'g', 'pz' :'g',
+        'ZN!': 'y', 'nz': 'y',
+        'CN!': 'w', 'nc': 'w',
 
-        'C': 't', 'c': 't',
-        'FZ': 'th', 'zf': 'th',
-        'SZ': 'k', 'zs': 'k',
+        'C!': 't', 'c': 't',
+        'FZ!': 'th', 'zf': 'th',
+        'SZ!': 'k', 'zs': 'k',
 
-        'FC': 'h', # head
-        'zcf': 'h', # tail
-        'cf': 'st',
+        'FC!': 'h', # head
+        'zcf!': 'h', # tail
+        'cf!': 'st',
 
-        'FCN': 'z', 'ncf': 'z',
-        'SC': 'c', 'cs': 'c',
-        'SP': 'ch', 'ps': 'ch',
-        'FZP': 'gh', 'pzf' :'gh',
-        'FN': 'ind', 'nf': 'nd', # and more in combos
-        'SN': 'inc', 'ns': 'ng', # blend? and sometimes ^ing?
-        'FZN': 'int', 'nzf' :'nt',
-        'zc': 'ck',
-        'ZC': 'st',
+        'FCN!': 'z', 'ncf': 'z',
+        'SC!': 'c', 'cs': 'c',
+        'SP!': 'ch', 'ps': 'ch',
+        'FZP!': 'gh', 'pzf' :'gh',
+        'FN!': 'ind', 'nf': 'nd', # and more in combos
+        'SN!': 'inc', 'ns': 'ng', # blend? and sometimes ^ing?
+        'FZN!': 'int', 'nzf' :'nt',
+        'zc!': 'ck',
+        'ZC!': 'st',
 
         # Not in the theory (white/black together) but useful
         # J
         # Q
         # L and D are one key apart so merge thing
-        'npcs': 'ld',
+        'npcs!': 'ld',
         # Same with R (my modified R)
-        'pzcs': 'rd',
+        'pzcs!': 'rd',
         # These could be used for something else on the left
         # Useful, not available on keyboard
-        'pcfs': 'dd',
-        'ncfs': 'll',
-        'npcfs': 'll', # easier to stroke
-        'fs': 'ss',
-        'nzc': 'rt', # zcs is shift, zcf is H, 
-        'nzcs': 'rl', 
+        'pcfs!': 'dd',
+        'ncfs!': 'll',
+        'npcfs!': 'll', # easier to stroke
+        'fs!': 'ss',
+        'nzc!': 'rt', # zcs is shift, zcf is H, 
+        'nzcs!': 'rl', 
         # -ort and -ert are maybe more common than -urt and -art (easier to stroke)
-        'CNP': 'wh', # Extra
+        'CNP!': 'wh', # Extra
 
         # 2nd series
-        'R': 'r',
-        'X': 's',
-        'I': 'i',
-        'RI': 'l',
-        'XI': 'w',
-        'U': 'u', # and backspace
+        'R!': 'r',
+        'X!': 's',
+        'I!': 'i',
+        'RI!': 'l',
+        'XI!': 'w',
+        'U!': 'u', # and backspace
         #'RU': 'm', # Never used?
-        'RU': 'y',
-        'XU': 'n', # for 'know'
-        'IU': 'h', # Used to be p/b
-        'RIU': 't', # Kind of useless with the S flip
-        'XIU': 'c', # and k/g
-        'XR': 'e',
-        'XRI': 'o',
+        'RU!': 'y',
+        'XU!': 'n', # for 'know'
+        'IU!': 'h', # Used to be p/b
+        'RIU!': 't', # Kind of useless with the S flip
+        'XIU!': 'c', # and k/g
+        'XR!': 'e',
+        'XRI!': 'o',
         # extra, but not useful any more
-        'XRIU': 'k',
+        'XRIU!': 'k',
 
         # Alternate 2nd (mirrored vowels for terminating e) are in the other dictionary
 
         # 3rd series
-        'a': 'a',
-        'e': 'e',
-        'i': 'i',
-        'ie': 'o',
-        'u': 'u',
+        'a!': 'a',
+        'e!': 'e',
+        'i!': 'i',
+        'ie!': 'o',
+        'u!': 'u',
 
         # 3rd series terminators
-        'ua': '$a',
-        'ue': '$e',
-        'ui': '$i',
-        'uie': '$o',
-        'uia': '$u',
+        'ua!': '$a',
+        'ue!': '$e',
+        'ui!': '$i',
+        'uie!': '$o',
+        'uia!': '$u',
 
         # 1st+2nd specials
-        'FSCR': 'str', # SCR blocks 'ha_e'. 
-        'FCRI': 'spl',
-        'FCIU': 'spr',
-        'FCXIU': 'scr',
-        'FCXIU': 'sch',
-        'FZXIU': 'sk',
-        'FSX': 'sci', # SX conflicts with [s][e]
-        'ZNI': 'j', # weird because it doesn't exist in the phonetic version?
-        'CPXIU': 'qu', # no standalone q!
+        'FSC!R!': 'str', # SCR blocks 'ha_e'. 
+        'FC!RI!': 'spl',
+        'FC!IU!': 'spr',
+        'FC!XIU!': 'scr',
+        'FC!XIU!': 'sch',
+        'FZ!XIU!': 'sk',
+        'FS!X!': 'sci', # SX conflicts with [s][e]
+        'ZN!I!': 'j', # weird because it doesn't exist in the phonetic version?
+        'CP!XIU!': 'qu', # no standalone q!
 
-        'Uu': 'au',
-        'Ii': 'ai',
-        'Iui': '$ai',
-        'Iie': 'io',
-        'Iuie': '$io', # aie is not useful
-        'Uua': '$ua', # Mostly for 'usual' - I don't need aual. Come to think of it, do these even need special cases? U left, whatever right...
-        'Uui': '$ui',# for 'build'
-        'Uue': '$ue', # for -ue (continue)
-        'Uuia': '$au', # for 'laugh' - this is in the document. Not sure if it's meant to be terminating
+        'U!u!': 'au',
+        'I!i!': 'ai',
+        'I!ui!': '$ai',
+        'I!ie!': 'io',
+        'I!uie!': '$io', # aie is not useful
+        'U!ua!': '$ua', # Mostly for 'usual' - I don't need aual. Come to think of it, do these even need special cases? U left, whatever right...
+        'U!ui!': '$ui',# for 'build'
+        'U!ue!': '$ue', # for -ue (continue)
+        'U!uia!': '$au', # for 'laugh' - this is in the document. Not sure if it's meant to be terminating
         #'apzc': 'ae',
         #'uapzc': 'ae', # TODO: terminator
-        'ia': '$ou',
+        'ia!': '$ou',
         #'ea': 'ea', # This is implicit!
-        'iea': '$ea', # not uea? hrm. They both work!
+        'iea!': '$ea', # not uea? hrm. They both work!
         # oh, uea is impossible on a proper Michela device
 
         # XI magic: after p,w,r,g it becomes H
@@ -302,23 +303,23 @@ dictionary = {
 # Applies when 3rd group is empmty
 dictionary_2nd = (
         # mirrored vowels for trailing-e
-        ('R', 'a'),
-        ('XI', 'o'),
-        ('X', 'e'),
-        ('U', 'u'),
-        ('I', 'i'),
-        ('XR', 'ea'),
-        ('RI', 'ou'),
+        ('R!', 'a'),
+        ('XI!', 'o'),
+        ('X!', 'e'),
+        ('U!', 'u'),
+        ('I!', 'i'),
+        ('XR!', 'ea'),
+        ('RI!', 'ou'),
 )
 # Applies when 2nd group is empty
 dictionary_3rd = (
-        ('ea', '$'),
-        ('uiea', '$\''), # Should this be terminating? Maybe it shouldn't count as 3rd group
+        ('ea!', '$'),
+        ('uiea!', '$\''), # Should this be terminating? Maybe it shouldn't count as 3rd group
         # Terminating and non-terminating versions would be nice...
         # ia not used right now
 )
 dictionary_apostrophe = (
-        ('iea', '$\''), # Should this be terminating? Maybe it shouldn't count as 3rd group
+        ('iea!', '$\''), # Should this be terminating? Maybe it shouldn't count as 3rd group
         # Terminating is better since other consonants can still be tacked on
         # except for 're and 've and .....
         # quote on its own -> not terminating?
@@ -336,7 +337,8 @@ class OutputStroke():
         self.ignore_shift = ignore_shift
 
 specials = {
-        # For briefs and things
+    # For briefs and things
+    # These use the entire chord so no need for the dividers
 
     'IUep': OutputStroke(DVP['DOT'], attach_left = True, end_sentence = True),
     'IUec': OutputStroke(DVP['COMM'], attach_left = True, end_sentence = False),
@@ -499,10 +501,13 @@ class Chord():
         alt_3rd = len(blocks[1]) == 0
         alt_apostrophe= len(blocks[1]) + len(blocks[0]) == 0
 
+
+        # Straight join for specials
         pressed = "".join(blocks)
 
         print(blocks)
         print(pressed)
+        #print(f"Status: 2nd {alt_2nd} 3rd {alt_3rd} apostrophe {alt_apostrophe}")
 
         if pressed == "":
             return ""
@@ -555,24 +560,26 @@ class Chord():
             else:
                 block_output = special
         else:
+            pressed = "!".join(blocks)
             if blocks[1] == 'X' and not alt_2nd:
                 # leading S
                 blocks[1] = blocks[0]
                 blocks[0] = 'X'
-                pressed = "".join(blocks)
+                pressed = "!".join(blocks)
             if blocks[2] == 'ui' and blocks[3] == 'nz':
                 # terminating y
                 blocks[2] = ''
                 space = True
-                pressed = "".join(blocks)
-
+                pressed = "!".join(blocks)
 
         # The pdf has FZNX as indent, so it's available... but I'm not sure I want to flip my vowel block
 
+            # TODO: unnecessary check
             if blocks[3] == "zcs":
                 # Actually not next, it's this round
                 self.next_shift = True
-                pressed = pressed[0:-3]
+                blocks[3] = ''
+                pressed = "!".join(blocks)
 
             # This part of the documentation is unclear. What's the actual trigger to end the word?
             # Maybe this logic is correct and the correct way is just to make sure the final stroke is [4] only?
@@ -587,13 +594,14 @@ class Chord():
 
             while idx < len(pressed):
                 initial_idx = idx
+                #print("Check: ", pressed[idx:])
 
                 if alt_2nd:
                     generated = False
                     # I wonder if linear search through the whole word list is too slow
                     for stroke, out in dictionary_2nd:
                         # This duplicated check is dumb
-                        if pressed.startswith(stroke, idx) and blocks[1] == stroke:
+                        if pressed.startswith(stroke, idx):
                             add_e = True
                             space = True
                             generated = True
@@ -631,7 +639,9 @@ class Chord():
                         continue
 
                 if pressed[idx] not in rules:
-                    block_output += list(pressed[idx])
+                    char = pressed[idx]
+                    if char != '!':
+                        block_output += list(char)
                     idx += 1
                     continue
 
@@ -656,7 +666,9 @@ class Chord():
 
                 # Guarantees no infinite loop
                 if idx == initial_idx:
-                    block_output += list(pressed[idx])
+                    char = pressed[idx]
+                    if char != '!':
+                        block_output += list(char)
                     idx += 1
 
         if add_e:
