@@ -78,6 +78,8 @@ required = [
         ('Iias', 'ious', True), # it's an Ii but that's not the entire pattern so it shouldn't generate ai
 
         ('CRuiazc', 'truck', True), # this broke before
+        ('ieas', '\'s', True),
+        ('ZPeaz', 'gr', True),
         ]
 
 class TestGeneration(unittest.TestCase):

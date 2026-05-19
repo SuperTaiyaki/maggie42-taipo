@@ -4,7 +4,7 @@ SCPR IU ui apcs
 b: FCP          r: R
 c: SC           s: X
 d: SCP          l: RI
-f: F            w/h: XI (h after pwrg)
+f: F            w: XI
 g: ZP           y: RU
 h: FC (zcf)     n: XU
 j: ZNI          h: IU
@@ -47,9 +47,9 @@ str: FSCR (fcr = hr?)
 spl: FCRI (hl)
 spr: FCIU (hb)
 scr: FCXIU (hc)
-sch: CXIU (cc)
-sk: ZXIU (zc)
+sch: FCXIU (cc)
 sci: FSX
+sk: FZXIU (zc)
 
 4th group only ends word (adds space)
 terminating vowels do the same

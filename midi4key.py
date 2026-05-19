@@ -296,8 +296,26 @@ dictionary = {
         #'ZPXI': 'gh' ,# is this necessary...?
         # Removed since IU generates this anyway
 
-        #'uinz': '$y',
-        # Removed since this is special-cased (nzs/nsf conflict)
+        'ui!nz!': '$y',
+
+        # TODO: apostrophe should force-connect to the left
+        '!!iea!': '$\'',# Should this be terminating? Maybe it shouldn't count as 3rd group
+        # Terminating is better since other consonants can still be tacked on
+        # except for 're and 've and .....
+        # quote on its own -> not terminating?
+        # Another idea: Including this pushes to the front, other letters generate as usual. Then you can have one full stroke behind the apostrophe
+        # AND! it's just easier to stroke sometimes (can use left hand s and whatever)
+        # but then, how to terminate...
+        # MAYBE todo: use some impossible post-apostrophe consonants for the e
+        # 'f is impossible... 
+        '!!iea!f!': '$\'e',# Should this be terminating? Maybe it shouldn't count as 3rd group
+
+        # Alt 3rd group, for empty 2nd group
+        '!ea!': '$',
+        'uiea!': '$\'', # Should this be terminating? Maybe it shouldn't count as 3rd group
+        # Terminating and non-terminating versions would be nice...
+        # ia not used right now
+
         }
 
 # Applies when 3rd group is empmty
@@ -310,22 +328,7 @@ dictionary_2nd = (
         ('I!', 'i'),
         ('XR!', 'ea'),
         ('RI!', 'ou'),
-)
-# Applies when 2nd group is empty
-dictionary_3rd = (
-        ('ea!', '$'),
-        ('uiea!', '$\''), # Should this be terminating? Maybe it shouldn't count as 3rd group
-        # Terminating and non-terminating versions would be nice...
-        # ia not used right now
-)
-dictionary_apostrophe = (
-        ('iea!', '$\''), # Should this be terminating? Maybe it shouldn't count as 3rd group
-        # Terminating is better since other consonants can still be tacked on
-        # except for 're and 've and .....
-        # quote on its own -> not terminating?
-        # Another idea: Including this pushes to the front, other letters generate as usual. Then you can have one full stroke behind the apostrophe
-        # AND! it's just easier to stroke sometimes (can use left hand s and whatever)
-        # but then, how to terminate...
+        # idea: combine these with ea or some other unused combo, for a non-terminating version?
 )
 # TODO: attach may not be useful any more
 class OutputStroke():
@@ -498,16 +501,13 @@ class Chord():
  
         # Alternate 2nd and 3rd blocks get enabled when the other block is empty
         alt_2nd = len(blocks[2]) == 0
-        alt_3rd = len(blocks[1]) == 0
-        alt_apostrophe= len(blocks[1]) + len(blocks[0]) == 0
-
 
         # Straight join for specials
         pressed = "".join(blocks)
 
         print(blocks)
         print(pressed)
-        #print(f"Status: 2nd {alt_2nd} 3rd {alt_3rd} apostrophe {alt_apostrophe}")
+        #print(f"Status: 2nd {alt_2nd}")
 
         if pressed == "":
             return ""
@@ -566,11 +566,6 @@ class Chord():
                 blocks[1] = blocks[0]
                 blocks[0] = 'X'
                 pressed = "!".join(blocks)
-            if blocks[2] == 'ui' and blocks[3] == 'nz':
-                # terminating y
-                blocks[2] = ''
-                space = True
-                pressed = "!".join(blocks)
 
         # The pdf has FZNX as indent, so it's available... but I'm not sure I want to flip my vowel block
 
@@ -610,33 +605,6 @@ class Chord():
                             break
                     if generated:
                         continue
-                if alt_3rd:
-                    generated = False
-                    for stroke, out in dictionary_3rd:
-                        if pressed.startswith(stroke, idx):
-                            if out[0] == '$':
-                                out = out[1:]
-                                space = True
-                            generated = True
-                            block_output += list(out)
-                            idx += len(stroke)
-                            break
-                    if generated:
-                        continue
-                if alt_apostrophe:
-                    generated = False
-                    for stroke, out in dictionary_apostrophe:
-                        if pressed.startswith(stroke, idx):
-                            if out[0] == '$':
-                                out = out[1:]
-                                space = True
-                            generated = True
-                            block_output += list(out)
-                            idx += len(stroke)
-                            attach_left = True # I think
-                            break
-                    if generated:
-                        continue
 
                 if pressed[idx] not in rules:
                     char = pressed[idx]
@@ -653,6 +621,11 @@ class Chord():
                             # buffer the space
                             space = True
                             target = target[1:]
+                        # maybe this is a bit filthy
+                        if len(target) > 0 and target[0] == '\'':
+                            attach_left = True
+                            # This is different from single quote (which may include a space)
+
                         #elif target[0] == '!':
                         #    # buffer the space
                         #    if len(blocks[1]) == 0:
