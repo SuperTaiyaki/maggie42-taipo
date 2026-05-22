@@ -1,4 +1,13 @@
 # https://github.com/Sillabix/MIDI4TEXT-sistema-ortosillabico-per-tastiera-midi--MIDI4TEXT-orthosllabic-system-for-midi-keyboard/tree/main/ENG
+"""
+Things changed from the original theory:
+    - base keymap changed (single-key t and r, basically easier fingering for stuff I want more ofter)
+    - 2nd-group S (X stroke) comes to the front, so PX- generates sp-
+    - ea is a terminating group that does nothing, so Peap generates a terminating 'pp'
+    - Even if a word has been terminated, single consonants from group 4 will attach to the end (not open a space)
+
+
+"""
 
 """
 # Somehow crams everything into 10 keys - no external consonants, no extra thumbs. How???
@@ -144,6 +153,21 @@ wtf is the B for in the second slot? I can see it being useful for the phonetic 
         Now, do I want to replace another useless character and generate a leading A?
 
 ZC on the right generates ck, left does nothing so ST (since it opens up group 2)
+    FS would also have been good, and maybe made more sense...
+    although I'm using FS as a chord trigger for some stuff
+
+Swap X and Z? Mainly so that -EX is less painful to stroke
+at current it's an up-down-up-down
+ez is rare, ex comes up occasionally
+    this may be weird on a piano keyboard
+    DONE
+
+Swap the ending/non-ending vowel logic?
+    so hold U for a continuation instead...
+    may actually work better, since no-continuation usually has the right hand consonant open
+
+AND THEN: allow U-modified vowels in group 2 for the E-thing, for non-ending and ending options there....
+    but, does this conflict with other group-2 stuff?
 
 """
 
@@ -183,7 +207,7 @@ dictionary = {
         'Z!': 'r', 'z': 'r',
         'SCN!': 'l', 'ncs': 'l',
         'P!': 'p', 'p': 'p',
-        'SZP!': 'x', 'pzs' :'x',
+        'SZP!': 'z', 'pzs' :'z',
         'N!': 'n', 'n': 'n',
         'FCP!': 'b', 'pcf': 'b',
         'SCP!': 'd', 'pcs': 'd',
@@ -200,7 +224,7 @@ dictionary = {
         'zcf!': 'h', # tail
         'cf!': 'st',
 
-        'FCN!': 'z', 'ncf': 'z',
+        'FCN!': 'x', 'ncf': 'x',
         'SC!': 'c', 'cs': 'c',
         'SP!': 'ch', 'ps': 'ch',
         'FZP!': 'gh', 'pzf' :'gh',
