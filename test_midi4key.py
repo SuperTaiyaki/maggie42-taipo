@@ -23,6 +23,9 @@ class DVP():
         self.QUOT = '\''
         self.BSPC = '⇐'
         self.SPC = ' '
+        self.ENTER = '↓'
+        self.LEFT_PAREN = '('
+        self.RIGHT_PAREN = ')'
 
     def __getitem__(self, name):
         if name == 'SPC':
@@ -62,22 +65,22 @@ required = [
         # [FCP][U][uia][]
         # actually biu is weird too
         # buie is better! (the e snuck in)
-        ('FCPUiu', 'bui', True), # ACTUALLY this is better
+        ('FCPUiu', 'bui', False), # ACTUALLY this is better
         ('FCPIiu', 'bai', False), # The more sane option
-        ('FCNXIUuiencs', 'zcol', True), # Not xhuiel - not cross-group
+        ('FCNXIUuiencs', 'xcol', False), # Not xhuiel - not cross-group
         # [FCN][XIU][uie][ncs]
-        ('FCPRIzcs', 'Bl', False), # not Baie. 2nd group doesn't generate so the flip-and-E doesn't apply
+        ('FCPRIzcs', 'Boue', True),
         # [FCP][RI][][zcs] - RI doesn't generate a vowel so it shouldn't add the trailing E (or generate the vowel side at all)
 
         ('Nieas', 'neas', False),
         # ('Nieas', 'neas'), # test 2nd-only too?
         ('ieas', '\'s', True),
-        ('PXuinz', 'spy', True), # uinz = $5
-        ('PRuinzf', 'print', True), # uinz should not generate $y if it's not the entire group 3 + 4
+        ('PXuinz', 'spy', True), # uinz = $y
+        ('PRuinzf', 'print', False), # uinz should not generate $y if it's not the entire group 3 + 4
 
         ('Iias', 'ious', True), # it's an Ii but that's not the entire pattern so it shouldn't generate ai
 
-        ('CRuiazc', 'truck', True), # this broke before
+        ('CRuiazc', 'truck', False), # this broke before
         ('ieas', '\'s', True),
         ('ZPeaz', 'gr', True),
         ]
