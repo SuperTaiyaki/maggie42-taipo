@@ -273,44 +273,46 @@ dictionary = {
         # Alternate 2nd (mirrored vowels for terminating e) are in the other dictionary
 
         # 3rd series
-        'a!': 'a',
-        'e!': 'e',
-        'i!': 'i',
-        'ie!': 'o',
-        'u!': 'u',
+        'a!': '$a',
+        'e!': '$e',
+        'i!': '$i',
+        'ie!': '$o',
+        'u!': '$u',
 
         # 3rd series terminators
-        'ua!': '$a',
-        'ue!': '$e',
-        'ui!': '$i',
-        'uie!': '$o',
-        'uia!': '$u',
+        'ua!': 'a',
+        'ue!': 'e',
+        'ui!': 'i',
+        'uie!': 'o',
+        'uia!': 'u',
 
         # 1st+2nd specials
-        'FSC!R!': 'str', # SCR blocks 'ha_e'. 
+        #'FSC!R!': 'str', # SCR blocks 'ha_e'. 
         'FC!RI!': 'spl',
         'FC!IU!': 'spr',
         'FC!XIU!': 'scr',
-        'FC!XIU!': 'sch',
-        'FZ!XIU!': 'sk',
+        #'FC!XIU!': 'sch',
+        #'FZ!XIU!': 'sk',
         'FS!X!': 'sci', # SX conflicts with [s][e]
         'ZN!I!': 'j', # weird because it doesn't exist in the phonetic version?
         'CP!XIU!': 'qu', # no standalone q!
 
-        'U!u!': 'au',
-        'I!i!': 'ai',
-        'I!ui!': '$ai',
-        'I!ie!': 'io',
-        'I!uie!': '$io', # aie is not useful
-        'U!ua!': '$ua', # Mostly for 'usual' - I don't need aual. Come to think of it, do these even need special cases? U left, whatever right...
-        'U!ui!': '$ui',# for 'build'
-        'U!ue!': '$ue', # for -ue (continue)
-        'U!uia!': '$au', # for 'laugh' - this is in the document. Not sure if it's meant to be terminating
+        'U!u!': '$au',
+        'I!i!': '$ai',
+        'I!ui!': 'ai',
+        'I!ie!': '$io',
+        'I!uie!': 'io', # aie is not useful
+        # TODO: join?
+        'U!ua!': 'ua', # Mostly for 'usual' - I don't need aual. Come to think of it, do these even need special cases? U left, whatever right...
+         # TODO: join?
+        'U!ui!': 'ui',# for 'build'
+        'U!ue!': 'ue', # for -ue (continue) 
+        'U!uia!': 'au', # for 'laugh'
         #'apzc': 'ae',
         #'uapzc': 'ae', # TODO: terminator
         'ia!': '$ou',
         #'ea': 'ea', # This is implicit!
-        'iea!': '$ea', # not uea? hrm. They both work!
+        'iea!': 'ea', # not uea? hrm. They both work!
         # oh, uea is impossible on a proper Michela device
 
         # XI magic: after p,w,r,g it becomes H
@@ -320,7 +322,10 @@ dictionary = {
         #'ZPXI': 'gh' ,# is this necessary...?
         # Removed since IU generates this anyway
 
+        # Special rule: ui with Y, becomes terminating y
         'ui!nz!': '$y',
+        'ia!nz!': 'y', # Opposite of the above - just a Y with a non-empty 3rd group
+        # To avoid triggering the 2nd block specials
 
         # TODO: apostrophe should force-connect to the left
         '!!iea!': '$\'',# Should this be terminating? Maybe it shouldn't count as 3rd group
@@ -339,11 +344,12 @@ dictionary = {
         'uiea!': '$\'', # Should this be terminating? Maybe it shouldn't count as 3rd group
         # Terminating and non-terminating versions would be nice...
         # ia not used right now
-
         }
 
-# Applies when 3rd group is empmty
+# Applies when 3rd group is empty. Needs a special case to trigger the trailing E.
+# Could be represented as R!! otherwise
 dictionary_2nd = (
+
         # mirrored vowels for trailing-e
         ('R!', 'a'),
         ('XI!', 'o'),
@@ -354,7 +360,7 @@ dictionary_2nd = (
         ('RI!', 'ou'),
         # idea: combine these with ea or some other unused combo, for a non-terminating version?
 )
-# TODO: attach may not be useful any more
+
 class OutputStroke():
     def __init__(self, keycode, end_sentence = False, attach_left = False, attach_right = False, ignore_shift = True):
         self.keycode = keycode
@@ -366,6 +372,8 @@ class OutputStroke():
 specials = {
     # For briefs and things
     # These use the entire chord so no need for the dividers
+
+    'FZzf': OutputStroke(KC.ENTER, attach_left = True),
 
     'IUep': OutputStroke(DVP['DOT'], attach_left = True, end_sentence = True),
     'IUec': OutputStroke(DVP['COMM'], attach_left = True, end_sentence = False),
@@ -388,12 +396,28 @@ specials = {
     'IUac': OutputStroke(KC.QUOT, attach_left = True, attach_right = True), # Still weird (-)
     'IUap': OutputStroke(DVP['QUES'], attach_left = True, end_sentence = True),
 
-    # e + (same as above, with shift held
+    # e + (same as above, with shift held)
     # e | : ~
     #   X X X  <-- Xs are regular punctuation instead
     'IUef': KC.LSFT(KC.GRV),
     'IUez': OutputStroke(KC.LSFT(DVP['SCLN']), attach_left = True),
     'IUen': KC.LSFT(DVP['BSLS']),
+
+    # ea +
+    # ( ) {
+    # [ ] }
+    'IUean': OutputStroke(KC.LEFT_PAREN, attach_right = True),
+    'IUeaz': OutputStroke(KC.RIGHT_PAREN, attach_left = True),
+    'IUeaf': OutputStroke(DVP['SCLN'], attach_left = True),
+
+    'IUeap': OutputStroke(DVP['LBRC'], attach_right = True),
+    'IUeac': OutputStroke(DVP['RBRC'], attach_left = True),
+    'IUeas': OutputStroke(DVP['SCLN'], attach_left = True),
+
+    # extra
+    'IUaf': OutputStroke(DVP['SLSH'], attach_left = True, attach_right = True),
+
+
 
     # Michela-style punctuation
     'NX': OutputStroke(DVP['DOT'], end_sentence = True, attach_left = True),
@@ -406,6 +430,7 @@ specials = {
     'FN': 'and',
     'X': 'is',
     'SZX': 'the',
+    'FZas': 'that\s',
     # do I need 'the'?
 
     'ieapf': OutputStroke((DVP['QUOT'], DVP['V'], DVP['E']), end_sentence = False, attach_left = True),
@@ -457,6 +482,20 @@ specials = {
 
 # Could add an extra thing that required that a space is buffered (or not) or the brief doesn't trigger
 # Mostly to avoid collisions with non-brief things and open up the space a bit
+
+    # TODO: want numbers to glue together... maybe?
+    # But manual spacing to terminate isn't bad
+    'Uea': OutputStroke(KC['1'], attach_left = True, attach_right = True),
+    'XUea': OutputStroke(KC['2'], attach_left = True, attach_right = True),
+    'NXUea': OutputStroke(KC['3'], attach_left = True, attach_right = True),
+    'ZNXUea': OutputStroke(KC['4'], attach_left = True, attach_right = True),
+    'FZNXUea': OutputStroke(KC['5'], attach_left = True, attach_right = True),
+    'Fea': OutputStroke(KC['6'], attach_left = True, attach_right = True),
+    'FZea': OutputStroke(KC['7'], attach_left = True, attach_right = True),
+    'FZNea': OutputStroke(KC['8'], attach_left = True, attach_right = True),
+    'FZNXea': OutputStroke(KC['9'], attach_left = True, attach_right = True),
+    'Nea': OutputStroke(KC['0'], attach_left = True, attach_right = True),
+
         }
 
 # special markers: $ for terminators
@@ -482,13 +521,21 @@ class RewindBuffer():
         self.buffer_write += 1
         self.buffer_write %= self.BUFFER_SIZE
         self.buffer[self.buffer_write] = (chars, space, shift)
-    def backspace(self):
+    def undo(self):
         # Return the entire state
         ret = self.buffer[self.buffer_write]
         self.buffer[self.buffer_write] = (1, False, False)
         self.buffer_write -= 1
         self.buffer_write %= self.BUFFER_SIZE
         return ret
+    def backspace(self):
+        if self.buffer[self.buffer_write][0] == 1:
+            self.undo()
+            return
+        else:
+            chars, space, shift = self.buffer[self.buffer_write]
+            self.buffer[self.buffer_write] = (chars - 1, space, shift)
+            return
 
 class Chord():
     def __init__(self):
@@ -501,6 +548,8 @@ class Chord():
         self.next_shift = False
         self.word_caps = False
         self.word_caps_tripped = False
+
+        self.auto_space = True
 
     def reset(self):
         for x in self.chord:
@@ -536,9 +585,12 @@ class Chord():
         if pressed == "":
             return ""
         elif pressed == "U":
-            # backspace
-            keys, self.space_buffered, self.next_shift = self.rewind.backspace()
+            # undo
+            keys, self.space_buffered, self.next_shift = self.rewind.undo()
             return [KC.BSPC] * keys
+        elif pressed == "SCPRea":
+            self.rewind.backspace()
+            return [KC.BSPC]
         elif pressed == "ea":
             # space
             self.space_buffered = False
@@ -548,22 +600,22 @@ class Chord():
             # Cancel space
             self.space_buffered = False
             return []
-        elif pressed == "FZzf":
-            # TODO: rewind
-            self.space_buffered = False
-            return [KC.ENTER] # TODO: set up a dictionary for this instead.
-        elif pressed == "zcs":
+        elif pressed == "zcs": # zcs shift, doubled (SZCzcs) to force down the next space
             self.next_shift = True
             return ""
         elif pressed == "SZCzcs":
             self.next_shift = False
             return ""
-        #elif pressed == "NX":
-            # TODO: rewind
-            # TODO: not useful
-            # TODO: 
-        #    self.next_shift = True
-        #    return [DVP['DOT'], DVP['SPC']]
+        elif pressed == "eazcs": # eazcs start (shift, no space)
+            self.next_shift = True
+            self.space_buffered = False
+            return ""
+        elif pressed == "ZNXea": #ZNX/CPR+ea: auto-space on/off
+            self.auto_space = True
+            return ""
+        elif pressed == "CPRea":
+            self.auto_space = False
+            return ""
         elif pressed in specials:
             special = specials[pressed]
             if isinstance(special, OutputStroke):
@@ -677,7 +729,7 @@ class Chord():
                 not isinstance(keystrokes[0], ModifierKey)):
             keystrokes[0] = KC.LSFT(keystrokes[0])
 
-        if self.space_buffered and not attach_left:
+        if self.space_buffered and not attach_left and self.auto_space:
             keystrokes = [KC.SPC] + keystrokes
         
         self.rewind.add(len(keystrokes), self.space_buffered, self.next_shift)
