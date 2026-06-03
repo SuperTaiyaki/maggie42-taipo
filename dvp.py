@@ -55,7 +55,7 @@ class DVP():
             'L': KC.P,
             'LABK': KC.LABK,
             'LALT': KC.LALT,
-            'LBRC': KC.LBRC,
+            'LBRC': KC.MINUS,
             'LCBR': KC.LCBR,
             'LCTL': KC.LCTL,
             'LEFT': KC.LEFT,
@@ -102,7 +102,7 @@ class DVP():
             'R': KC.O,
             'RABK': KC.RABK,
             'RALT': KC.RALT,
-            'RBRC': KC.RBRC,
+            'RBRC': KC.EQL,
             'RCBR': KC.RCBR,
             'RIGHT': KC.RIGHT,
             'RPRN': KC.RPRN, # right paren

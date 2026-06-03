@@ -38,7 +38,7 @@ keyboard.matrix = SynchronousScanner(keyboard.col_pins, keyboard.row_pins)
 split = ThickSplit(data_pin = board.GP0, use_pio = False, split_flip = False)
 keyboard.modules.append(split)
 
-keyboard.modules.append(StickyKeys(release_after = 3000))
+keyboard.modules.append(StickyKeys(release_after = 1000))
 keyboard.modules.append(MouseKeys())
 keyboard.modules.append(RapidFire())
 
@@ -81,10 +81,10 @@ keyboard.keymap = [
 #    ],
 
 [
- KC.NO, KC.NO, KC.NO, KC.NO, KC.NO, KC.NO,  KC.NO, KC.NO, KC.NO, KC.NO, KC.NO, KC.NO, 
- KC.NO, KC.MT_F, KC.MT_Z, KC.MT_N, KC.MT_X, KC.NO, KC.NO, KC.MT_e, KC.MT_n, KC.MT_z, KC.MT_f, KC.NO,
- KC.NO, KC.MT_S, KC.MT_C, KC.MT_P, KC.MT_R, KC.NO, KC.NO, KC.MT_a, KC.MT_p, KC.MT_c, KC.MT_s, KC.NO,
-KC.NO, KC.NO, KC.NO,   KC.NO, KC.MT_I, KC.MT_U, KC.MT_u, KC.MT_i, KC.NO,
+ KC.ESCAPE, KC.NO, KC.NO, KC.NO, KC.NO, KC.NO,  KC.NO, KC.NO, KC.NO, KC.NO, KC.NO, KC.NO, 
+ KC.SK(KC.LCTRL), KC.MT_F, KC.MT_Z, KC.MT_N, KC.MT_X, KC.NO, KC.NO, KC.MT_e, KC.MT_n, KC.MT_z, KC.MT_f, KC.NO,
+ KC.SK(KC.LGUI), KC.MT_S, KC.MT_C, KC.MT_P, KC.MT_R, KC.MO(3), KC.MO(3), KC.MT_a, KC.MT_p, KC.MT_c, KC.MT_s, KC.NO,
+KC.NO, KC.NO, KC.MO(1),   KC.NO, KC.MT_I, KC.MT_U, KC.MT_u, KC.MT_i, KC.MO(1),
  ],
 
     # Browser layer
@@ -114,7 +114,7 @@ KC.NO, KC.NO, KC.NO,   KC.NO, KC.MT_I, KC.MT_U, KC.MT_u, KC.MT_i, KC.NO,
     # HHKB-based
     [
         KC.NO, KC.LSFT(KC.N1), KC.LSFT(KC.N2), KC.LSFT(KC.N3), KC.LSFT(KC.N4), KC.LSFT(KC.N5),    KC.LSFT(KC.N6), KC.LSFT(KC.N7), KC.LSFT(KC.N8), KC.LSFT(KC.N9), KC.INSERT, KC.DELETE, 
-        KC.TRNS, KC.N1, KC.N2, KC.N3, KC.N4, KC.N5,          KC.HOME, KC.PGUP, KC.N8, KC.UP, KC.GRAVE, KC.BSLASH, 
+        KC.TRNS, KC.N1, KC.N2, KC.N3, KC.N4, KC.N5,          KC.HOME, KC.PGUP, KC.LEFT, KC.UP, KC.RIGHT, KC.BSLASH, 
         KC.TRNS, KC.NO, KC.NO, KC.NO, KC.END, KC.NO,       KC.END, KC.PGDN, KC.LEFT, KC.DOWN, KC.RIGHT, KC.TRNS, 
         KC.NO, KC.NO, KC.NO, KC.NO, KC.NO, KC.NO,       KC.NO, KC.NO, KC.NO, KC.NO, KC.NO, KC.NO, 
         ],
