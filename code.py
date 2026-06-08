@@ -82,8 +82,8 @@ keyboard.keymap = [
 
 [
  KC.ESCAPE, KC.NO, KC.NO, KC.NO, KC.NO, KC.NO,  KC.NO, KC.NO, KC.NO, KC.NO, KC.NO, KC.NO, 
- KC.SK(KC.LCTRL), KC.MT_F, KC.MT_Z, KC.MT_N, KC.MT_X, KC.NO, KC.NO, KC.MT_e, KC.MT_n, KC.MT_z, KC.MT_f, KC.NO,
- KC.SK(KC.LGUI), KC.MT_S, KC.MT_C, KC.MT_P, KC.MT_R, KC.MO(3), KC.MO(3), KC.MT_a, KC.MT_p, KC.MT_c, KC.MT_s, KC.NO,
+ KC.SK(KC.LCTRL), KC.MT_F, KC.MT_Z, KC.MT_N, KC.MT_X, KC.NO, KC.NO, KC.MT_e, KC.MT_n, KC.MT_z, KC.MT_f, KC.LCTRL,
+ KC.SK(KC.LGUI), KC.MT_S, KC.MT_C, KC.MT_P, KC.MT_R, KC.MO(3), KC.MO(3), KC.MT_a, KC.MT_p, KC.MT_c, KC.MT_s, KC.LGUI,
 KC.NO, KC.NO, KC.MO(1),   KC.NO, KC.MT_I, KC.MT_U, KC.MT_u, KC.MT_i, KC.MO(1),
  ],
 

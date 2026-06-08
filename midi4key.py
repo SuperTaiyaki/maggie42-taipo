@@ -344,6 +344,10 @@ dictionary = {
         'uiea!': '$\'', # Should this be terminating? Maybe it shouldn't count as 3rd group
         # Terminating and non-terminating versions would be nice...
         # ia not used right now
+
+        # Special for ae
+        'a!pzc': '$ae',
+        'ua!pzc': 'ae',
         }
 
 # Applies when 3rd group is empty. Needs a special case to trigger the trailing E.
@@ -417,21 +421,9 @@ specials = {
     # extra
     'IUaf': OutputStroke(DVP['SLSH'], attach_left = True, attach_right = True),
 
-
-
     # Michela-style punctuation
     'NX': OutputStroke(DVP['DOT'], end_sentence = True, attach_left = True),
     'NXen': OutputStroke(DVP['COMM'], end_sentence = False, attach_left = True),
-
-    # Briefs list
-    'I': OutputStroke(KC.LSFT(DVP['I'])), # I = I
-    'IU': 'you', # you = IU
-    #'FN': OutputStroke((DVP['a'], DVP['n'], DVP['d'])), # and = FN
-    'FN': 'and',
-    'X': 'is',
-    'SZX': 'the',
-    'FZas': 'that\s',
-    # do I need 'the'?
 
     'ieapf': OutputStroke((DVP['QUOT'], DVP['V'], DVP['E']), end_sentence = False, attach_left = True),
     'Iieapf': OutputStroke((KC.LSFT(DVP['I']), DVP['QUOT'], DVP['V'], DVP['E'])),
@@ -451,6 +443,37 @@ specials = {
     # and if I want 'error' I need the er starter (non-terminating)
     # Use the mirrored 'e' instead...?
     # since ere and ede and ene aren't useful
+
+# Could add an extra thing that required that a space is buffered (or not) or the brief doesn't trigger
+# Mostly to avoid collisions with non-brief things and open up the space a bit
+
+    # TODO: want numbers to glue together... maybe?
+    # But manual spacing to terminate isn't bad
+    'Uea': OutputStroke(KC['1'], attach_left = True, attach_right = True),
+    'XUea': OutputStroke(KC['2'], attach_left = True, attach_right = True),
+    'NXUea': OutputStroke(KC['3'], attach_left = True, attach_right = True),
+    'ZNXUea': OutputStroke(KC['4'], attach_left = True, attach_right = True),
+    'FZNXUea': OutputStroke(KC['5'], attach_left = True, attach_right = True),
+    'Fea': OutputStroke(KC['6'], attach_left = True, attach_right = True),
+    'FZea': OutputStroke(KC['7'], attach_left = True, attach_right = True),
+    'FZNea': OutputStroke(KC['8'], attach_left = True, attach_right = True),
+    'FZNXea': OutputStroke(KC['9'], attach_left = True, attach_right = True),
+    'Nea': OutputStroke(KC['0'], attach_left = True, attach_right = True),
+
+
+
+    # Briefs list
+    'I': OutputStroke(KC.LSFT(DVP['I'])), # I = I
+    'IU': 'you', # you = IU
+    #'FN': OutputStroke((DVP['a'], DVP['n'], DVP['d'])), # and = FN
+    'FN': 'and',
+    'X': 'is',
+    'SZX': 'the',
+    'FZas': 'that\'s',
+    # do I need 'the'?
+    'FCPXIUu': 'because', # [b][c][u][]
+    'Ries': 'also', # [][a][o][s]
+    'XInz': 'only', # [][o][][y]
 
 # Samples from the PDF:
 # for = FR
@@ -480,21 +503,6 @@ specials = {
 # Auto^ = UApf
 # don't = RIUuienzf
 
-# Could add an extra thing that required that a space is buffered (or not) or the brief doesn't trigger
-# Mostly to avoid collisions with non-brief things and open up the space a bit
-
-    # TODO: want numbers to glue together... maybe?
-    # But manual spacing to terminate isn't bad
-    'Uea': OutputStroke(KC['1'], attach_left = True, attach_right = True),
-    'XUea': OutputStroke(KC['2'], attach_left = True, attach_right = True),
-    'NXUea': OutputStroke(KC['3'], attach_left = True, attach_right = True),
-    'ZNXUea': OutputStroke(KC['4'], attach_left = True, attach_right = True),
-    'FZNXUea': OutputStroke(KC['5'], attach_left = True, attach_right = True),
-    'Fea': OutputStroke(KC['6'], attach_left = True, attach_right = True),
-    'FZea': OutputStroke(KC['7'], attach_left = True, attach_right = True),
-    'FZNea': OutputStroke(KC['8'], attach_left = True, attach_right = True),
-    'FZNXea': OutputStroke(KC['9'], attach_left = True, attach_right = True),
-    'Nea': OutputStroke(KC['0'], attach_left = True, attach_right = True),
 
         }
 
@@ -616,6 +624,9 @@ class Chord():
         elif pressed == "CPRea":
             self.auto_space = False
             return ""
+        elif pressed == "SCPea":
+            self.auto_space = False
+            return [KC.ESCAPE] # For vim
         elif pressed in specials:
             special = specials[pressed]
             if isinstance(special, OutputStroke):
@@ -776,10 +787,13 @@ class MidiKey(Module):
         else:
             # oops should wait until everything is up
             if self.pressing:
+
+                # coordkeys is private but ehhhh
+                modifiers_held = any([isinstance(key, ModifierKey) for key in keyboard._coordkeys_pressed.values()])
+                # TODO: Now, use this to disable auto-space
+
                 output = self.chord.result()
-                #print("Output: ", output)
                 self.handle_output(output)
-                #self.chord.reset()
                 self.pressing = False
             self.chord.discard(code)
 

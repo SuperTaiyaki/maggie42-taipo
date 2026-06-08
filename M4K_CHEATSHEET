@@ -43,17 +43,29 @@ wh: CNP
 ind/inc/int
 (ing not useful)
 
-str: FSCR (fcr = hr?)
 spl: FCRI (hl)
 spr: FCIU (hb)
 scr: FCXIU (hc)
-sch: FCXIU (cc)
 sci: FSX
 sk: FZXIU (zc)
+removed:
+str: FSCR (fcr = hr?)
+sch: FCXIU (cc) <-- not needed, can use reversed S
 
 4th group only ends word (adds space)
 terminating vowels do the same
 2nd group X- (s) generates a leading s
 vowels mirrored into 2nd group and empty 3rd group generate the vowel, 4th group, then trailing E
 
-want: trailing ~lf (maybe)
+true is annoying
+tr$u -> true? I can't think when else it would be useful...
+t/RU works...
+
+"Mr" (shift+M, or shift->m) failed, wtf?
+fly -> can I fix the left hand OU?
+    uiea is an option to fix -Y...
+    ui is nice to terminate it!
+    ea works...
+    ea to join it is ... unintuitive (reverse of the normal stuff)
+    ia?
+
