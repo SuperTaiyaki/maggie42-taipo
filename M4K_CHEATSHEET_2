@@ -1,0 +1,25 @@
+e: RX
+o: RXI
+
+r: R
+s: X
+l: RI
+n: XU
+
+w: XI
+y: RU
+h: IU
+t: RIU
+c: XIU
+k: RXIU
+
+spl: FCRI (hl)
+spr: FCIU (hb)
+scr: FCXIU (hc)
+sci: FSX
+sk: FZXIU (zc)
+
+    'FCPUus': 'because', # [b][u][u][s]
+    'Ries': 'also', # [][a][o][s]
+    'XInz': 'only', # [][o][][y]
+

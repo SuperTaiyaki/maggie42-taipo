@@ -243,9 +243,9 @@ dictionary = {
         'pzcs!': 'rd',
         # These could be used for something else on the left
         # Useful, not available on keyboard
-        'pcfs!': 'dd',
+        'pcfs!': 'dd', # This is maybe not so useful
         'ncfs!': 'll',
-        'npcfs!': 'll', # easier to stroke
+        'nzcfs!': 'll', # easier to stroke
         'fs!': 'ss',
         'nzc!': 'rt', # zcs is shift, zcf is H, 
         'nzcs!': 'rl', 
@@ -293,7 +293,8 @@ dictionary = {
         'FC!XIU!': 'scr',
         #'FC!XIU!': 'sch',
         #'FZ!XIU!': 'sk',
-        'FS!X!': 'sci', # SX conflicts with [s][e]
+        #'FS!X!': 'sci', # SX conflicts with [s][e][]
+        'X!FS!': 'sci', # because of the S flip
         'ZN!I!': 'j', # weird because it doesn't exist in the phonetic version?
         'CP!XIU!': 'qu', # no standalone q!
 
@@ -313,7 +314,8 @@ dictionary = {
         'ia!': '$ou',
         #'ea': 'ea', # This is implicit!
         'iea!': 'ea', # not uea? hrm. They both work!
-        # oh, uea is impossible on a proper Michela device
+        'uea!': 'ea',
+        # uea is impossible on a proper Michela device (but easier on a keyboard)
 
         # XI magic: after p,w,r,g it becomes H
         #'PXI': 'ph',
@@ -430,6 +432,7 @@ specials = {
     'IUieapf': 'you\'ve',
     'ieaz': OutputStroke((DVP['QUOT'], DVP['R'], DVP['E']), end_sentence = False, attach_left = True), # 're
     'ieancs': OutputStroke((DVP['QUOT'], DVP['L'], DVP['L']), end_sentence = False, attach_left = True), #'ll
+    'Nieac': OutputStroke((DVP['N'], DVP['QUOT'], DVP['T']), end_sentence = False, attach_left = True), #n't
 
     # Maybe I want a connected -ed here
     # so type 'roll' and still be able to extend it
@@ -471,7 +474,8 @@ specials = {
     'SZX': 'the',
     'FZas': 'that\'s',
     # do I need 'the'?
-    'FCPXIUu': 'because', # [b][c][u][]
+    #'FCPXIUu': 'because', # [b][c][u][]
+    'FCPUus': 'because', # [b][u][u][s]
     'Ries': 'also', # [][a][o][s]
     'XInz': 'only', # [][o][][y]
 
@@ -736,6 +740,9 @@ class Chord():
         keystrokes = [c if isinstance(c, Key) else DVP[c] for c in block_output]
 
         if (self.next_shift and
+            # TODO: Modifier is bad, check for pure alpha
+            # oh wow the key thing is dynamic?
+            # Basically, the problem is we don't want to shift punctuation and things (single quote should not be shifted)
                 not isinstance(keystrokes[0], ModifiedKey) and
                 not isinstance(keystrokes[0], ModifierKey)):
             keystrokes[0] = KC.LSFT(keystrokes[0])
