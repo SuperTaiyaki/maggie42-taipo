@@ -3,10 +3,9 @@
 Things changed from the original theory:
     - base keymap changed (single-key t and r, basically easier fingering for stuff I want more ofter)
     - 2nd-group S (X stroke) comes to the front, so PX- generates sp-
-    - ea is a terminating group that does nothing, so Peap generates a terminating 'pp'
+    - ea is a terminating group that does nothing, so Peap generates a
+        terminating 'pp' (if group 2 is empty)
     - Even if a word has been terminated, single consonants from group 4 will attach to the end (not open a space)
-
-
 """
 
 """
@@ -37,32 +36,10 @@ using the left hand vowels instead (a -> R) -> terminate + add ending e
     BUT on the observation that all words have to be memorized anyway that's fine
         composing with this is quite a bit harder, by the looks of it
 
-Maybe more natural voiced/unvoiced variations
-    oh, maybe not
-
-I don't know if this follows the steno priority rules...
-
-Magic: XI generates W, but H after a (p, w, r) but also f/v in special cases
-    'swung' is SXIiuans, but shuck is.... oh, Ciua...
-ah, 'divi' is special (SCPXIi
-    .... maybe this is the level of magic I want?
-
-Hesitation:
-FCe/Si/FPa/FPIuien
-
-Oh hey there's a sample: 'jail' doesn't generate in one stroke
-ZNIa/uincs
-    The J requires the I so break the stroke
-
-should call this something other than midi4text, bah
-
 How do I terminate a word without a vowel...?
 standalone 4th block is also terminating...? HRM.
     so the logic is pretty similar to my jackdaw, lol
     I guess if you need to drop more in you use non-4th consonants?
-
-^STR is easy enough (FCR), but ST is... S from the first block, T/D from the second block
-ah, RIU
 
 P31, lesson V: ending E
     Is the rule for group 2 without group 3? Or vowels specifically?
@@ -71,6 +48,7 @@ P56, lesson XV: uo mix ('ground' using ia)
 p57, "" - consonant clusters
     I don't get why contexts gets a space on the FPs
     maybe it doesn't and the manual space gets used?
+pxx, ui before a Y makes it a terminating Y
 
 So, this is a proper steno-ish thing that uses plenty of briefs (or can...)
     is that better than jackdaw? IDK
@@ -115,39 +93,11 @@ On the right hand, FZ to add some more useful stuff...
         lol same logic as jackdaw
         DONE
 
-Since I have the C/K problem in group 2, use one of the open slots to deal with it?
-    XIU -> C
-    The missing one was... RXU RXIU
-        RXIU -> K looks reasonable
-        DONE
-
 The dictionary has a bunch of useless shit, why?
     158k lines ughhh
     "boae"
 
-I installed EA as a null terminal but it's actually in use - when 2nd group is in use, it generates ea
-    ia for $ou as well
-    and iea for $ea
-    these will reduce the need for a null terminal...
-    can use the impossible ones though - UIEA, UEA
-    ea for $ with no 2nd group should be fine, it's just for forcing consonant blocks to terminate
-
 wtf is the B for in the second slot? I can see it being useful for the phonetic version...
-    I want a slot to split W/H, that's taking up space
-    the dictionary has lots of bp and the like, but that's also useless
-    SP-type stuff is about all of it... useless!
-        let's put the h there instead
-        P would be much better
-    C is also a bit iffy
-        again, SC... is about all
-        heck, the only consonant that chains into other consonants like that is S
-    This slot is mostly for the phonetic version anyway, can rethink it later
-        hopefully not confuse myself too much in the process
-
-    URGH some sort of inversion might be better - S on the second, something else in the first and they
-    swap. That solves most of the problems!
-        so like the trailing E, set up a leading S
-    actually H in 2nd is useful - TH, CH, WH so don't put the S on UI
     X generates S, which is absolutely useless in second... flip that?
         DONE works pretty well.
         Now, do I want to replace another useless character and generate a leading A?
@@ -155,20 +105,6 @@ wtf is the B for in the second slot? I can see it being useful for the phonetic 
 ZC on the right generates ck, left does nothing so ST (since it opens up group 2)
     FS would also have been good, and maybe made more sense...
     although I'm using FS as a chord trigger for some stuff
-
-Swap X and Z? Mainly so that -EX is less painful to stroke
-at current it's an up-down-up-down
-ez is rare, ex comes up occasionally
-    this may be weird on a piano keyboard
-    DONE
-
-Swap the ending/non-ending vowel logic?
-    so hold U for a continuation instead...
-    may actually work better, since no-continuation usually has the right hand consonant open
-
-AND THEN: allow U-modified vowels in group 2 for the E-thing, for non-ending and ending options there....
-    but, does this conflict with other group-2 stuff?
-
 """
 
 from kmk.keys import Key, KC, make_key, ModifierKey, ModifiedKey
@@ -305,24 +241,18 @@ dictionary = {
         'I!uie!': 'io', # aie is not useful
         # TODO: join?
         'U!ua!': 'ua', # Mostly for 'usual' - I don't need aual. Come to think of it, do these even need special cases? U left, whatever right...
-         # TODO: join?
+        # TODO: join?
         'U!ui!': 'ui',# for 'build'
         'U!ue!': 'ue', # for -ue (continue) 
         'U!uia!': 'au', # for 'laugh'
-        #'apzc': 'ae',
-        #'uapzc': 'ae', # TODO: terminator
+        # Special for ae
+        'a!pzc': '$ae',
+        'ua!pzc': 'ae',
         'ia!': '$ou',
         #'ea': 'ea', # This is implicit!
         'iea!': 'ea', # not uea? hrm. They both work!
         'uea!': 'ea',
         # uea is impossible on a proper Michela device (but easier on a keyboard)
-
-        # XI magic: after p,w,r,g it becomes H
-        #'PXI': 'ph',
-        #'CNXI': 'wh',
-        #'FCNXI': 'rh',
-        #'ZPXI': 'gh' ,# is this necessary...?
-        # Removed since IU generates this anyway
 
         # Special rule: ui with Y, becomes terminating y
         'ui!nz!': '$y',
@@ -346,16 +276,72 @@ dictionary = {
         'uiea!': '$\'', # Should this be terminating? Maybe it shouldn't count as 3rd group
         # Terminating and non-terminating versions would be nice...
         # ia not used right now
-
-        # Special for ae
-        'a!pzc': '$ae',
-        'ua!pzc': 'ae',
         }
+
+# Second dictionary for left-hand only typing. Not great for memory usage...
+dictionary_lh = {
+        'FP!': 'v',
+        'CP!': 'sh',
+        'S!': 's',
+        'F!': 'f',
+        'Z!': 'r',
+        'SCN!': 'l',
+        'P!': 'p',
+        'SZP!': 'z',
+        'N!': 'n',
+        'FCP!': 'b',
+        'SCP!': 'd',
+        'SZN!': 'm',
+        'ZP!': 'g',
+        'ZN!': 'y',
+        'CN!': 'w',
+
+        'C!': 't',
+        'FZ!': 'th',
+        'SZ!': 'k',
+
+        'FC!': 'h', # head
+
+        'FCN!': 'x',
+        'SC!': 'c',
+        'SP!': 'ch',
+        'FZP!': 'gh',
+        'FN!': 'ind', 'nf': 'nd', # and more in combos
+        'SN!': 'inc', 'ns': 'ng', # blend? and sometimes ^ing?
+        'FZN!': 'int', 'nzf' :'nt', # Which version to use for one hand...?
+        'ZC!': 'st', # More useful than ck (gets used at front and back)
+
+        'CNP!': 'wh', # Extra
+
+        # 2nd series
+        #'RI!': 'l',
+        'U!': ' ',
+        'IU!': 'h', # maybe
+
+        # LH-dedicated vowel block
+        'X!': 'e',
+        'R!': 'a',
+        'I!': 'i',
+        'XI!': 'o',
+        'RI!': 'u',
+
+        # 1st+2nd specials
+        #'FSC!R!': 'str', # SCR blocks 'ha_e'. 
+        'FC!RI!': 'spl',
+        'FC!IU!': 'spr',
+        'FC!XIU!': 'scr',
+        #'FC!XIU!': 'sch',
+        #'FZ!XIU!': 'sk',
+        #'FS!X!': 'sci', # SX conflicts with [s][e][]
+        'X!FS!': 'sci', # because of the S flip
+        'ZN!I!': 'j', # weird because it doesn't exist in the phonetic version?
+        'CP!XIU!': 'qu', # no standalone q!
+}
+
 
 # Applies when 3rd group is empty. Needs a special case to trigger the trailing E.
 # Could be represented as R!! otherwise
 dictionary_2nd = (
-
         # mirrored vowels for trailing-e
         ('R!', 'a'),
         ('XI!', 'o'),
@@ -364,8 +350,19 @@ dictionary_2nd = (
         ('I!', 'i'),
         ('XR!', 'ea'),
         ('RI!', 'ou'),
+        ('RU!', 'y'), # TEST: Will this conflict?
         # idea: combine these with ea or some other unused combo, for a non-terminating version?
 )
+
+# If using qwerty, this should be 4-29
+# qwe are ',. -> should not be shifted
+# ; is s -> should be shifted
+# ',. are wvz -> should be shifted
+# z is ; -> should not be shifted
+# 8, 20, 26, 29 -> 51, 54, 55, 56
+SHIFTABLE = set((4,5,6,7,9,10,11,12,13,14,15,16,17,18,19,21,22,23,24,25,27,28,
+    51,54,55,56))
+# I think in practice the only time this ever comes into play is non-brief apostrophe
 
 class OutputStroke():
     def __init__(self, keycode, end_sentence = False, attach_left = False, attach_right = False, ignore_shift = True):
@@ -401,6 +398,8 @@ specials = {
     'IUas': DVP['EQL'],
     'IUac': OutputStroke(KC.QUOT, attach_left = True, attach_right = True), # Still weird (-)
     'IUap': OutputStroke(DVP['QUES'], attach_left = True, end_sentence = True),
+
+    'IUps': OutputStroke(KC.QUOT), # Still weird (-), # spaced hyphen
 
     # e + (same as above, with shift held)
     # e | : ~
@@ -463,8 +462,6 @@ specials = {
     'FZNXea': OutputStroke(KC['9'], attach_left = True, attach_right = True),
     'Nea': OutputStroke(KC['0'], attach_left = True, attach_right = True),
 
-
-
     # Briefs list
     'I': OutputStroke(KC.LSFT(DVP['I'])), # I = I
     'IU': 'you', # you = IU
@@ -479,6 +476,10 @@ specials = {
     'Ries': 'also', # [][a][o][s]
     'XInz': 'only', # [][o][][y]
 
+    'SRIef': 'self', # does not change spacing state (so, if word is not closed it will attach)
+    'SRIuef': OutputStroke('self', attach_left = False, attach_right = True),
+    # but this one can merge into words (standard non-terminating)
+
 # Samples from the PDF:
 # for = FR
 # I = I*
@@ -487,7 +488,7 @@ specials = {
 # did = SCPI
 # he = FCX
 # his = FCs
-# self = SRIuef
+# self = SRIuef*
 # is = X*
 # its = Xuipf
 # can = CPR
@@ -505,13 +506,12 @@ specials = {
 # also = SCNXuie
 # why = CNnz
 # Auto^ = UApf
-# don't = RIUuienzf
-
-
+# don't = RIUuienzf <- want this
+# https://github.com/Sillabix/MIDI4TEXT-sistema-ortosillabico-per-tastiera-midi--MIDI4TEXT-orthosllabic-system-for-midi-keyboard/blob/main/ENG/Midi4Text%20briefs%20sample%20(eng)%20(1.3.7).json
+# Anyway work through the NGSL
         }
 
 # special markers: $ for terminators
-# ! for terminator + ending E
 
 rules = {}
 for k, v in dictionary.items():
@@ -521,6 +521,16 @@ for k, v in dictionary.items():
     rules[leader].append((k, v))
 
 for combos in rules.values():
+    combos.sort(key = lambda x: len(x[0]) * -1)
+
+rules_lh = {}
+for k, v in dictionary_lh.items():
+    leader = k[0]
+    if leader not in rules_lh:
+        rules_lh[leader] = []
+    rules_lh[leader].append((k, v))
+
+for combos in rules_lh.values():
     combos.sort(key = lambda x: len(x[0]) * -1)
 
 class RewindBuffer():
@@ -563,6 +573,11 @@ class Chord():
 
         self.auto_space = True
 
+        self.one_hand = False
+
+        #self.one_hand = True
+        #self.auto_space = False
+
     def reset(self):
         for x in self.chord:
             self.chord[x] = False
@@ -596,7 +611,7 @@ class Chord():
 
         if pressed == "":
             return ""
-        elif pressed == "U":
+        elif (pressed == "U" and not self.one_hand) or (pressed == "XU" and self.one_hand):
             # undo
             keys, self.space_buffered, self.next_shift = self.rewind.undo()
             return [KC.BSPC] * keys
@@ -605,8 +620,8 @@ class Chord():
             return [KC.BSPC]
         elif pressed == "ea":
             # space
+            self.rewind.add(1, self.space_buffered, self.next_shift)
             self.space_buffered = False
-            # TODO: rewind
             return [KC.SPC]
         elif pressed == "XRea":
             # Cancel space
@@ -631,11 +646,11 @@ class Chord():
         elif pressed == "SCPea":
             self.auto_space = False
             return [KC.ESCAPE] # For vim
-        elif pressed in specials:
+        elif pressed in specials and not self.one_hand:
             special = specials[pressed]
             if isinstance(special, OutputStroke):
                 end_sentence = special.end_sentence
-                attach_left = special.attach_left
+                attach_left = special.attach_left # TODO: if this is None, don't touch the state
                 attach_right = special.attach_right # maybe unused
                 space = not special.attach_right # Do this directly instead of attach_right
                 if special.ignore_shift:
@@ -660,29 +675,24 @@ class Chord():
 
         # The pdf has FZNX as indent, so it's available... but I'm not sure I want to flip my vowel block
 
-            # TODO: unnecessary check
             if blocks[3] == "zcs":
                 # Actually not next, it's this round
                 self.next_shift = True
                 blocks[3] = ''
                 pressed = "!".join(blocks)
 
-            # This part of the documentation is unclear. What's the actual trigger to end the word?
-            # Maybe this logic is correct and the correct way is just to make sure the final stroke is [4] only?
-            if len(blocks[0]) == 0 and len(blocks[1]) == 0 and len(blocks[2]) == 0 and len(blocks[3]) > 0:
+            # My interpretation of the auto-spacing logic:
+            # 4th-group only is terminating, but it will also attach left
+            # So multiple 4th-only blocks will be the same word, it's only when another
+            # block gets used that the space gets generated
+            if pressed.startswith("!!!"):
                 space = True
-                # TODO: maybe continuous 4th-only blocks shouldn't trigger this (so -n/-n generates 'nn', not 'n n'
-                # The only English single-letter words are vowels
-                # Should  probably rework the auto spacing logic overall
-                # something like self.space_buffered = False
-                # More like, attach_right is true...?
                 attach_left = True
 
             while idx < len(pressed):
                 initial_idx = idx
-                #print("Check: ", pressed[idx:])
 
-                if alt_2nd:
+                if alt_2nd and not self.one_hand:
                     generated = False
                     # I wonder if linear search through the whole word list is too slow
                     for stroke, out in dictionary_2nd:
@@ -697,14 +707,16 @@ class Chord():
                     if generated:
                         continue
 
-                if pressed[idx] not in rules:
+                ruleset = rules if not self.one_hand else rules_lh
+
+                if pressed[idx] not in ruleset:
                     char = pressed[idx]
                     if char != '!':
                         block_output += list(char)
                     idx += 1
                     continue
 
-                candidates = rules[pressed[idx]]
+                candidates = ruleset[pressed[idx]]
                 for c in candidates:
                     if pressed.startswith(c[0], idx):
                         target = c[1]
@@ -737,15 +749,14 @@ class Chord():
 
         if add_e:
             block_output += 'e'
+
         keystrokes = [c if isinstance(c, Key) else DVP[c] for c in block_output]
 
         if (self.next_shift and
-            # TODO: Modifier is bad, check for pure alpha
-            # oh wow the key thing is dynamic?
-            # Basically, the problem is we don't want to shift punctuation and things (single quote should not be shifted)
-                not isinstance(keystrokes[0], ModifiedKey) and
-                not isinstance(keystrokes[0], ModifierKey)):
-            keystrokes[0] = KC.LSFT(keystrokes[0])
+            not isinstance(keystrokes[0], ModifiedKey) and
+            not isinstance(keystrokes[0], ModifierKey) and
+            keystrokes[0].code in SHIFTABLE):
+                keystrokes[0] = KC.LSFT(keystrokes[0])
 
         if self.space_buffered and not attach_left and self.auto_space:
             keystrokes = [KC.SPC] + keystrokes
@@ -792,9 +803,7 @@ class MidiKey(Module):
             self.chord.add(code)
             self.pressing = True
         else:
-            # oops should wait until everything is up
             if self.pressing:
-
                 # coordkeys is private but ehhhh
                 modifiers_held = any([isinstance(key, ModifierKey) for key in keyboard._coordkeys_pressed.values()])
                 # TODO: Now, use this to disable auto-space
